@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>야퍼 & X 크리에이터 마인드쉐어 분석기4.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- CSV 파서 (Papa Parse) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #020617;
+      --surface: rgba(15,23,42,0.9);
+      --border: rgba(148,163,184,0.2);
+      --accent: #22c55e;
+      --accent-soft: rgba(34,197,94,0.12);
+      --danger: #f97373;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --shadow: 0 22px 45px rgba(15,23,42,0.9);
+
+      --grade-s: #fbbf24;
+      --grade-a: #38bdf8;
+      --grade-b: #22c55e;
+      --grade-c: #a855f7;
+      --grade-d: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 32px 16px 48px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(56,189,248,0.14), transparent 60%),
+        radial-gradient(circle at 100% 0%, rgba(248,250,252,0.08), transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(52,211,153,0.12), transparent 55%),
+        var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 55%),
+                  radial-gradient(circle at top right, rgba(234,179,8,0.18), transparent 50%),
+                  linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.9));
+      border-radius: 28px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(148,163,184,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(34,197,94,0.18), transparent 50%),
+        radial-gradient(circle at 90% 0%, rgba(59,130,246,0.18), transparent 50%);
+      opacity: 0.4;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .hero-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.6);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hero-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 5px rgba(34,197,94,0.35);
+    }
+
+    .hero-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .upload-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .file-input-wrap {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .file-input-wrap input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-input-fake {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.65);
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(12px);
+      background: rgba(15,23,42,0.85);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .file-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(148,163,184,0.7);
+    }
+
+    .summary-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .summary-card {
+      border-radius: 16px;
+      padding: 10px 12px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: radial-gradient(circle at top left, rgba(30,64,175,0.24), transparent 65%),
+                  linear-gradient(145deg, rgba(15,23,42,0.95), rgba(15,23,42,0.9));
+      font-size: 11px;
+    }
+
+    .summary-label {
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .summary-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .summary-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    main {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .section-card {
+      border-radius: 22px;
+      padding: 16px 14px 18px;
+      border: 1px solid rgba(148,163,184,0.3);
+      background: rgba(15,23,42,0.9);
+      box-shadow: 0 20px 40px rgba(15,23,42,0.85);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .grade-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--text-muted);
+    }
+
+    .grade-chip strong {
+      font-weight: 700;
+      color: #e5e7eb;
+      letter-spacing: 0.03em;
+    }
+
+    .grade-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      align-items: center;
+    }
+
+    .grade-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .grade-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .grade-dot.s { background: var(--grade-s); }
+    .grade-dot.a { background: var(--grade-a); }
+    .grade-dot.b { background: var(--grade-b); }
+    .grade-dot.c { background: var(--grade-c); }
+    .grade-dot.d { background: var(--grade-d); }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(30,64,175,0.6);
+      background: radial-gradient(circle at top left, rgba(30,64,175,0.35), transparent 55%),
+                  linear-gradient(135deg, rgba(15,23,42,0.98), rgba(15,23,42,0.96));
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      min-width: 680px;
+    }
+
+    th, td {
+      padding: 8px 8px;
+      text-align: left;
+      border-bottom: 1px solid rgba(30,64,175,0.4);
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      background: rgba(15,23,42,0.96);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: rgba(15,23,42,0.85);
+    }
+
+    .rank-cell {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .grade-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .grade-badge.s {
+      background: rgba(251,191,36,0.16);
+      border: 1px solid rgba(251,191,36,0.75);
+      color: var(--grade-s);
+    }
+    .grade-badge.a {
+      background: rgba(56,189,248,0.14);
+      border: 1px solid rgba(56,189,248,0.7);
+      color: var(--grade-a);
+    }
+    .grade-badge.b {
+      background: rgba(34,197,94,0.14);
+      border: 1px solid rgba(34,197,94,0.7);
+      color: var(--grade-b);
+    }
+    .grade-badge.c {
+      background: rgba(168,85,247,0.18);
+      border: 1px solid rgba(168,85,247,0.7);
+      color: var(--grade-c);
+    }
+    .grade-badge.d {
+      background: rgba(55,65,81,0.5);
+      border: 1px solid rgba(75,85,99,0.9);
+      color: var(--grade-d);
+    }
+
+    .text-main {
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .text-main strong {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .text-meta {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .stat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(75,85,99,0.85);
+      background: rgba(15,23,42,0.92);
+    }
+
+    .stat-chip strong {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(37,99,235,0.8);
+      background: rgba(30,64,175,0.7);
+      color: #dbeafe;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .link-pill:hover {
+      background: rgba(37,99,235,0.9);
+    }
+
+    .grade-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+      font-size: 11px;
+    }
+
+    .grade-tab {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.92);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .grade-tab-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .grade-tab.active {
+      border-color: rgba(56,189,248,1);
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.35), transparent 60%),
+                  rgba(15,23,42,0.96);
+      color: #e5e7eb;
+    }
+
+    .empty {
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 8px 0;
+    }
+
+    .error {
+      font-size: 11px;
+      color: var(--danger);
+      margin-top: 6px;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 20px 10px 32px;
+      }
+      .hero {
+        padding: 20px 16px;
+      }
+      .hero-title {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="hero-title">
+          야핑 마인드쉐어 분석기
+          <div class="hero-pill">
+            <span class="hero-pill-dot"></span>
+            <span>CSV 업로드 → 마쉐 터진 글 찾기</span>
+          </div>
+        </div>
+        <div class="hero-sub">
+          X 애널리틱스 CSV에서<br>
+          <strong>① 콘텐츠 오른쪽 상단</strong>다운로드<br>
+          <strong>② 마인드쉐어 점수 계산 → Top10 + S~D 등급</strong>까지 한 번에 뽑아주는 도구임.
+        </div>
+
+        <div class="upload-row">
+          <div class="file-input-wrap">
+            <div class="file-input-fake">
+              <span>📁 CSV 파일 선택하기</span>
+            </div>
+            <input type="file" id="csvInput" accept=".csv" />
+          </div>
+          <span class="file-hint">
+            X 애널리틱스의 <strong>account_analytics_content_YYYY-MM-DD_YYYY-MM-DD.csv</strong> 그대로 올리면 됨
+          </span>
+        </div>
+
+        <div class="badge">
+          <span class="badge-dot"></span>
+          <span>컬럼 이름은 다음 형식 기준: <strong>게시물 본문 / 노출수 / 참여수 / 새로운 팔로우 / 북마크 / 재게시 / 답글 / 프로필 조회수 / URL 클릭수 / 고유 링크 클릭수</strong></span>
+        </div>
+
+        <div id="summary" class="summary-grid" style="display:none;"></div>
+        <div id="error" class="error"></div>
+      </div>
+    </header>
+
+    <main>
+      <!-- 전체 Top10 -->
+      <section class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            💥 마인드쉐어 폭발 Top 10
+            <span id="top10-count"></span>
+          </div>
+          <div class="grade-chip">
+            <span>점수 기준</span> ·
+            <strong>마인드쉐어 스코어</strong>
+          </div>
+        </div>
+        <div class="table-wrap" id="top10-table-wrap">
+          <!-- JS에서 테이블 렌더링 -->
+        </div>
+      </section>
+
+      <!-- 등급별 상위 10개 -->
+      <section class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            🎚 등급별 상위 게시글 (S ~ D)
+            <span>각 등급별 최대 10개</span>
+          </div>
+          <div class="grade-legend">
+            <span><span class="grade-dot s"></span> S: 상위 5%</span>
+            <span><span class="grade-dot a"></span> A: 상위 20%</span>
+            <span><span class="grade-dot b"></span> B: 상위 40%</span>
+            <span><span class="grade-dot c"></span> C: 상위 60%</span>
+            <span><span class="grade-dot d"></span> D: 그 외</span>
+          </div>
+        </div>
+
+        <div class="grade-tabs">
+          <button class="grade-tab active" data-grade="ALL">
+            <span class="grade-tab-dot" style="background: linear-gradient(90deg,var(--grade-s),var(--grade-a),var(--grade-b));"></span>
+            전체
+          </button>
+          <button class="grade-tab" data-grade="S">
+            <span class="grade-tab-dot" style="background: var(--grade-s);"></span>
+            S 등급
+          </button>
+          <button class="grade-tab" data-grade="A">
+            <span class="grade-tab-dot" style="background: var(--grade-a);"></span>
+            A 등급
+          </button>
+          <button class="grade-tab" data-grade="B">
+            <span class="grade-tab-dot" style="background: var(--grade-b);"></span>
+            B 등급
+          </button>
+          <button class="grade-tab" data-grade="C">
+            <span class="grade-tab-dot" style="background: var(--grade-c);"></span>
+            C 등급
+          </button>
+          <button class="grade-tab" data-grade="D">
+            <span class="grade-tab-dot" style="background: var(--grade-d);"></span>
+            D 등급
+          </button>
+        </div>
+
+        <div class="table-wrap" id="grade-table-wrap">
+          <!-- JS에서 등급별 테이블 렌더링 -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const summaryEl = document.getElementById("summary");
+    const errorEl = document.getElementById("error");
+    const csvInput = document.getElementById("csvInput");
+    const top10Wrap = document.getElementById("top10-table-wrap");
+    const top10CountEl = document.getElementById("top10-count");
+    const gradeWrap = document.getElementById("grade-table-wrap");
+    const gradeTabs = document.querySelectorAll(".grade-tab");
+
+    let allPosts = [];   // 전체 원글 리스트 (답글 제외)
+    let top10Posts = []; // 스코어 기준 Top10
+    let gradeBuckets = { S: [], A: [], B: [], C: [], D: [] }; // 등급별 상위 10개
+
+    function num(v) {
+      if (v === null || v === undefined) return 0;
+      if (typeof v === "number") return v;
+      const s = String(v).replace(/,/g, "").trim();
+      if (!s) return 0;
+      const n = parseFloat(s);
+      return isNaN(n) ? 0 : n;
+    }
+
+    // 마인드쉐어 점수 계산 로직
+    // (원하는대로 가중치 바꾸고 싶으면 여기만 손대면 됨)
+    function computeMindshareScore(p) {
+      const impressions = p.impressions || 0;
+
+      const core = p.engagements; // 참여수 자체 반영
+
+      const qualitySignals =
+        p.bookmarks * 3 +
+        p.newFollows * 10 +
+        p.profileClicks * 0.7 +
+        p.urlClicks * 0.8 +
+        p.uniqueClicks * 1.2;
+
+      const interactionSignals =
+        p.likes * 1.2 +
+        p.retweets * 2 +
+        p.replies * 1.5 +
+        p.shares * 1.8;
+
+      const raw = core * 1.0 + qualitySignals + interactionSignals;
+      const denom = Math.log10((impressions || 0) + 10); // 노출수 너무 큰 글 보정
+
+      const score = denom > 0 ? raw / denom : raw;
+      return score;
+    }
+
+    function assignGrades(posts) {
+      const N = posts.length;
+      if (!N) return;
+
+      // 점수 기준 내림차순 정렬
+      posts.sort((a, b) => b.score - a.score);
+
+      posts.forEach((p, idx) => {
+        const pct = (N > 1) ? (1 - idx / (N - 1)) : 1; // 상위 -> 1.0, 하위 -> 0
+        p.percentile = Math.round(pct * 100);
+
+        let grade;
+        if (pct >= 0.95) grade = "S";       // 상위 5%
+        else if (pct >= 0.80) grade = "A";  // 상위 20%
+        else if (pct >= 0.60) grade = "B";  // 상위 40%
+        else if (pct >= 0.40) grade = "C";  // 상위 60%
+        else grade = "D";
+
+        p.grade = grade;
+      });
+    }
+
+    function buildSummary(posts) {
+      if (!posts.length) {
+        summaryEl.style.display = "none";
+        return;
+      }
+
+      const total = posts.length;
+      const avgScore = posts.reduce((sum, p) => sum + p.score, 0) / total;
+      const maxScore = posts[0].score;
+      const bestPost = posts[0];
+
+      const avgEng = posts.reduce((s, p) => s + p.engagements, 0) / total;
+      const avgImp = posts.reduce((s, p) => s + p.impressions, 0) / total;
+
+      summaryEl.innerHTML = `
+        <div class="summary-card">
+          <div class="summary-label">원글 개수 (답글 제외)</div>
+          <div class="summary-value">${total.toLocaleString()}</div>
+          <div class="summary-sub">"게시물 본문"이 @로 시작하는 글은 전부 제거</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">평균 마인드쉐어 스코어</div>
+          <div class="summary-value">${avgScore.toFixed(1)}</div>
+          <div class="summary-sub">게시글당 평균</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">평균 참여수 / 노출수</div>
+          <div class="summary-value">${avgEng.toFixed(1)} / ${Math.round(avgImp).toLocaleString()}</div>
+          <div class="summary-sub">참여수 / 노출수 기준</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">가장 터진 글 (스코어 기준)</div>
+          <div class="summary-value">${maxScore.toFixed(1)}</div>
+          <div class="summary-sub">${bestPost.date || ""}</div>
+        </div>
+      `;
+      summaryEl.style.display = "grid";
+    }
+
+    function renderTop10(posts) {
+      if (!posts.length) {
+        top10Wrap.innerHTML = `<div class="empty">데이터가 없습니다. CSV를 업로드 해주세요.</div>`;
+        top10CountEl.textContent = "";
+        return;
+      }
+
+      const rows = posts.slice(0, 10).map((p, idx) => {
+        return `
+          <tr>
+            <td class="rank-cell">#${idx + 1}</td>
+            <td>
+              <div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div>
+            </td>
+            <td>
+              <div class="text-main">${p.text || ""}</div>
+              <div class="text-meta">
+                ${p.date || ""} · 스코어 <strong>${p.score.toFixed(1)}</strong> · 상위 ${p.percentile}% 구간
+              </div>
+            </td>
+            <td>
+              <div class="stat-chip"><span>참여수</span> <strong>${p.engagements.toLocaleString()}</strong></div>
+              <div class="stat-chip"><span>노출수</span> <strong>${p.impressions.toLocaleString()}</strong></div>
+            </td>
+            <td>
+              <div class="stat-chip"><span>새 팔로워</span> <strong>${p.newFollows.toLocaleString()}</strong></div>
+              <div class="stat-chip"><span>북마크</span> <strong>${p.bookmarks.toLocaleString()}</strong></div>
+            </td>
+            <td>
+              <a href="${p.link}" target="_blank" rel="noopener noreferrer" class="link-pill">
+                트윗 보기 ↗
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      top10Wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>등급</th>
+              <th>게시물 본문</th>
+              <th>참여수 / 노출수</th>
+              <th>새 팔로워 / 북마크</th>
+              <th>링크</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+
+      top10CountEl.textContent = `(${Math.min(posts.length, 10)}개)`;
+    }
+
+    function computeGradeBuckets(posts) {
+      gradeBuckets = { S: [], A: [], B: [], C: [], D: [] };
+
+      posts.forEach((p) => {
+        const g = p.grade;
+        if (gradeBuckets[g] && gradeBuckets[g].length < 10) {
+          gradeBuckets[g].push(p);
+        }
+      });
+    }
+
+    function getFilteredGradePosts(grade) {
+      if (grade === "ALL") {
+        // 모든 등급에서 각각 상위 5개씩만 모아서 보여줄 수도 있지만,
+        // 여기서는 전체 중 상위 30개 정도만 보여줄게
+        return allPosts.slice(0, 30);
+      }
+      return gradeBuckets[grade] || [];
+    }
+
+    function renderGradeTable(gradeKey) {
+      const posts = getFilteredGradePosts(gradeKey);
+
+      if (!posts.length) {
+        gradeWrap.innerHTML = `<div class="empty">해당 등급의 게시글이 없습니다.</div>`;
+        return;
+      }
+
+      const rows = posts.map((p, idx) => {
+        return `
+          <tr>
+            <td class="rank-cell">#${idx + 1}</td>
+            <td>
+              <div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div>
+            </td>
+            <td>
+              <div class="text-main">${p.text || ""}</div>
+              <div class="text-meta">
+                ${p.date || ""} · 스코어 <strong>${p.score.toFixed(1)}</strong> · 상위 ${p.percentile}% 구간
+              </div>
+            </td>
+            <td>
+              <div class="stat-chip"><span>참여수</span> <strong>${p.engagements.toLocaleString()}</strong></div>
+              <div class="stat-chip"><span>노출수</span> <strong>${p.impressions.toLocaleString()}</strong></div>
+            </td>
+            <td>
+              <div class="stat-chip"><span>새 팔로워</span> <strong>${p.newFollows.toLocaleString()}</strong></div>
+              <div class="stat-chip"><span>북마크</span> <strong>${p.bookmarks.toLocaleString()}</strong></div>
+            </td>
+            <td>
+              <a href="${p.link}" target="_blank" rel="noopener noreferrer" class="link-pill">
+                트윗 보기 ↗
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      gradeWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>등급</th>
+              <th>게시물 본문</th>
+              <th>참여수 / 노출수</th>
+              <th>새 팔로워 / 북마크</th>
+              <th>링크</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    gradeTabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        gradeTabs.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const gradeKey = btn.getAttribute("data-grade");
+        renderGradeTable(gradeKey);
+      });
+    });
+
+    csvInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      errorEl.textContent = "";
+      summaryEl.style.display = "none";
+      top10Wrap.innerHTML = "";
+      gradeWrap.innerHTML = "";
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+          const rows = results.data;
+          if (!rows || !rows.length) {
+            errorEl.textContent = "CSV 내용이 비어있습니다.";
+            return;
+          }
+
+          try {
+            const posts = [];
+
+            rows.forEach((row) => {
+              const text = (row["게시물 본문"] || "").trim();
+              if (!text) return;
+
+              // @로 시작하는 글 = 답글로 간주 → 제외
+              if (text.startsWith("@")) return;
+
+              const post = {
+                id: row["게시물 ID"],
+                date: row["날짜"],
+                text,
+                link: row["게시물 링크"],
+                impressions: num(row["노출수"]),
+                likes: num(row["마음에 들어요"]),
+                engagements: num(row["참여수"]),
+                bookmarks: num(row["북마크"]),
+                shares: num(row["공유 수"]),
+                newFollows: num(row["새로운 팔로우"]),
+                replies: num(row["답글"]),
+                retweets: num(row["재게시"]),
+                profileClicks: num(row["프로필 조회수"]),
+                urlClicks: num(row["URL 클릭수"]),
+                uniqueClicks: num(row["고유 링크 클릭수"]),
+                score: 0,
+                grade: "D",
+                percentile: 0
+              };
+
+              post.score = computeMindshareScore(post);
+              posts.push(post);
+            });
+
+            if (!posts.length) {
+              errorEl.textContent = "원글(게시물 본문이 @로 시작하지 않는 글)이 하나도 없습니다.";
+              return;
+            }
+
+            allPosts = posts;
+            assignGrades(allPosts);
+            computeGradeBuckets(allPosts);
+
+            top10Posts = allPosts.slice(); // 이미 assignGrades 안에서 정렬됨
+            renderTop10(top10Posts);
+            buildSummary(allPosts);
+            renderGradeTable("ALL");
+
+          } catch (e) {
+            console.error(e);
+            errorEl.textContent = "CSV 파싱 중 오류가 발생했습니다. 컬럼 이름이 X 애널리틱스 기본 형식인지 확인해주세요.";
+          }
+        },
+        error: function (err) {
+          console.error(err);
+          errorEl.textContent = "CSV를 읽어오는 중 오류가 발생했습니다.";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
