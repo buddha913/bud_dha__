@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <title>X 크리에이터 마인드쉐어 분석기 4.0</title>
+  <title>X 크리에이터 마인드쉐어 분석기 4.0 + 리더보드</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- CSV 파서 -->
@@ -19,6 +19,7 @@
       --grade-b: #22c55e;
       --grade-c: #a855f7;
       --grade-d: #6b7280;
+      --border-soft: rgba(148,163,184,.35);
     }
     *{box-sizing:border-box}
     body{
@@ -37,7 +38,7 @@
                 radial-gradient(circle at top right,rgba(234,179,8,.18),transparent 50%),
                 linear-gradient(135deg,rgba(15,23,42,.95),rgba(15,23,42,.9));
       border-radius:28px;padding:28px 24px;
-      border:1px solid rgba(148,163,184,.35);
+      border:1px solid var(--border-soft);
       position:relative;overflow:hidden;
     }
     .hero-inner{position:relative;z-index:1}
@@ -77,7 +78,7 @@
     }
     .summary-card{
       border-radius:16px;padding:10px 12px;font-size:11px;
-      border:1px solid rgba(148,163,184,.35);
+      border:1px solid var(--border-soft);
       background:radial-gradient(circle at top left,rgba(30,64,175,.24),transparent 65%),
                  linear-gradient(145deg,rgba(15,23,42,.95),rgba(15,23,42,.9));
     }
@@ -118,27 +119,15 @@
       background:radial-gradient(circle at top left,rgba(30,64,175,.35),transparent 55%),
                  linear-gradient(135deg,rgba(15,23,42,.98),rgba(15,23,42,.96));
     }
-th {
-  background: rgba(15,23,42,0.96);
-  color:#9ca3af;
-  text-transform:uppercase;
-  font-size:11px;
-  position:sticky;
-  top:0;
-  z-index:1;
-}
-
-/* ▼ 여기 추가 (정답 위치) */
-th:last-child,
-td:last-child {
-  width: 80px;
-  min-width: 80px;
-  white-space: nowrap;
-}
-
     table{width:100%;border-collapse:collapse;min-width:680px;font-size:11px}
     th,td{padding:8px;border-bottom:1px solid rgba(30,64,175,.4);vertical-align:top}
-    th{background:rgba(15,23,42,.96);color:#9ca3af;text-transform:uppercase;font-size:11px}
+    th{
+      background:rgba(15,23,42,.96);
+      color:#9ca3af;
+      text-transform:uppercase;
+      font-size:11px;
+      position:sticky;top:0;z-index:1;
+    }
     tr:last-child td{border-bottom:none}
     tbody tr:hover td{background:rgba(15,23,42,.85)}
 
@@ -162,12 +151,41 @@ td:last-child {
       padding:3px 7px;border-radius:999px;font-size:10px;
       border:1px solid rgba(37,99,235,.8);
       background:rgba(30,64,175,.7);color:#dbeafe;text-decoration:none;
+      white-space:nowrap;
     }
+
+    .error{color:#f97373;font-size:12px;margin-top:8px}
+
+    /* 리더보드 관련 */
+    .leader-input-row{
+      margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+    }
+    .leader-input{
+      flex:1;min-width:200px;
+      border-radius:999px;border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);color:#e5e7eb;
+      padding:8px 14px;font-size:13px;
+    }
+    .leader-btn{
+      border-radius:999px;border:none;
+      background:linear-gradient(135deg,#3b82f6,#0ea5e9);
+      color:white;font-size:13px;padding:8px 16px;
+      cursor:pointer;font-weight:600;
+    }
+    .leader-btn:disabled{opacity:.5;cursor:default}
+    .leader-note{font-size:11px;color:var(--text-muted);margin-top:4px}
+    .empty{font-size:12px;color:var(--text-muted);padding:8px 4px}
+
+    /* 작은 텍스트 스타일 */
+    .text-main{font-size:11px;}
+    .text-meta{font-size:10px;color:var(--text-muted);margin-top:2px;}
+    .grade-chip{font-size:11px;color:var(--text-muted);}
   </style>
 </head>
 
 <body>
 
+<!-- 상단 프로필 카드 -->
 <div style="max-width:1080px;margin:0 auto;margin-top:20px;margin-bottom:20px;padding:16px 20px;border-radius:18px;background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.25);backdrop-filter:blur(14px);display:flex;gap:14px;align-items:center">
   <img src="https://unavatar.io/twitter/bud_dha__" style="width:52px;height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.2)"/>
   <div style="flex:1">
@@ -176,6 +194,7 @@ td:last-child {
   </div>
 </div>
 
+<!-- 풀코스 네비 -->
 <nav style="width:100%;padding:12px 0;display:flex;justify-content:center;background:rgba(15,23,42,.6);border-bottom:1px solid rgba(148,163,184,.25);backdrop-filter:blur(12px);position:sticky;top:0;z-index:999">
   <a href="https://buddha913.github.io/crypto-fullcourse/" style="color:#e5e7eb;font-size:14px;font-weight:600;padding:8px 18px;border-radius:999px;border:1px solid rgba(148,163,184,.5);background:rgba(30,41,59,.7);text-decoration:none">📘 크립토 풀코스</a>
 </nav>
@@ -210,15 +229,16 @@ td:last-child {
   </div>
 </header>
 
-<!-- 🔥 결과 구역 -->
+<!-- 🔥 결과 구역: Top 10 -->
 <section class="section-card">
   <div class="section-header">
     <div class="section-title">💥 마인드쉐어 폭발 Top 10 <span id="top10-count"></span></div>
-    <div class="grade-chip">점수 기준·<strong>마인드쉐어 스코어</strong></div>
+    <div class="grade-chip">점수 기준 · <strong>마인드쉐어 스코어</strong></div>
   </div>
   <div class="table-wrap" id="top10-table-wrap"></div>
 </section>
 
+<!-- 🔥 등급별 -->
 <section class="section-card">
   <div class="section-header">
     <div class="section-title">🎚 등급별 상위 게시글 <span>(S~D)</span></div>
@@ -243,64 +263,59 @@ td:last-child {
   <div class="table-wrap" id="grade-table-wrap"></div>
 </section>
 
+<!-- 🔥 리더보드 -->
+<section class="section-card">
+  <div class="section-header">
+    <div class="section-title">🏆 크리에이터 마인드쉐어 리더보드 (Beta)</div>
+  </div>
+
+  <div class="leader-input-row">
+    <input id="leader-handle" class="leader-input" placeholder="X 핸들 입력 (예: @bud_dha__)" />
+    <button id="leader-save-btn" class="leader-btn">현재 분석 결과를 리더보드에 저장하기</button>
+  </div>
+  <div class="leader-note">※ 최소 원글 수 20개 이상일 때 리더보드 점수가 더 정확합니다.</div>
+
+  <!-- 🆕 내 순위 카드 -->
+  <div id="my-rank-wrap" style="margin-top:12px"></div>
+
+  <!-- 리더보드 테이블 -->
+  <div class="table-wrap" id="leaderboard-wrap" style="margin-top:12px"></div>
+</section>
+
 </div><!-- app -->
 
 <script>
-/* -------------------------------------------------------------
-  1) CSV 헤더 자동 매핑 (한국어/영어 지원)
-------------------------------------------------------------- */
+/* ===========================
+   0. 설정
+=========================== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0yJIOdUoeRNwMn9fys-5ePI6UX6wkqBVhWNLrZ-gomO1sGNgTUJbhO0Kfj0n2QgdC/exec";
+const MIN_POSTS_FOR_LEADERBOARD = 20;
+const TRIM_RATIO = 0.1;
+
+/* 현재 분석 결과 */
+let ANALYSIS = null;
+
+/* ===========================
+   1. CSV 헤더 자동 매핑
+=========================== */
 function autoMap(row) {
   const map = {
-    "게시물 본문": "text",
-    "Post text": "text",
-    "Tweet text": "text",
-
-    "날짜": "date",
-    "Date": "date",
-
-    "게시물 링크": "link",
-    "Tweet permalink": "link",
-    "URL": "link",
-    "Link": "link",
-
-    "게시물 ID": "id",
-    "Tweet ID": "id",
-
-    "노출수": "impressions",
-    "Impressions": "impressions",
-
-    "참여수": "engagements",
-    "Engagements": "engagements",
-
-    "마음에 들어요": "likes",
-    "Likes": "likes",
-
-    "북마크": "bookmarks",
-    "Bookmarks": "bookmarks",
-
-    "재게시": "retweets",
-    "Retweets": "retweets",
-    "Reposts": "retweets",
-
-    "답글": "replies",
-    "Replies": "replies",
-
-    "공유 수": "shares",
-    "Shares": "shares",
-
-    "새로운 팔로우": "newFollows",
-    "New follows": "newFollows",
-
-    "프로필 조회수": "profileClicks",
-    "Profile clicks": "profileClicks",
-
-    "URL 클릭수": "urlClicks",
-    "URL clicks": "urlClicks",
-
-    "고유 링크 클릭수": "uniqueClicks",
-    "Unique link clicks": "uniqueClicks",
+    "게시물 본문": "text", "Post text": "text", "Tweet text": "text",
+    "날짜": "date", "Date": "date",
+    "게시물 링크": "link", "Tweet permalink": "link","URL":"link","Link":"link",
+    "게시물 ID":"id","Tweet ID":"id",
+    "노출수":"impressions","Impressions":"impressions",
+    "참여수":"engagements","Engagements":"engagements",
+    "마음에 들어요":"likes","Likes":"likes",
+    "북마크":"bookmarks","Bookmarks":"bookmarks",
+    "재게시":"retweets","Retweets":"retweets","Reposts":"retweets",
+    "답글":"replies","Replies":"replies",
+    "공유 수":"shares","Shares":"shares",
+    "새로운 팔로우":"newFollows","New follows":"newFollows",
+    "프로필 조회수":"profileClicks","Profile clicks":"profileClicks",
+    "URL 클릭수":"urlClicks","URL clicks":"urlClicks",
+    "고유 링크 클릭수":"uniqueClicks","Unique link clicks":"uniqueClicks",
   };
-
   const result = {};
   for (const key in row) {
     const clean = key.trim();
@@ -308,20 +323,11 @@ function autoMap(row) {
   }
   return result;
 }
+function num(v){if(!v)return 0;v=String(v).replace(/,/g,"").trim();const n=parseFloat(v);return isNaN(n)?0:n;}
 
-/* -------------------------------------------------------------
-  숫자 변환
-------------------------------------------------------------- */
-function num(v) {
-  if (!v) return 0;
-  v = String(v).replace(/,/g,"").trim();
-  const n = parseFloat(v);
-  return isNaN(n)?0:n;
-}
-
-/* -------------------------------------------------------------
-  마인드쉐어 점수 계산
-------------------------------------------------------------- */
+/* ===========================
+   2. 마인드쉐어 스코어 계산
+=========================== */
 function computeScore(p){
   const impres = p.impressions || 0;
   const raw =
@@ -335,18 +341,14 @@ function computeScore(p){
       p.retweets * 2 +
       p.replies * 1.5 +
       p.shares * 1.8;
-
   return raw / Math.log10(impres + 10);
 }
 
-/* -------------------------------------------------------------
-  등급 분류
-------------------------------------------------------------- */
 function assignGrades(list){
   list.sort((a,b)=>b.score-a.score);
-  const N = list.length;
+  const N = list.length || 1;
   list.forEach((p,i)=>{
-    const pct = 1 - i/(N-1);
+    const pct = N>1 ? 1 - i/(N-1) : 1;
     p.percentile = Math.round(pct*100);
     p.grade =
       pct>=0.95?"S":
@@ -356,50 +358,26 @@ function assignGrades(list){
   });
 }
 
-/* -------------------------------------------------------------
-  UI: TOP10 렌더
-------------------------------------------------------------- */
-function renderTop10(posts){
-  const wrap = document.getElementById("top10-table-wrap");
-  if(!posts.length){
-    wrap.innerHTML = "<div class='empty'>데이터가 없습니다.</div>";
-    return;
-  }
-  const rows = posts.slice(0,10).map((p,i)=>`
-    <tr>
-      <td>#${i+1}</td>
-      <td><div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div></td>
-      <td>
-        <div class="text-main">${p.text}</div>
-        <div class="text-meta">${p.date} · 스코어 <strong>${p.score.toFixed(1)}</strong></div>
-      </td>
-      <td>
-        <div class="stat-chip">참여 <strong>${p.engagements}</strong></div>
-        <div class="stat-chip">노출 <strong>${p.impressions}</strong></div>
-      </td>
-      <td>
-        <div class="stat-chip">팔로우 <strong>${p.newFollows}</strong></div>
-        <div class="stat-chip">북마크 <strong>${p.bookmarks}</strong></div>
-      </td>
-      <td><a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a></td>
-    </tr>
-  `).join("");
-
-  wrap.innerHTML = `
-    <table>
-      <thead><tr>
-        <th>#</th><th>등급</th><th>본문</th><th>참여/노출</th><th>팔로우/북마크</th><th>링크</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+function computeTrimmedAverage(list, ratio){
+  if(!list.length) return 0;
+  const scores = list.map(p=>p.score).sort((a,b)=>a-b);
+  const n = scores.length;
+  let k = Math.floor(n*ratio);
+  if(k*2>=n) k = 0;
+  const trimmed = scores.slice(k, n-k);
+  const sum = trimmed.reduce((s,v)=>s+v,0);
+  return sum / trimmed.length;
 }
 
-/* -------------------------------------------------------------
-  UI: 등급별 렌더
-------------------------------------------------------------- */
-function renderGrade(list){
-  const wrap = document.getElementById("grade-table-wrap");
-  const rows = list.map((p,i)=>`
+/* ===========================
+   3. UI 렌더링
+=========================== */
+let ALL=[], buckets={S:[],A:[],B:[],C:[],D:[]};
+
+function renderTop10(posts){
+  const wrap=document.getElementById("top10-table-wrap");
+  if(!posts.length){wrap.innerHTML="<div class='empty'>데이터가 없습니다.</div>";return;}
+  const rows=posts.slice(0,10).map((p,i)=>`
     <tr>
       <td>#${i+1}</td>
       <td><div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div></td>
@@ -417,42 +395,60 @@ function renderGrade(list){
       </td>
       <td><a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a></td>
     </tr>`).join("");
-
-  wrap.innerHTML = `
-  <table>
-    <thead><tr>
-      <th>#</th><th>등급</th><th>본문</th>
-      <th>참여/노출</th><th>팔로우/북마크</th><th>링크</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
+  wrap.innerHTML=`
+    <table>
+      <thead><tr>
+        <th>#</th><th>등급</th><th>본문</th><th>참여/노출</th><th>팔로우/북마크</th><th>링크</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 }
 
-/* -------------------------------------------------------------
-  CSV 업로드 파싱
-------------------------------------------------------------- */
-let ALL = [];
-let buckets = {S:[],A:[],B:[],C:[],D:[]};
+function renderGrade(list){
+  const wrap=document.getElementById("grade-table-wrap");
+  if(!list.length){wrap.innerHTML="<div class='empty'>데이터가 없습니다.</div>";return;}
+  const rows=list.map((p,i)=>`
+    <tr>
+      <td>#${i+1}</td>
+      <td><div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div></td>
+      <td>
+        <div class="text-main">${p.text}</div>
+        <div class="text-meta">${p.date} · 스코어 <strong>${p.score.toFixed(1)}</strong></div>
+      </td>
+      <td>
+        <div class="stat-chip">참여 <strong>${p.engagements}</strong></div>
+        <div class="stat-chip">노출 <strong>${p.impressions}</strong></div>
+      </td>
+      <td>
+        <div class="stat-chip">팔로우 <strong>${p.newFollows}</strong></div>
+        <div class="stat-chip">북마크 <strong>${p.bookmarks}</strong></div>
+      </td>
+      <td><a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a></td>
+    </tr>`).join("");
+  wrap.innerHTML=`
+    <table>
+      <thead><tr>
+        <th>#</th><th>등급</th><th>본문</th><th>참여/노출</th><th>팔로우/북마크</th><th>링크</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
 
+/* ===========================
+   4. CSV 업로드 파싱
+=========================== */
 document.getElementById("csvInput").addEventListener("change", e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-
+  const file=e.target.files[0]; if(!file) return;
   Papa.parse(file,{
-    header:true,
-    skipEmptyLines:true,
+    header:true,skipEmptyLines:true,
     complete:res=>{
-      ALL = [];
-
+      ALL=[];
       res.data.forEach(row=>{
-        const r = autoMap(row);
-        const t = (r.text||"").trim();
+        const r=autoMap(row);
+        const t=(r.text||"").trim();
         if(!t || t.startsWith("@")) return;
-
-        const p = {
-          text:t,
-          date:r.date,
-          link:r.link,
+        const p={
+          text:t,date:r.date,link:r.link,
           impressions:num(r.impressions),
           engagements:num(r.engagements),
           likes:num(r.likes),
@@ -465,71 +461,209 @@ document.getElementById("csvInput").addEventListener("change", e=>{
           urlClicks:num(r.urlClicks),
           uniqueClicks:num(r.uniqueClicks),
         };
-        p.score = computeScore(p);
+        p.score=computeScore(p);
         ALL.push(p);
       });
 
       if(!ALL.length){
-        document.getElementById("error").textContent = "CSV에서 분석 가능한 원글이 없습니다.";
+        document.getElementById("error").textContent="CSV에서 분석 가능한 원글이 없습니다.";
         return;
       }
-
       document.getElementById("error").textContent="";
 
-      // 등급 분배
       assignGrades(ALL);
+      buckets={S:[],A:[],B:[],C:[],D:[]};
+      ALL.forEach(p=>{ if(buckets[p.grade].length<10) buckets[p.grade].push(p); });
 
-      // 버킷 채우기
-      buckets = {S:[],A:[],B:[],C:[],D:[]};
-      ALL.forEach(p=>{
-        if(buckets[p.grade].length < 10) buckets[p.grade].push(p);
-      });
+      const total=ALL.length;
+      const avgScore=ALL.reduce((s,p)=>s+p.score,0)/total;
+      const avgEng=ALL.reduce((s,p)=>s+p.engagements,0)/total;
+      const avgImp=Math.round(ALL.reduce((s,p)=>s+p.impressions,0)/total);
+      const best=ALL[0];
+      const trimmedAvg=computeTrimmedAverage(ALL,TRIM_RATIO);
 
-      // 요약 렌더
-      const total = ALL.length;
-      const avgScore = (ALL.reduce((s,p)=>s+p.score,0)/total).toFixed(1);
-      const avgEng = (ALL.reduce((s,p)=>s+p.engagements,0)/total).toFixed(1);
-      const avgImp = Math.round(ALL.reduce((s,p)=>s+p.impressions,0)/total);
-      const best = ALL[0];
+      ANALYSIS = {
+        trimmedAvg,
+        avgScore,
+        bestScore: best.score,
+        bestDate: best.date,
+        bestLink: best.link,
+        totalPosts: total
+      };
 
-      document.getElementById("summary").innerHTML = `
+      document.getElementById("summary").innerHTML=`
         <div class="summary-card"><div class="summary-label">원글 개수</div>
           <div class="summary-value">${total}</div><div class="summary-sub">답글 제외</div></div>
-
         <div class="summary-card"><div class="summary-label">평균 스코어</div>
-          <div class="summary-value">${avgScore}</div></div>
-
-        <div class="summary-card"><div class="summary-label">평균 참여수/노출수</div>
-          <div class="summary-value">${avgEng} / ${avgImp}</div></div>
-
+          <div class="summary-value">${avgScore.toFixed(1)}</div>
+          <div class="summary-sub">전체 원글 기준</div></div>
+        <div class="summary-card"><div class="summary-label">트림드 평균</div>
+          <div class="summary-value">${trimmedAvg.toFixed(1)}</div>
+          <div class="summary-sub">상·하위 10% 제거 후 평균</div></div>
         <div class="summary-card"><div class="summary-label">가장 터진 글</div>
           <div class="summary-value">${best.score.toFixed(1)}</div>
-          <div class="summary-sub">${best.date}</div></div>
-      `;
+          <div class="summary-sub">${best.date}</div></div>`;
       document.getElementById("summary").style.display="grid";
 
-      // TOP10 렌더
       renderTop10(ALL);
-
-      // 등급 기본 ALL
       renderGrade(ALL.slice(0,30));
     }
   });
 });
 
-/* -------------------------------------------------------------
-  탭 이벤트
-------------------------------------------------------------- */
+/* ===========================
+   5. 리더보드 저장
+=========================== */
+async function saveToLeaderboard(){
+  if(!ANALYSIS){
+    alert("먼저 CSV를 업로드해서 분석을 돌려줘.");
+    return;
+  }
+  const handleInput = document.getElementById("leader-handle");
+  const handle = (handleInput.value || "").trim();
+  if(!handle){
+    alert("X 핸들을 입력해줘. (예: @bud_dha__)");
+    handleInput.focus();
+    return;
+  }
+  if(ANALYSIS.totalPosts < MIN_POSTS_FOR_LEADERBOARD){
+    if(!confirm(`원글이 ${ANALYSIS.totalPosts}개입니다. 최소 ${MIN_POSTS_FOR_LEADERBOARD}개 이상일 때 리더보드에 올라가는 걸 추천해.\n그래도 저장할래?`)) return;
+  }
+
+  const payload = {
+    handle,
+    trimmedAvg: ANALYSIS.trimmedAvg,
+    avgScore: ANALYSIS.avgScore,
+    bestScore: ANALYSIS.bestScore,
+    bestDate: ANALYSIS.bestDate,
+    bestLink: ANALYSIS.bestLink,
+    totalPosts: ANALYSIS.totalPosts
+  };
+
+  try{
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    alert("리더보드에 기록 저장 완료! 🔥");
+
+    // 저장한 핸들 기준으로 내 순위 포함해서 다시 불러오기
+    loadLeaderboard(handle);
+  }catch(err){
+    console.error(err);
+    alert("리더보드 저장 중 오류가 발생했다.");
+  }
+}
+
+/* ===========================
+   6. 리더보드 불러오기
+=========================== */
+async function loadLeaderboard(handle){
+  const tableWrap = document.getElementById("leaderboard-wrap");
+  const myRankWrap = document.getElementById("my-rank-wrap");
+  if(!tableWrap) return;
+
+  try{
+    // 내 핸들을 쿼리로 보내서 myRank까지 받아오기
+    const url = handle
+      ? `${SCRIPT_URL}?handle=${encodeURIComponent(handle)}`
+      : SCRIPT_URL;
+
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    const list   = Array.isArray(data) ? data : (data.top || []);
+    const myRank = !Array.isArray(data) ? data.myRank : null;
+
+    if(myRankWrap) myRankWrap.innerHTML = "";
+
+    if(!list || !list.length){
+      tableWrap.innerHTML = "<div class='empty'>아직 리더보드 데이터가 없습니다.<br>최소 20개 이상 원글로 분석 후 저장하면 순위에 반영돼.</div>";
+      return;
+    }
+
+    // 🔹 내 순위 카드 HTML
+    if(myRank && myRankWrap){
+      const trimmedAvg = Number(myRank.trimmedAvg || 0).toFixed(1);
+      const avgScore   = Number(myRank.avgScore   || 0).toFixed(1);
+      const totalPosts = myRank.totalPosts || 0;
+
+      myRankWrap.innerHTML = `
+        <div style="padding:10px 12px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(148,163,184,.6);background:rgba(15,23,42,.95);font-size:12px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">내 현재 순위</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+            <span style="font-weight:700;color:#fbbf24;">#${myRank.rank}위</span>
+            <span>· 트림드 평균 <strong>${trimmedAvg}</strong></span>
+            <span>· 평균 스코어 <strong>${avgScore}</strong></span>
+            <span>· 원글 수 <strong>${totalPosts}</strong></span>
+          </div>
+        </div>
+      `;
+    }
+
+    // 🔹 상위 20명 테이블 HTML
+    const rows = list.map((item, idx) => {
+      const handle      = item.handle || "";
+      const handleClean = handle.replace("@","").trim();
+      const trimmedAvg  = Number(item.trimmedAvg || 0).toFixed(1);
+      const avgScore    = Number(item.avgScore   || 0).toFixed(1);
+      const totalPosts  = item.totalPosts || 0;
+      const bestLink    = item.bestLink || (handleClean ? `https://twitter.com/${handleClean}` : "#");
+
+      return `
+        <tr>
+          <td>#${idx+1}</td>
+          <td>
+            <a href="${bestLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#e5e7eb">
+              <img src="https://unavatar.io/twitter/${handleClean}" style="width:20px;height:20px;border-radius:999px;border:1px solid rgba(148,163,184,.6)"/>
+              <span>${handle}</span>
+            </a>
+          </td>
+          <td>${trimmedAvg}</td>
+          <td>${avgScore}</td>
+          <td>${totalPosts}</td>
+          <td>${item.bestLink ? `<a href="${item.bestLink}" class="link-pill" target="_blank">대표 트윗 보기 ↗</a>` : ""}</td>
+        </tr>`;
+    }).join("");
+
+    tableWrap.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>순위</th>
+            <th>핸들</th>
+            <th>트림드 평균</th>
+            <th>평균 스코어</th>
+            <th>원글 수</th>
+            <th>대표 트윗</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }catch(err){
+    console.error(err);
+    tableWrap.innerHTML = "<div class='empty'>리더보드를 불러오는 중 오류가 발생했다.</div>";
+  }
+}
+
+/* ===========================
+   7. 탭 & 이벤트
+=========================== */
 document.querySelectorAll(".grade-tab").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".grade-tab").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    const g = btn.dataset.grade;
-
+    const g=btn.dataset.grade;
     if(g==="ALL") renderGrade(ALL.slice(0,30));
     else renderGrade(buckets[g]);
   });
 });
+
+document.getElementById("leader-save-btn").addEventListener("click", saveToLeaderboard);
+
+// 처음에는 그냥 상위 20명만 불러오기 (내 순위 없이)
+loadLeaderboard();
 </script>
 
 </body>
