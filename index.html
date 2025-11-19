@@ -1,303 +1,1035 @@
-<!doctype html>
+<!doctype html> 
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <title>X 크리에이터 마인드쉐어 분석기 4.2 + 리더보드</title>
+  <title>X 크리에이터 마인드쉐어 분석기 5.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- CSV 파서 -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- 프로젝트별 원형 그래프용 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- ✅ STEP 2에서 이 안에 CSS 전체를 붙여 넣어 -->
   <style>
-    :root {
-      --bg: #020617;
-      --surface: rgba(15,23,42,0.9);
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --grade-s: #fbbf24;
-      --grade-a: #38bdf8;
-      --grade-b: #22c55e;
-      --grade-c: #a855f7;
-      --grade-d: #6b7280;
-      --border-soft: rgba(148,163,184,.35);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;padding:32px 16px 48px;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(56,189,248,.14), transparent 60%),
-        radial-gradient(circle at 100% 0%, rgba(248,250,252,.08), transparent 55%),
-        radial-gradient(circle at 50% 100%, rgba(52,211,153,.12), transparent 55%),
-        var(--bg);
-      color:var(--text-main);min-height:100vh;
-    }
-    .app{max-width:1080px;margin:0 auto}
-    .hero{
-      background:radial-gradient(circle at top left,rgba(56,189,248,.18),transparent 55%),
-                radial-gradient(circle at top right,rgba(234,179,8,.18),transparent 50%),
-                linear-gradient(135deg,rgba(15,23,42,.95),rgba(15,23,42,.9));
-      border-radius:28px;padding:28px 24px;
-      border:1px solid var(--border-soft);
-      position:relative;overflow:hidden;
-    }
-    .hero-inner{position:relative;z-index:1}
-    .hero-title{font-size:24px;font-weight:800;gap:10px;margin-bottom:6px;display:flex;align-items:center}
-    .hero-pill{
-      font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;
-      background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.6);
-      display:inline-flex;gap:5px;align-items:center;
-    }
-    .hero-pill-dot{
-      width:7px;height:7px;border-radius:999px;background:#22c55e;
-      box-shadow:0 0 0 5px rgba(34,197,94,.35);
-    }
-    .hero-sub{font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.5}
+  html {
+  scroll-behavior: smooth;
+}
 
-    .upload-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px;}
-    .file-input-wrap{position:relative;display:inline-block;overflow:hidden}
-    .file-input-wrap input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
-    .file-input-fake{
-      padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.65);
-      font-size:13px;display:inline-flex;align-items:center;gap:8px;
-      background:rgba(15,23,42,.85);cursor:pointer;white-space:nowrap;
-    }
-    .file-hint{font-size:11px;color:var(--text-muted)}
+:root {
+  --bg: #f3f7ff;
+  --bg-soft: #f8fbff;
+  --sidebar-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-soft: #f9fbff;
+  --accent: #4f46e5;
+  --accent-soft: #e0e7ff;
+  --accent-2: #06b6d4;
+  --accent-3: #22c55e;
+  --text-main: #0f172a;
+  --text-muted: #6b7280;
+  --border-soft: rgba(148,163,184,.35);
 
-    .badge{
-      display:inline-flex;gap:6px;padding:4px 9px;border-radius:999px;
-      border:1px solid rgba(148,163,184,.5);font-size:11px;color:var(--text-muted);
-      background:rgba(15,23,42,.9);margin-top:4px;
-    }
-    .badge-dot{width:7px;height:7px;border-radius:999px;background:rgba(148,163,184,.7)}
+  --grade-s: #f59e0b;
+  --grade-a: #38bdf8;
+  --grade-b: #22c55e;
+  --grade-c: #a855f7;
+  --grade-d: #9ca3af;
+}
 
-    .summary-grid{
-      margin-top:18px;display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:10px;
-    }
-    .summary-card{
-      border-radius:16px;padding:10px 12px;font-size:11px;
-      border:1px solid var(--border-soft);
-      background:radial-gradient(circle at top left,rgba(30,64,175,.24),transparent 65%),
-                 linear-gradient(145deg,rgba(15,23,42,.95),rgba(15,23,42,.9));
-    }
-    .summary-label{color:var(--text-muted);margin-bottom:4px}
-    .summary-value{font-size:16px;font-weight:700}
-    .summary-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+*{box-sizing:border-box}
 
-    .section-card{
-      margin-top:24px;border-radius:22px;padding:16px 14px 18px;
-      border:1px solid rgba(148,163,184,.3);background:rgba(15,23,42,.9);
-    }
-    .section-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-    .section-title{font-size:15px;font-weight:700;display:flex;gap:8px;align-items:center}
-    .grade-legend{display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:var(--text-muted)}
-    .grade-dot{width:8px;height:8px;border-radius:999px}
-    .grade-dot.s{background:var(--grade-s)}
-    .grade-dot.a{background:var(--grade-a)}
-    .grade-dot.b{background:var(--grade-b)}
-    .grade-dot.c{background:var(--grade-c)}
-    .grade-dot.d{background:var(--grade-d)}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 0% 0%, #e0f2fe, transparent 55%),
+    radial-gradient(circle at 100% 0%, #ffe4f5, transparent 55%),
+    linear-gradient(180deg,#eef4ff,#f9fafb);
+  color:var(--text-main);
+  min-height:100vh;
+}
 
-    .grade-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-    .grade-tab{
-      padding:4px 10px;border-radius:999px;font-size:11px;
-      border:1px solid rgba(55,65,81,.9);background:rgba(15,23,42,.92);
-      color:var(--text-muted);cursor:pointer;display:flex;gap:6px;align-items:center;
-    }
-    .grade-tab-dot{width:8px;height:8px;border-radius:999px}
-    .grade-tab.active{
-      background:radial-gradient(circle at top left,rgba(56,189,248,.35),transparent 60%),
-                rgba(15,23,42,.96);
-      border-color:rgba(56,189,248,1);color:#fff;
-    }
+.layout{
+  display:flex;
+  min-height:100vh;
+}
 
-    .table-wrap{
-      width:100%;overflow:auto;border-radius:14px;
-      border:1px solid rgba(30,64,175,.6);
-      background:radial-gradient(circle at top left,rgba(30,64,175,.35),transparent 55%),
-                 linear-gradient(135deg,rgba(15,23,42,.98),rgba(15,23,42,.96));
-    }
-    table{width:100%;border-collapse:collapse;min-width:680px;font-size:11px}
-    th,td{padding:8px;border-bottom:1px solid rgba(30,64,175,.4);vertical-align:top}
-    th{
-      background:rgba(15,23,42,.96);
-      color:#9ca3af;
-      text-transform:uppercase;
-      font-size:11px;
-      position:sticky;top:0;z-index:1;
-    }
-    tr:last-child td{border-bottom:none}
-    tbody tr:hover td{background:rgba(15,23,42,.85)}
+/* ========== SIDEBAR ========== */
+.sidebar{
+  width:230px;
+  background:var(--sidebar-bg);
+  backdrop-filter: blur(18px) saturate(160%);
+  color:#111827;
+  padding:20px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+  box-shadow: 10px 0 35px rgba(148,163,184,.45);
+  position:relative;
+  transition:width .2s ease;
+  overflow:hidden;
+  border-right:1px solid rgba(209,213,219,.9);
+}
 
-    .grade-badge{
-      display:inline-flex;min-width:24px;padding:3px 7px;border-radius:999px;
-      font-size:11px;font-weight:700;justify-content:center;
-    }
-    .grade-badge.s{background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.75);color:var(--grade-s)}
-    .grade-badge.a{background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.7);color:var(--grade-a)}
-    .grade-badge.b{background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.7);color:var(--grade-b)}
-    .grade-badge.c{background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.7);color:var(--grade-c)}
-    .grade-badge.d{background:rgba(55,65,81,.5);border:1px solid rgba(75,85,99,.9);color:var(--grade-d)}
+.sidebar-toggle{
+  position:absolute;
+  top:14px;
+  right:12px;
+  width:26px;
+  height:26px;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(79,70,229,.65);
+  z-index:10;
+}
 
-    .stat-chip{
-      display:inline-flex;gap:3px;font-size:10px;color:var(--text-muted);
-      padding:2px 6px;border-radius:999px;border:1px solid rgba(75,85,99,.85);
-      background:rgba(15,23,42,.92);
-    }
-    .stat-chip strong{color:#fff}
-    .link-pill{
-      padding:3px 7px;border-radius:999px;font-size:10px;
-      border:1px solid rgba(37,99,235,.8);
-      background:rgba(30,64,175,.7);color:#dbeafe;text-decoration:none;
-      white-space:nowrap;
-    }
+.side-profile{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-top:18px;
+}
+.side-avatar{
+  width:44px;height:44px;
+  border-radius:999px;
+  border:2px solid rgba(248,250,252,.9);
+  overflow:hidden;
+  box-shadow:0 8px 18px rgba(148,163,184,.7);
+}
+.side-avatar img{width:100%;height:100%;object-fit:cover}
+.side-name{font-size:15px;font-weight:700;}
+.side-handle{
+  font-size:12px;color:#6b7280;
+  text-decoration:none;
+}
 
-    .error{color:#f97373;font-size:12px;margin-top:8px}
+.side-nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:12px;
+}
+.side-nav-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border-radius:12px;
+  font-size:13px;
+  color:#4b5563;
+  cursor:pointer;
+  text-decoration:none;
+  transition:background .15s ease, transform .1s ease, box-shadow .15s ease;
+}
+.side-nav-item:hover{
+  background:rgba(191,219,254,.6);
+  transform:translateX(2px);
+  box-shadow:0 6px 16px rgba(148,163,184,.4);
+}
+.side-nav-item span.icon{
+  width:20px;height:20px;
+  border-radius:9px;
+  background:linear-gradient(135deg,#e0f2fe,#e5e7eb);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;
+  flex-shrink:0;
+}
+.side-label{
+  white-space:nowrap;
+}
+.side-nav-item.active{
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  box-shadow:0 10px 24px rgba(79,70,229,.7);
+}
+.side-nav-item.active span.icon{
+  background:rgba(15,23,42,.9);
+  color:#e5e7eb;
+}
 
-    /* 리더보드 관련 */
-    .leader-input-row{
-      margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
-    }
-    .leader-input{
-      flex:1;min-width:200px;
-      border-radius:999px;border:1px solid rgba(148,163,184,.6);
-      background:rgba(15,23,42,.9);color:#e5e7eb;
-      padding:8px 14px;font-size:13px;
-    }
-    .leader-btn{
-      border-radius:999px;border:none;
-      background:linear-gradient(135deg,#3b82f6,#0ea5e9);
-      color:white;font-size:13px;padding:8px 16px;
-      cursor:pointer;font-weight:600;
-    }
-    .leader-btn:disabled{opacity:.5;cursor:default}
-    .leader-note{font-size:11px;color:var(--text-muted);margin-top:4px}
-    .empty{font-size:12px;color:var(--text-muted);padding:8px 4px}
+.side-footer{
+  margin-top:auto;
+  font-size:11px;
+  color:#9ca3af;
+}
+.side-badge{
+  margin-top:6px;
+  padding:8px 10px;
+  border-radius:14px;
+  background:radial-gradient(circle at 0% 0%,#4f46e5,#06b6d4);
+  font-size:12px;
+  color:#f9fafb;
+  text-align:left;
+  box-shadow:0 14px 28px rgba(15,23,42,.65);
+}
 
-    /* 작은 텍스트 스타일 */
-    .text-main{font-size:11px;}
-    .text-meta{font-size:10px;color:var(--text-muted);margin-top:2px;}
-    .grade-chip{font-size:11px;color:var(--text-muted);}
+/* ========== SIDEBAR COLLAPSE ========== */
+.layout.collapsed .sidebar{
+  width:70px;
+}
+.layout.collapsed .side-name,
+.layout.collapsed .side-handle,
+.layout.collapsed .side-label,
+.layout.collapsed .side-footer{
+  display:none;
+}
+.layout.collapsed .side-profile{
+  justify-content:center;
+}
+.layout.collapsed .sidebar-toggle{
+  transform:rotate(180deg);
+}
+
+/* ========== MAIN AREA ========== */
+.main{
+  flex:1;
+  padding:20px 24px 32px;
+  max-width:calc(100vw - 230px);
+  overflow-x:hidden;
+  transition:max-width .2s ease;
+}
+.layout.collapsed .main{
+  max-width:calc(100vw - 70px);
+}
+
+.top-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.top-title{
+  font-size:20px;
+  font-weight:800;
+}
+.top-sub{
+  font-size:12px;
+  color:var(--text-muted);
+}
+.top-cta{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.top-link{
+  font-size:12px;
+  padding:7px 12px;
+  border-radius:999px;
+  border:1px solid #c7d2fe;
+  background:var(--card-soft);
+  color:var(--accent);
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* HERO */
+.hero-card{
+  background:
+    radial-gradient(circle at 0% 0%, #c7d2fe, transparent 45%),
+    radial-gradient(circle at 100% 0%, #a5f3fc, transparent 45%),
+    linear-gradient(135deg,#f9fafb,#eef2ff);
+  border-radius:24px;
+  padding:18px 18px 16px;
+  border:1px solid rgba(191,219,254,.9);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  box-shadow:0 22px 45px rgba(148,163,184,.45);
+}
+.hero-top-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.hero-main-title{
+  font-size:17px;
+  font-weight:800;
+  color:#111827;
+}
+.hero-desc{
+  font-size:12px;
+  color:#4b5563;
+  margin-top:4px;
+  line-height:1.4;
+}
+.hero-pill{
+  font-size:11px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(148,163,184,.5);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+}
+.hero-dot{
+  width:8px;height:8px;border-radius:999px;
+  background:#22c55e;
+  box-shadow:0 0 0 5px rgba(34,197,94,.2);
+}
+
+.hero-upload-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  margin-top:4px;
+}
+.file-input-wrap{position:relative;display:inline-block;overflow:hidden}
+.file-input-wrap input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-input-fake{
+  padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.7);
+  font-size:12px;display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.95);cursor:pointer;white-space:nowrap;
+  color:#111827;
+}
+.file-hint{font-size:11px;color:#4b5563}
+
+.range-tabs{
+  margin-top:10px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.range-tab{
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  border:1px solid rgba(148,163,184,.7);
+  background:rgba(255,255,255,.9);
+  color:#4b5563;
+  cursor:pointer;
+  transition:background .15s ease, transform .1s ease;
+}
+.range-tab:hover{
+  transform:translateY(-1px);
+}
+.range-tab.active{
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  border-color:transparent;
+  color:#f9fafb;
+}
+
+.badge{
+  display:inline-flex;gap:6px;padding:4px 9px;border-radius:999px;
+  border:1px solid rgba(148,163,184,.6);font-size:11px;color:#4b5563;
+  background:rgba(255,255,255,.85);margin-top:2px;
+}
+.badge-dot{width:7px;height:7px;border-radius:999px;background:#a5b4fc}
+
+.error{color:#ef4444;font-size:12px;margin-top:4px}
+
+/* GRID (대시보드) */
+.grid-1{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:2.2fr 1.4fr;
+  gap:16px;
+  align-items:flex-start;
+}
+
+.column-main{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.column-side{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.card{
+  border-radius:18px;
+  background:var(--card-bg);
+  border:1px solid rgba(203,213,225,.8);
+  padding:14px 14px 16px;
+  box-shadow:0 10px 25px rgba(148,163,184,.25);
+}
+.card-soft{
+  background:var(--card-soft);
+}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+
+@media (max-width:1100px){
+  .grid-1{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:960px){
+  .layout{flex-direction:column;}
+  .sidebar{
+    width:100%;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .layout.collapsed .sidebar{width:100%;}
+  .main{
+    max-width:100%;
+    padding:16px;
+  }
+  .summary-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media (max-width:640px){
+  .summary-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+.summary-card{
+  border-radius:14px;padding:10px 10px;font-size:11px;
+  border:1px solid rgba(226,232,240,0.9);
+  background:
+    radial-gradient(circle at top left,#eef2ff,transparent 60%),
+    #ffffff;
+}
+.summary-label{color:var(--text-muted);margin-bottom:4px}
+.summary-value{font-size:16px;font-weight:700}
+.summary-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+
+.section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+  gap:8px;
+}
+.section-title{
+  font-size:14px;
+  font-weight:700;
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+.section-sub{
+  font-size:11px;
+  color:var(--text-muted);
+}
+
+.grade-legend{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  font-size:10px;
+  color:var(--text-muted);
+}
+.grade-dot{width:8px;height:8px;border-radius:999px}
+.grade-dot.s{background:var(--grade-s)}
+.grade-dot.a{background:var(--grade-a)}
+.grade-dot.b{background:var(--grade-b)}
+.grade-dot.c{background:var(--grade-c)}
+.grade-dot.d{background:var(--grade-d)}
+
+.grade-tabs{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.grade-tab{
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  border:1px solid rgba(209,213,219,.9);
+  background:#ffffff;
+  color:var(--text-muted);
+  cursor:pointer;
+  display:flex;
+  gap:6px;
+  align-items:center;
+  transition:background .15s ease, transform .1s ease;
+}
+.grade-tab:hover{
+  transform:translateY(-1px);
+}
+.grade-tab-dot{width:8px;height:8px;border-radius:999px}
+.grade-tab.active{
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  border-color:transparent;
+}
+
+.table-wrap{
+  width:100%;overflow:auto;border-radius:14px;
+  border:1px solid rgba(226,232,240,.9);
+  background:#ffffff;
+}
+table{width:100%;border-collapse:collapse;min-width:680px;font-size:11px}
+th,td{padding:8px;border-bottom:1px solid rgba(226,232,240,1);vertical-align:top}
+th{
+  background:#f8fafc;
+  color:#6b7280;
+  text-transform:uppercase;
+  font-size:10px;
+  position:sticky;top:0;z-index:1;
+}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#f9fafb}
+
+.grade-badge{
+  display:inline-flex;min-width:24px;padding:3px 7px;border-radius:999px;
+  font-size:11px;font-weight:700;justify-content:center;
+}
+.grade-badge.s{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.8);color:var(--grade-s)}
+.grade-badge.a{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.8);color:var(--grade-a)}
+.grade-badge.b{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.8);color:var(--grade-b)}
+.grade-badge.c{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.8);color:var(--grade-c)}
+.grade-badge.d{background:rgba(148,163,184,.16);border:1px solid rgba(148,163,184,1);color:var(--grade-d)}
+
+.stat-chip{
+  display:inline-flex;gap:3px;font-size:10px;color:var(--text-muted);
+  padding:2px 6px;border-radius:999px;border:1px solid rgba(209,213,219,1);
+  background:#f9fafb;
+}
+.stat-chip strong{color:#111827}
+.link-pill{
+  padding:3px 7px;border-radius:999px;font-size:10px;
+  border:1px solid rgba(59,130,246,.9);
+  background:rgba(239,246,255,1);color:#1d4ed8;text-decoration:none;
+  white-space:nowrap;
+}
+
+.leader-input-row{
+  margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+}
+.leader-input{
+  flex:1;min-width:200px;
+  border-radius:999px;border:1px solid rgba(209,213,219,1);
+  background:#ffffff;color:#111827;
+  padding:8px 14px;font-size:12px;
+}
+.leader-btn{
+  border-radius:999px;border:none;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:white;font-size:12px;padding:8px 16px;
+  cursor:pointer;font-weight:600;
+  box-shadow:0 10px 22px rgba(79,70,229,.45);
+}
+.leader-btn:disabled{opacity:.5;cursor:default}
+.leader-note{font-size:11px;color:var(--text-muted);margin-top:2px}
+.empty{font-size:12px;color:var(--text-muted);padding:8px 4px;text-align:center}
+
+.text-main{font-size:11px;}
+.text-meta{font-size:10px;color:var(--text-muted);margin-top:2px;}
+.grade-chip{font-size:11px;color:var(--text-muted);}
+
+.sort-select{
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+  color:#374151;
+  font-size:11px;
+  padding:4px 8px;
+}
+
+/* 프로젝트 뷰 추가 스타일 */
+.project-chart-wrap{
+  width:100%;
+  max-width:420px;
+  margin:0 auto 12px;
+}
+.project-detail-controls{
+  margin-top:14px;
+  margin-bottom:8px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+  font-size:12px;
+}
+.project-select{
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+  padding:6px 10px;
+  font-size:12px;
+}
+
+/* 코치 봇 카드 */
+.bot-card{
+  background:
+    radial-gradient(circle at 0% 0%, #e0f2fe, transparent 55%),
+    radial-gradient(circle at 100% 0%, #ddd6fe, transparent 55%),
+    #ffffff;
+  position:relative;
+  overflow:hidden;
+}
+.bot-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 9px;
+  border-radius:999px;
+  font-size:11px;
+  background:rgba(15,23,42,.05);
+  border:1px solid rgba(148,163,184,.5);
+  margin-bottom:6px;
+}
+.bot-output{
+  font-size:11px;
+  color:#111827;
+  line-height:1.5;
+  white-space:pre-line;
+}
+.bot-hint{
+  font-size:10px;
+  color:var(--text-muted);
+  margin-top:6px;
+}
   </style>
 </head>
 
 <body>
+<div class="layout">
 
-<!-- 상단 프로필 카드 -->
-<div style="max-width:1080px;margin:0 auto;margin-top:20px;margin-bottom:20px;padding:16px 20px;border-radius:18px;background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.25);backdrop-filter:blur(14px);display:flex;gap:14px;align-items:center">
-  <img src="https://unavatar.io/twitter/bud_dha__" style="width:52px;height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.2)"/>
-  <div style="flex:1">
-    <div style="font-size:18px;font-weight:700;color:#e5e7eb">🧘‍♂️ 붓다 <a href="https://twitter.com/bud_dha__" target="_blank" style="font-size:14px;margin-left:6px;color:#60a5fa;text-decoration:none">@bud_dha__ ↗</a></div>
-    <div style="font-size:13px;color:#9ca3af;margin-top:4px">Web3 · InfoFi · Agentic Crypto Research</div>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <button id="sidebar-toggle" class="sidebar-toggle">⟨</button>
+
+    <div>
+      <div class="side-profile">
+        <div class="side-avatar">
+          <img src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
+        </div>
+        <div>
+          <div class="side-name">🧘‍♂️ 붓다</div>
+          <a href="https://twitter.com/bud_dha__" target="_blank" class="side-handle">@bud_dha__ ↗</a>
+        </div>
+      </div>
+
+      <div class="side-nav">
+        <div class="side-nav-item active" data-view="dashboard">
+          <span class="icon">📊</span><span class="side-label">Dashboard</span>
+        </div>
+        <div class="side-nav-item" data-view="leaderboard">
+          <span class="icon">🏆</span><span class="side-label">리더보드</span>
+        </div>
+        <div class="side-nav-item" data-view="projects">
+          <span class="icon">📚</span><span class="side-label">프로젝트별 마인드쉐어</span>
+        </div>
+        <a class="side-nav-item" href="https://buddha913.github.io/crypto-fullcourse/" target="_blank">
+          <span class="icon">📘</span><span class="side-label">크립토 풀코스</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="side-footer">
+      InfoFi Creator Console (Beta)
+      <div class="side-badge">
+        오늘도 한 번<br>마쉐 터트려볼까? 💥
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ▼▼ Dashboard 화면 ▼▼ -->
+    <div id="view-dashboard">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">X 크리에이터 마인드쉐어 분석기</div>
+          <div class="top-sub">애널리틱스 CSV로 내 계정의 진짜 임팩트를 보는 대시보드</div>
+        </div>
+        <div class="top-cta">
+          <a class="top-link" href="https://analytics.twitter.com/user" target="_blank">
+            X 애널리틱스 열기 ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <section class="hero-card">
+        <div class="hero-top-row">
+          <div>
+            <div class="hero-main-title">마인드쉐어 스코어 · S~D 등급 · 리더보드까지 한 번에</div>
+            <div class="hero-desc">
+              X 애널리틱스에서 CSV를 내려받고 이곳에 업로드하면,<br>
+              원글 기준으로 마인드쉐어 점수와 상위 글, 리더보드까지 한 번에 분석할 수 있어.
+            </div>
+            <div class="hero-pill"><span class="hero-dot"></span> CSV 한 번 → 계정 분석 끝</div>
+          </div>
+        </div>
+
+        <div class="hero-upload-row">
+          <div class="file-input-wrap">
+            <div class="file-input-fake">📁 CSV 파일 선택하기</div>
+            <input type="file" id="csvInput" accept=".csv"/>
+          </div>
+          <span class="file-hint">account_analytics_content_YYYY-MM-DD_YYYY-MM-DD.csv 그대로 업로드</span>
+        </div>
+
+        <div class="badge"><span class="badge-dot"></span>한국어/영어 CSV 자동 인식 · 답글 제외 후 원글만 분석</div>
+
+        <div id="range-tabs" class="range-tabs" style="display:none">
+          <button class="range-tab active" data-range="ALL">전체 기간</button>
+          <button class="range-tab" data-range="7">최근 7일</button>
+          <button class="range-tab" data-range="30">최근 30일</button>
+          <button class="range-tab" data-range="90">최근 90일</button>
+        </div>
+
+        <div id="summary" class="summary-grid" style="display:none"></div>
+        <div id="error" class="error"></div>
+      </section>
+
+      <!-- 메인 그리드: 왼쪽(표), 오른쪽(봇/요약) -->
+      <div class="grid-1">
+        <div class="column-main">
+          <section class="card">
+            <div class="section-header">
+              <div class="section-title">
+                💥 마인드쉐어 폭발 Top 10 <span id="top10-count"></span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <div class="grade-chip">점수 기준 · <strong>마인드쉐어 스코어</strong></div>
+                <select id="sort-key" class="sort-select">
+                  <option value="score">정렬: 스코어</option>
+                  <option value="impressions">정렬: 노출수</option>
+                  <option value="engagements">정렬: 참여수</option>
+                  <option value="bookmarks">정렬: 북마크</option>
+                  <option value="newFollows">정렬: 신규 팔로우</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap" id="top10-table-wrap"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-header">
+              <div class="section-title">🎚 등급별 상위 게시글 <span>(S~D)</span></div>
+              <div class="grade-legend">
+                <span><span class="grade-dot s"></span>S 상위 5%</span>
+                <span><span class="grade-dot a"></span>A 상위 20%</span>
+                <span><span class="grade-dot b"></span>B 상위 40%</span>
+                <span><span class="grade-dot c"></span>C 상위 60%</span>
+                <span><span class="grade-dot d"></span>D 그 외</span>
+              </div>
+            </div>
+
+            <div class="grade-tabs">
+              <button class="grade-tab active" data-grade="ALL"><span class="grade-tab-dot" style="background:linear-gradient(90deg,var(--grade-s),var(--grade-a),var(--grade-b))"></span>전체</button>
+              <button class="grade-tab" data-grade="S"><span class="grade-tab-dot" style="background:var(--grade-s)"></span>S 등급</button>
+              <button class="grade-tab" data-grade="A"><span class="grade-tab-dot" style="background:var(--grade-a)"></span>A 등급</button>
+              <button class="grade-tab" data-grade="B"><span class="grade-tab-dot" style="background:var(--grade-b)"></span>B 등급</button>
+              <button class="grade-tab" data-grade="C"><span class="grade-tab-dot" style="background:var(--grade-c)"></span>C 등급</button>
+              <button class="grade-tab" data-grade="D"><span class="grade-tab-dot" style="background:var(--grade-d)"></span>D 등급</button>
+            </div>
+
+            <div class="table-wrap" id="grade-table-wrap"></div>
+          </section>
+        </div>
+
+        <!-- 오른쪽: 코치 봇 -->
+        <div class="column-side">
+          <section class="card bot-card">
+            <div class="section-header">
+              <div class="section-title">🤖 마인드쉐어 코치 봇 <span style="font-size:11px;color:var(--text-muted);">(Beta)</span></div>
+            </div>
+            <div class="bot-chip">
+              <span>📌</span><span>현재 선택한 기간 기준 한 줄 요약 + 피드백</span>
+            </div>
+            <div id="coach-output" class="bot-output">
+              아직 CSV를 올리지 않았어.<br>
+              상단에서 애널리틱스 CSV를 업로드하고 기간 탭(전체/7/30/90일)을 바꾸면<br>
+              이 구간의 마인드쉐어 상태를 코치 봇이 자동으로 요약해 줄 거야.
+            </div>
+            <div class="bot-hint">
+              * 서버/LLM 호출 없이, 내 애널리틱스를 기반으로 규칙적으로 요약해 주는 오프라인 코치야.
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <!-- ▲▲ Dashboard 끝 ▲▲ -->
+
+
+    <!-- ▼▼ 리더보드 화면 ▼▼ -->
+    <div id="view-leaderboard" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">크리에이터 마인드쉐어 리더보드</div>
+          <div class="top-sub">내 순위 · 트림드 평균 · 대표 트윗을 한 눈에 보는 랭킹 보드</div>
+        </div>
+      </div>
+
+      <section id="leaderboard-section" class="card" style="margin-top:8px;">
+        <div class="section-header">
+          <div class="section-title">🏆 크리에이터 마인드쉐어 리더보드 (Beta)</div>
+        </div>
+
+        <div class="leader-input-row">
+          <input id="leader-handle" class="leader-input" placeholder="X 핸들 입력 (예: @bud_dha__)" />
+          <button id="leader-save-btn" class="leader-btn">현재 분석 결과 저장</button>
+        </div>
+        <div class="leader-note">※ 최소 원글 수 20개 이상일 때 리더보드 점수가 더 정확합니다.</div>
+
+        <div id="my-rank-wrap" style="margin-top:10px"></div>
+        <div class="table-wrap" id="leaderboard-wrap" style="margin-top:10px"></div>
+      </section>
+    </div>
+    <!-- ▲▲ 리더보드 화면 끝 ▲▲ -->
+
+    <!-- ▼▼ 프로젝트별 마인드쉐어 화면 ▼▼ -->
+    <div id="view-projects" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">프로젝트별 마인드쉐어</div>
+          <div class="top-sub">트윗 본문 키워드 기준으로 프로젝트별 임팩트와 게시글/등급을 분석합니다.</div>
+        </div>
+      </div>
+
+      <section class="card card-soft">
+        <div class="section-header">
+          <div class="section-title">📚 프로젝트 요약 + 원형 그래프</div>
+          <div class="section-sub">코드 상단 <code>PROJECTS</code> 배열의 키워드를 네가 트는 프로젝트에 맞게 바꿔줘.</div>
+        </div>
+
+        <div class="project-chart-wrap">
+          <canvas id="project-pie" height="160"></canvas>
+        </div>
+
+        <div class="table-wrap" id="project-summary-wrap">
+          <div class="empty">먼저 Dashboard에서 CSV를 업로드하고 분석을 한 번 돌려줘.</div>
+        </div>
+
+        <div class="project-detail-controls">
+          <span>🔍 프로젝트별 게시글 보기</span>
+          <select id="project-select" class="project-select">
+            <option value="">CSV 업로드 후 자동 활성화됩니다.</option>
+          </select>
+        </div>
+        <div class="table-wrap" id="project-detail-wrap">
+          <div class="empty">프로젝트를 선택하면 해당 프로젝트의 게시글과 등급이 여기에 표시됩니다.</div>
+        </div>
+      </section>
+    </div>
+    <!-- ▲▲ 프로젝트 화면 끝 ▲▲ -->
+
+  </main>
 </div>
 
-<!-- 풀코스 네비 -->
-<nav style="width:100%;padding:12px 0;display:flex;justify-content:center;background:rgba(15,23,42,.6);border-bottom:1px solid rgba(148,163,184,.25);backdrop-filter:blur(12px);position:sticky;top:0;z-index:999">
-  <a href="https://buddha913.github.io/crypto-fullcourse/" style="color:#e5e7eb;font-size:14px;font-weight:600;padding:8px 18px;border-radius:999px;border:1px solid rgba(148,163,184,.5);background:rgba(30,41,59,.7);text-decoration:none">📘 크립토 풀코스</a>
-</nav>
-
-<div class="app">
-
-<header class="hero">
-  <div class="hero-inner">
-    <div class="hero-title">
-      애널리틱스로 보는 마인드쉐어 분석기
-      <div class="hero-pill"><span class="hero-pill-dot"></span>CSV 업로드 → 마쉐 터진 글 찾기</div>
-    </div>
-
-    <div class="hero-sub">
-      X 애널리틱스 CSV에서<br>
-      <strong>① 콘텐츠 오른쪽 상단</strong> 다운로드<br>
-      <strong>② 마인드쉐어 점수 계산 → Top10 + S~D 등급</strong> 자동 분석
-    </div>
-
-    <div class="upload-row">
-      <div class="file-input-wrap">
-        <div class="file-input-fake">📁 CSV 파일 선택하기</div>
-        <input type="file" id="csvInput" accept=".csv"/>
-      </div>
-      <span class="file-hint">account_analytics_content_YYYY-MM-DD_YYYY-MM-DD.csv 그대로 업로드</span>
-    </div>
-
-    <div class="badge"><span class="badge-dot"></span>한국어/영어 CSV 자동 인식 지원</div>
-
-    <div id="summary" class="summary-grid" style="display:none"></div>
-    <div id="error" class="error"></div>
-  </div>
-</header>
-
-<!-- 🔥 결과 구역: Top 10 -->
-<section class="section-card">
-  <div class="section-header">
-    <div class="section-title">💥 마인드쉐어 폭발 Top 10 <span id="top10-count"></span></div>
-    <div class="grade-chip">점수 기준 · <strong>마인드쉐어 스코어</strong></div>
-  </div>
-  <div class="table-wrap" id="top10-table-wrap"></div>
-</section>
-
-<!-- 🔥 등급별 -->
-<section class="section-card">
-  <div class="section-header">
-    <div class="section-title">🎚 등급별 상위 게시글 <span>(S~D)</span></div>
-    <div class="grade-legend">
-      <span><span class="grade-dot s"></span>S 상위 5%</span>
-      <span><span class="grade-dot a"></span>A 상위 20%</span>
-      <span><span class="grade-dot b"></span>B 상위 40%</span>
-      <span><span class="grade-dot c"></span>C 상위 60%</span>
-      <span><span class="grade-dot d"></span>D 그 외</span>
-    </div>
-  </div>
-
-  <div class="grade-tabs">
-    <button class="grade-tab active" data-grade="ALL"><span class="grade-tab-dot" style="background:linear-gradient(90deg,var(--grade-s),var(--grade-a),var(--grade-b))"></span>전체</button>
-    <button class="grade-tab" data-grade="S"><span class="grade-tab-dot" style="background:var(--grade-s)"></span>S 등급</button>
-    <button class="grade-tab" data-grade="A"><span class="grade-tab-dot" style="background:var(--grade-a)"></span>A 등급</button>
-    <button class="grade-tab" data-grade="B"><span class="grade-tab-dot" style="background:var(--grade-b)"></span>B 등급</button>
-    <button class="grade-tab" data-grade="C"><span class="grade-tab-dot" style="background:var(--grade-c)"></span>C 등급</button>
-    <button class="grade-tab" data-grade="D"><span class="grade-tab-dot" style="background:var(--grade-d)"></span>D 등급</button>
-  </div>
-
-  <div class="table-wrap" id="grade-table-wrap"></div>
-</section>
-
-<!-- 🔥 리더보드 -->
-<section class="section-card">
-  <div class="section-header">
-    <div class="section-title">🏆 크리에이터 마인드쉐어 리더보드 (Beta)</div>
-  </div>
-
-  <div class="leader-input-row">
-    <input id="leader-handle" class="leader-input" placeholder="X 핸들 입력 (예: @bud_dha__)" />
-    <button id="leader-save-btn" class="leader-btn">현재 분석 결과를 리더보드에 저장하기</button>
-  </div>
-  <div class="leader-note">※ 최소 원글 수 20개 이상일 때 리더보드 점수가 더 정확합니다.</div>
-
-  <!-- 🆕 내 순위 카드 -->
-  <div id="my-rank-wrap" style="margin-top:12px"></div>
-
-  <!-- 리더보드 테이블 -->
-  <div class="table-wrap" id="leaderboard-wrap" style="margin-top:12px"></div>
-</section>
-
-</div><!-- app -->
-
+<!-- ✅ STEP 3에서 이 안에 JS 전체를 붙여 넣어 -->
 <script>
-/* ===========================
-   0. 설정
-=========================== */
+/* ========= 설정 ========= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0yJIOdUoeRNwMn9fys-5ePI6UX6wkqBVhWNLrZ-gomO1sGNgTUJbhO0Kfj0n2QgdC/exec";
 const MIN_POSTS_FOR_LEADERBOARD = 20;
 const TRIM_RATIO = 0.1;
 
-/* 현재 분석 결과 */
-let ANALYSIS = null;
+/* 프로젝트 키워드 (원하면 여기 수정) */
+/* 프로젝트 키워드 (이미지에 나온 프로젝트 + 주요 야핑 프로젝트) */
+const PROJECTS = [
+  // --- L0 / L1 ---
+  { id: "aptos",       label: "Aptos",                  category: "L0/L1", keywords: ["aptos"] },
+  { id: "beldex",      label: "Beldex",                 category: "L0/L1", keywords: ["beldex"] },
+  { id: "berachain",   label: "Berachain",              category: "L0/L1", keywords: ["berachain"] },
+  { id: "camp",        label: "Camp Network",           category: "L0/L1", keywords: ["camp network","campnet"] },
+  { id: "ethereum",    label: "Ethereum",               category: "L0/L1", keywords: ["ethereum","eth "] },
+  { id: "fogo",        label: "Fogo",                   category: "L0/L1", keywords: ["fogo"] },
+  { id: "injective",   label: "Injective",              category: "L0/L1", keywords: ["injective","inj "] },
+  { id: "irys",        label: "Irys",                   category: "L0/L1", keywords: ["irys"] },
+  { id: "kaia",        label: "Kaia",                   category: "L0/L1", keywords: ["kaia"] },
+  { id: "mantra",      label: "MANTRA",                 category: "L0/L1", keywords: ["mantra"] },
+  { id: "mavryk",      label: "Mavryk",                 category: "L0/L1", keywords: ["mavryk"] },
+  { id: "mitosis",     label: "Mitosis",                category: "L0/L1", keywords: ["mitosis"] },
+  { id: "monad",       label: "Monad",                  category: "L0/L1", keywords: ["monad"] },
+  { id: "movement",    label: "Movement",               category: "L0/L1", keywords: ["movement"] },
+  { id: "near",        label: "Near",                   category: "L0/L1", keywords: ["near"] },
+  { id: "peaq",        label: "PEAQ",                   category: "L0/L1", keywords: ["peaq"] },
+  { id: "polkadot",    label: "Polkadot",               category: "L0/L1", keywords: ["polkadot","dot "] },
+  { id: "sei",         label: "Sei",                    category: "L0/L1", keywords: ["sei "] },
+  { id: "somnia",      label: "Somnia",                 category: "L0/L1", keywords: ["somnia"] },
+  { id: "sonic",       label: "Sonic (L1)",             category: "L0/L1", keywords: ["sonic chain","sonic l1","sonic mainnet"] },
+  { id: "story",       label: "Story",                  category: "L0/L1", keywords: ["story protocol","story chain"] },
+  { id: "xion",        label: "XION",                   category: "L0/L1", keywords: ["xion"] },
 
-/* ===========================
-   1. CSV 헤더 자동 매핑
-=========================== */
+  // --- L2 ---
+  { id: "arbitrum",    label: "Arbitrum",               category: "L2",    keywords: ["arbitrum","arb "] },
+  { id: "katana",      label: "Katana",                 category: "L2",    keywords: ["katana"] },
+  { id: "mantle",      label: "Mantle",                 category: "L2",    keywords: ["mantle"] },
+  { id: "megaeth",     label: "MegaETH",                category: "L2",    keywords: ["megaeth"] },
+  { id: "polygon",     label: "Polygon",                category: "L2",    keywords: ["polygon","matic"] },
+  { id: "soon",        label: "SOON",                   category: "L2",    keywords: ["soon network","soon chain"] },
+
+  // --- DeFi / Infra ---
+  { id: "falcon",      label: "Falcon Finance",         category: "DeFi",  keywords: ["falcon finance","falconfi"] },
+  { id: "frax",        label: "Frax",                   category: "DeFi",  keywords: ["frax"] },
+  { id: "huma",        label: "Huma",                   category: "DeFi",  keywords: ["huma"] },
+  { id: "moremarkets", label: "MoreMarkets",            category: "DeFi",  keywords: ["moremarkets","more markets"] },
+  { id: "multipli",    label: "Multipli",               category: "DeFi",  keywords: ["multipli"] },
+  { id: "noble",       label: "Noble",                  category: "DeFi",  keywords: ["noble chain","noble network"] },
+  { id: "orderly",     label: "Orderly",                category: "DeFi",  keywords: ["orderly","orderly network","orderly omni"] },
+  { id: "pyth",        label: "Pyth",                   category: "DeFi",  keywords: ["pyth oracle","pyth network"] },
+  { id: "soul",        label: "Soul Protocol",          category: "DeFi",  keywords: ["soul protocol"] },
+  { id: "stbl",        label: "STBL",                   category: "DeFi",  keywords: ["stbl","usst","yld","stablecoin 2.0"] },
+  { id: "turtle",      label: "Turtle Club",            category: "DeFi",  keywords: ["turtle club"] },
+  { id: "walrus",      label: "Walrus",                 category: "DeFi",  keywords: ["walrus"] },
+
+  // --- AI Agents / Agent Infra ---
+  { id: "creatorbid",  label: "CreatorBid",             category: "AI Agents", keywords: ["creatorbid"] },
+  { id: "infinit",     label: "INFINIT",                category: "AI Agents", keywords: ["infinit"] },
+  { id: "newton",      label: "Newton",                 category: "AI Agents", keywords: ["newton ai"] },
+  { id: "surf",        label: "Surf",                   category: "AI Agents", keywords: ["surf ai","surf agent"] },
+  { id: "symphony",    label: "Symphony",               category: "AI Agents", keywords: ["symphony","symphony finance","symphony router"] },
+  { id: "talus",       label: "Talus",                  category: "AI Agents", keywords: ["talus"] },
+  { id: "theoriq",     label: "Theoriq",                category: "AI Agents", keywords: ["theoriq"] },
+  { id: "virtuals",    label: "Virtuals Protocol",      category: "AI Agents", keywords: ["virtuals","virtuals protocol"] },
+  { id: "warden",      label: "Warden Protocol",        category: "AI Agents", keywords: ["warden protocol"] },
+  { id: "wayfinder",   label: "Wayfinder",              category: "AI Agents", keywords: ["wayfinder"] },
+
+  // --- Culture / NFT ---
+  { id: "anime",       label: "ANIME",                  category: "Culture", keywords: ["anime token","anime protocol"] },
+  { id: "boop",        label: "Boop",                   category: "Culture", keywords: ["boop"] },
+  { id: "doodles",     label: "Doodles",                category: "Culture", keywords: ["doodles"] },
+  { id: "memex",       label: "MemeX",                  category: "Culture", keywords: ["memex"] },
+  { id: "moonbirds",   label: "Moonbirds",              category: "Culture", keywords: ["moonbirds"] },
+  { id: "pengu",       label: "PENGU",                  category: "Culture", keywords: ["pengu"] },
+
+  // --- BTCFi ---
+  { id: "corn",        label: "Corn",                   category: "BTCFi",  keywords: ["corn"] },
+  { id: "goat",        label: "GOAT Network",           category: "BTCFi",  keywords: ["goat network"] },
+  { id: "lombard",     label: "Lombard",                category: "BTCFi",  keywords: ["lombard"] },
+  { id: "portalbtc",   label: "Portal to BTC",          category: "BTCFi",  keywords: ["portal to btc","portal btc"] },
+  { id: "satlayer",    label: "SatLayer",               category: "BTCFi",  keywords: ["satlayer"] },
+
+  // --- Robotics ---
+  { id: "openmind",    label: "Openmind",               category: "Robotics", keywords: ["openmind"] },
+
+  // --- ZK ---
+  { id: "boundless",   label: "Boundless",              category: "ZK", keywords: ["boundless"] },
+  { id: "brevis",      label: "Brevis",                 category: "ZK", keywords: ["brevis"] },
+  { id: "cysic",       label: "Cysic",                  category: "ZK", keywords: ["cysic"] },
+  { id: "miden",       label: "Miden",                  category: "ZK", keywords: ["miden"] },
+  { id: "starknet",    label: "Starknet",               category: "ZK", keywords: ["starknet"] },
+  { id: "succinct",    label: "Succinct",               category: "ZK", keywords: ["succinct"] },
+  { id: "zcash",       label: "Zcash",                  category: "ZK", keywords: ["zcash"] },
+  { id: "zkpass",      label: "zkPass",                 category: "ZK", keywords: ["zkpass"] },
+
+  // --- Others ---
+  { id: "anoma",       label: "Anoma",                  category: "Others", keywords: ["anoma"] },
+  { id: "bless",       label: "Bless",                  category: "Others", keywords: ["bless protocol"] },
+  { id: "bybittradfi", label: "Bybit TradFi",           category: "Others", keywords: ["bybit tradfi"] },
+  { id: "humanity",    label: "Humanity Protocol",      category: "Others", keywords: ["humanity protocol"] },
+  { id: "integra",     label: "Integra",                category: "Others", keywords: ["integra"] },
+  { id: "multibank",   label: "Multibank",              category: "Others", keywords: ["multibank"] },
+  { id: "thrive",      label: "Thrive Protocol",        category: "Others", keywords: ["thrive protocol"] },
+
+  // --- Exchange / Perp ---
+  { id: "apex",        label: "ApeX",                   category: "Exchange", keywords: ["apex pro","apex dex"] },
+  { id: "bluefin",     label: "Bluefin",                category: "Exchange", keywords: ["bluefin"] },
+  { id: "dydx",        label: "dYdX",                   category: "Exchange", keywords: ["dydx"] },
+  { id: "flipster",    label: "Flipster",               category: "Exchange", keywords: ["flipster"] },
+  { id: "mememax",     label: "MemeMax",                category: "Exchange", keywords: ["mememax","mememax_fi","@mememax_fi","memax"] },
+  { id: "momentum",    label: "Momentum",               category: "Exchange", keywords: ["momentum"] },
+  { id: "paradex",     label: "PARADEX",                category: "Exchange", keywords: ["paradex"] },
+
+  // --- AI / InfoFi ---
+  { id: "kaito",       label: "Kaito / Yapper",         category: "AI", keywords: ["kaito","kaito ai","yapper","yap points","infofi"] },
+  { id: "og",          label: "OG",                     category: "AI", keywords: ["og protocol"] },
+  { id: "allora",      label: "Allora",                 category: "AI", keywords: ["allora"] },
+  { id: "billions",    label: "Billions Network",       category: "AI", keywords: ["billions network"] },
+  { id: "edgen",       label: "Edgen",                  category: "AI", keywords: ["edgen"] },
+  { id: "everlynai",   label: "EverlynAI",              category: "AI", keywords: ["everlynai"] },
+  { id: "iq",          label: "IQ",                     category: "AI", keywords: ["iq ai","iq token"] },
+  { id: "kindred",     label: "Kindred",                category: "AI", keywords: ["kindred"] },
+  { id: "mira",        label: "Mira Network",           category: "AI", keywords: ["mira network"] },
+  { id: "novastro",    label: "Novastro",               category: "AI", keywords: ["novastro"] },
+  { id: "noya",        label: "Noya.ai",                category: "AI", keywords: ["noya.ai","noya ai"] },
+  { id: "openledger",  label: "OpenLedger",             category: "AI", keywords: ["openledger"] },
+  { id: "pipworld",    label: "PiP World",              category: "AI", keywords: ["pip world","pipworld"] },
+  { id: "playai",      label: "PlayAI",                 category: "AI", keywords: ["playai","play ai"] },
+  { id: "sapien",      label: "Sapien",                 category: "AI", keywords: ["sapien"] },
+  { id: "sentient",    label: "Sentient",               category: "AI", keywords: ["sentient"] },
+  { id: "uxlink",      label: "UXLINK",                 category: "AI", keywords: ["uxlink"] },
+
+  // --- Consumer / Apps ---
+  { id: "tria",        label: "Tria",                   category: "Consumer", keywords: ["tria","use tria","@useTria"] },
+  { id: "anichess",    label: "Anichess",               category: "Consumer", keywords: ["anichess"] },
+  { id: "bitdealer",   label: "Bitdealer",              category: "Consumer", keywords: ["bitdealer"] },
+  { id: "defiapp",     label: "Defi App",               category: "Consumer", keywords: ["defi app"] },
+  { id: "hana",        label: "Hana",                   category: "Consumer", keywords: ["hana app"] },
+  { id: "infinex",     label: "Infinex",                category: "Consumer", keywords: ["infinex"] },
+  { id: "lumiterra",   label: "Lumiterra",              category: "Consumer", keywords: ["lumiterra"] },
+  { id: "maplestory",  label: "MapleStory Universe",    category: "Consumer", keywords: ["maplestory universe","msu"] },
+  { id: "metawin",     label: "Metawin",                category: "Consumer", keywords: ["metawin"] },
+  { id: "parti",       label: "Parti",                  category: "Consumer", keywords: ["parti"] },
+  { id: "puffpaw",     label: "Puffpaw",                category: "Consumer", keywords: ["puffpaw"] },
+  { id: "rainbow",     label: "Rainbow",                category: "Consumer", keywords: ["rainbow wallet","rainbow app"] },
+  { id: "sidekick",    label: "Sidekick",               category: "Consumer", keywords: ["sidekick"] },
+  { id: "sixr",        label: "SIXR Cricket",           category: "Consumer", keywords: ["sixr cricket","sixr"] },
+  { id: "sophon",      label: "Sophon",                 category: "Consumer", keywords: ["sophon"] },
+  { id: "vultisig",    label: "Vultisig",               category: "Consumer", keywords: ["vultisig"] },
+  { id: "yeet",        label: "YEET",                   category: "Consumer", keywords: ["yeet"] },
+
+  // --- Interop ---
+  { id: "caldera",     label: "Caldera",                category: "Interop", keywords: ["caldera"] },
+  { id: "initia",      label: "Initia",                 category: "Interop", keywords: ["initia"] },
+  { id: "skate",       label: "Skate",                  category: "Interop", keywords: ["skate"] },
+  { id: "union",       label: "Union",                  category: "Interop", keywords: ["union"] },
+
+  // --- RWA ---
+  { id: "kaio",        label: "KAIO",                   category: "RWA", keywords: ["kaio","kaio network"] },
+  { id: "theo",        label: "Theo Network",           category: "RWA", keywords: ["theo","theo network","thbill","tultra"] },
+
+  // --- Snapper / Campaign style(마인드쉐어용) ---
+  { id: "superform",   label: "Superform",              category: "Campaign", keywords: ["superform","superformxyz","@superformxyz"] },
+  { id: "glint",       label: "Glint Analytics",        category: "Campaign", keywords: ["glint analytics","@glintanalytics"] },
+  { id: "solv",        label: "Solv Protocol",          category: "Campaign", keywords: ["solv protocol","@solvprotocol"] },
+  { id: "pacifica",    label: "Pacifica",               category: "Campaign", keywords: ["pacifica_fi","@pacifica_fi","pacifica fi"] },
+  { id: "layerbank",   label: "LayerBank",              category: "Campaign", keywords: ["layerbank","layerbankfi","@layerbankfi"] },
+  { id: "rayls",       label: "Rayls",                  category: "Campaign", keywords: ["rayls","@RaylsLabs","raylslabs"] },
+  { id: "velora",      label: "Velora",                 category: "Campaign", keywords: ["velora","veloradex","@veloradex"] },
+  { id: "antix",       label: "Antix",                  category: "Campaign", keywords: ["antix","@antix_in"] },
+  { id: "almanak",     label: "Almanak",                category: "Campaign", keywords: ["almanak","@Almanak"] },
+  { id: "bob",         label: "BOB",                    category: "Campaign", keywords: ["bob","build on bitcoin","@build_on_bob"] },
+  { id: "ten",         label: "TEN Protocol",           category: "Campaign", keywords: ["ten protocol","@tenprotocol","ten app"] },
+  { id: "vooi",        label: "Vooi",                   category: "Campaign", keywords: ["vooi","@vooi_io","vooi io"] },
+
+  // --- 너 전용(이미 CSV에서 자주 쓰는 것들) ---
+  { id: "river",       label: "River / satUSD",         category: "Stable", keywords: ["river","satusd","sat usd","river4fun","river4 fun","@riverhq"] },
+  { id: "cookie",      label: "Cookie.fun",             category: "InfoFi", keywords: ["cookie.fun","cookie fun","cookie leaderboard","@cookie_fun"] },
+  { id: "bnkr",        label: "BNKR / BANKR",           category: "Social", keywords: ["bnkr","bankr","bankr leaderboard","@bnkr_network"] }
+];
+
+
+let ANALYSIS = null;
+let ALL_BASE = [];
+let CURRENT_LIST = [];
+let buckets = { S:[], A:[], B:[], C:[], D:[] };
+let CURRENT_RANGE = "ALL";
+let CURRENT_GRADE = "ALL";
+let SORT_KEY = "score";
+
+/* 프로젝트 통계/차트용 */
+let PROJECT_STATS = [];
+let projectChart = null;
+
+/* ========== CSV 헤더 매핑/숫자 ========== */
 function autoMap(row) {
   const map = {
     "게시물 본문": "text", "Post text": "text", "Tweet text": "text",
@@ -321,13 +1053,73 @@ function autoMap(row) {
     const clean = key.trim();
     if (map[clean]) result[map[clean]] = row[key];
   }
+
+  // 날짜 & 링크 & 본문을 좀 더 유연하게 찾기
+  if (!result.date) {
+    for (const key in row) {
+      const l = key.trim().toLowerCase();
+      if (l.includes("날짜") || l === "date" || l.startsWith("date ")) {
+        result.date = row[key];
+        break;
+      }
+    }
+  }
+  if (!result.link) {
+    for (const key in row) {
+      const l = key.trim().toLowerCase();
+      if (l.includes("링크") || l.includes("permalink") || l === "url" || l.includes("url")) {
+        result.link = row[key];
+        break;
+      }
+    }
+  }
+  if (!result.text) {
+    for (const key in row) {
+      const l = key.trim().toLowerCase();
+      if (l.includes("text") || l.includes("본문")) {
+        result.text = row[key];
+        break;
+      }
+    }
+  }
   return result;
 }
-function num(v){if(!v)return 0;v=String(v).replace(/,/g,"").trim();const n=parseFloat(v);return isNaN(n)?0:n;}
+function num(v){
+  if(!v) return 0;
+  v = String(v).replace(/,/g,"").trim();
+  const n = parseFloat(v);
+  return isNaN(n)?0:n;
+}
 
-/* ===========================
-   2. 마인드쉐어 스코어 계산
-=========================== */
+/* ========== 날짜/기간 처리 (한국식 날짜 포함) ========== */
+function parseDateValue(v){
+  if(!v) return null;
+  let s = String(v).trim();
+  const m = s.match(/(\d{4})[^\d]?(\d{1,2})[^\d]?(\d{1,2})/);
+  if(!m) return null;
+  const year = parseInt(m[1],10);
+  const month = parseInt(m[2],10)-1;
+  const day = parseInt(m[3],10);
+  const d = new Date(year, month, day);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function applyDateFilter(list, range){
+  if(range === "ALL") return list.slice();
+  const days = Number(range);
+  if(!days || !list.length) return list.slice();
+  const dates = list.map(p=>p.dateObj).filter(Boolean);
+  if(!dates.length) {
+    return list.slice();
+  }
+  const latestTime = Math.max.apply(null, dates.map(d=>d.getTime()));
+  const latest = new Date(latestTime);
+  const ms = 24*60*60*1000;
+  const threshold = new Date(latest.getTime() - (days-1)*ms);
+  return list.filter(p => !p.dateObj || p.dateObj >= threshold);
+}
+
+/* ========== 스코어/등급 ========== */
 function computeScore(p){
   const impres = p.impressions || 0;
   const raw =
@@ -343,7 +1135,6 @@ function computeScore(p){
       p.shares * 1.8;
   return raw / Math.log10(impres + 10);
 }
-
 function assignGrades(list){
   list.sort((a,b)=>b.score-a.score);
   const N = list.length || 1;
@@ -357,7 +1148,6 @@ function assignGrades(list){
       pct>=0.40?"C":"D";
   });
 }
-
 function computeTrimmedAverage(list, ratio){
   if(!list.length) return 0;
   const scores = list.map(p=>p.score).sort((a,b)=>a-b);
@@ -368,16 +1158,230 @@ function computeTrimmedAverage(list, ratio){
   const sum = trimmed.reduce((s,v)=>s+v,0);
   return sum / trimmed.length;
 }
+function sortForView(list){
+  const key = SORT_KEY || "score";
+  list.sort((a,b)=>{
+    let va, vb;
+    switch(key){
+      case "impressions": va = a.impressions; vb = b.impressions; break;
+      case "engagements": va = a.engagements; vb = b.engagements; break;
+      case "bookmarks":  va = a.bookmarks;  vb = b.bookmarks;  break;
+      case "newFollows": va = a.newFollows; vb = b.newFollows; break;
+      case "score":
+      default:
+        va = a.score; vb = b.score; break;
+    }
+    if(va < vb) return 1;
+    if(va > vb) return -1;
+    return 0;
+  });
+  return list;
+}
 
-/* ===========================
-   3. UI 렌더링
-=========================== */
-let ALL=[], buckets={S:[],A:[],B:[],C:[],D:[]};
+/* ========== 프로젝트 태깅/집계 ========== */
+function tagProjectsForPost(p){
+  const text = (p.text || "").toLowerCase();
+  const tags = [];
+  PROJECTS.forEach(proj=>{
+    const hit = proj.keywords.some(kw => text.includes(kw.toLowerCase()));
+    if(hit) tags.push(proj.id);
+  });
+  p.projects = tags;
+}
 
+function computeProjectStats(list){
+  const stats = {};
+  PROJECTS.forEach(proj=>{
+    stats[proj.id] = {
+      id: proj.id,
+      label: proj.label,
+      count: 0,
+      avgScore: 0,
+      trimmedAvg: 0,
+      bestScore: 0,
+      bestDate: "",
+      bestLink: "",
+      posts: []
+    };
+  });
+
+  list.forEach(post=>{
+    (post.projects || []).forEach(pid=>{
+      const s = stats[pid];
+      if(!s) return;
+      s.count++;
+      s.posts.push(post);
+      if(!s.bestScore || post.score > s.bestScore){
+        s.bestScore = post.score;
+        s.bestDate = post.date;
+        s.bestLink = post.link;
+      }
+    });
+  });
+
+  const result = [];
+  Object.values(stats).forEach(s=>{
+    if(!s.posts.length) return;
+    const total = s.posts.length;
+    s.avgScore = s.posts.reduce((sum,p)=>sum+p.score,0)/total;
+    s.trimmedAvg = computeTrimmedAverage(s.posts, TRIM_RATIO);
+    result.push(s);
+  });
+  return result;
+}
+
+/* 프로젝트 요약 테이블 */
+function renderProjectSummary(list){
+  const wrap = document.getElementById("project-summary-wrap");
+  if(!wrap) return;
+  if(!list.length){
+    wrap.innerHTML = "<div class='empty'>프로젝트 키워드에 매칭된 글이 아직 없습니다.</div>";
+    return;
+  }
+  list.sort((a,b)=>(b.trimmedAvg||0)-(a.trimmedAvg||0));
+  const rows = list.map((s,idx)=>`
+    <tr>
+      <td>#${idx+1}</td>
+      <td>${s.label}</td>
+      <td>${s.count}</td>
+      <td>${s.avgScore ? s.avgScore.toFixed(1) : "-"}</td>
+      <td>${s.trimmedAvg ? s.trimmedAvg.toFixed(1) : "-"}</td>
+      <td>${s.bestLink ? `<a href="${s.bestLink}" class="link-pill" target="_blank">대표 트윗 ↗</a>` : ""}</td>
+    </tr>
+  `).join("");
+  wrap.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>순위</th>
+          <th>프로젝트</th>
+          <th>게시글 수</th>
+          <th>평균 스코어</th>
+          <th>트림드 평균</th>
+          <th>대표 트윗</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+/* 프로젝트별 상세 셀렉트 & 테이블 */
+function buildProjectSelect(list){
+  const select = document.getElementById("project-select");
+  const detailWrap = document.getElementById("project-detail-wrap");
+  if(!select || !detailWrap) return;
+
+  if(!list.length){
+    select.innerHTML = `<option value="">매칭된 프로젝트가 없습니다.</option>`;
+    detailWrap.innerHTML = `<div class="empty">프로젝트 키워드에 매칭된 글이 아직 없습니다.</div>`;
+    return;
+  }
+
+  select.innerHTML = list.map(p=>`<option value="${p.id}">${p.label} (${p.count})</option>`).join("");
+  select.onchange = () => {
+    renderProjectDetail(select.value);
+  };
+  renderProjectDetail(list[0].id);
+}
+
+function renderProjectDetail(projectId){
+  const wrap = document.getElementById("project-detail-wrap");
+  if(!wrap) return;
+  const proj = PROJECT_STATS.find(p=>p.id===projectId);
+  if(!proj || !proj.posts.length){
+    wrap.innerHTML = `<div class="empty">선택한 프로젝트에 해당하는 게시글이 없습니다.</div>`;
+    return;
+  }
+  const posts = proj.posts.slice().sort((a,b)=>b.score-a.score);
+  const rows = posts.map((p,idx)=>`
+    <tr>
+      <td>#${idx+1}</td>
+      <td><div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div></td>
+      <td>
+        <div class="text-main">${p.text}</div>
+        <div class="text-meta">${p.date} · 스코어 <strong>${p.score.toFixed(1)}</strong></div>
+      </td>
+      <td>
+        <div class="stat-chip">참여 <strong>${p.engagements}</strong></div>
+        <div class="stat-chip">노출 <strong>${p.impressions}</strong></div>
+      </td>
+      <td>
+        <div class="stat-chip">팔로우 <strong>${p.newFollows}</strong></div>
+        <div class="stat-chip">북마크 <strong>${p.bookmarks}</strong></div>
+      </td>
+      <td>${p.link ? `<a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a>` : ""}</td>
+    </tr>
+  `).join("");
+
+  wrap.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>등급</th>
+          <th>본문</th>
+          <th>참여/노출</th>
+          <th>팔로우/북마크</th>
+          <th>링크</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+/* 프로젝트 도넛 차트 */
+function renderProjectPieChart(list){
+  const canvas = document.getElementById("project-pie");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  if(projectChart){
+    projectChart.destroy();
+    projectChart = null;
+  }
+  if(!list.length) return;
+
+  const labels = list.map(p=>p.label);
+  const data = list.map(p=>p.count);
+
+  projectChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: [
+          "rgba(59,130,246,0.9)",
+          "rgba(45,212,191,0.9)",
+          "rgba(251,191,36,0.9)",
+          "rgba(244,114,182,0.9)"
+        ]
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: "bottom" }
+      },
+      cutout: "60%"
+    }
+  });
+}
+
+/* ========== Top10 / 등급별 렌더링 ========== */
 function renderTop10(posts){
   const wrap=document.getElementById("top10-table-wrap");
-  if(!posts.length){wrap.innerHTML="<div class='empty'>데이터가 없습니다.</div>";return;}
-  const rows=posts.slice(0,10).map((p,i)=>`
+  const countSpan = document.getElementById("top10-count");
+  if(!posts.length){
+    wrap.innerHTML="<div class='empty'>데이터가 없습니다.</div>";
+    if(countSpan) countSpan.textContent = "";
+    return;
+  }
+  const base = sortForView(posts.slice());
+  const top = base.slice(0,10);
+  if(countSpan) countSpan.textContent = `(${top.length} / ${posts.length})`;
+  const rows=top.map((p,i)=>`
     <tr>
       <td>#${i+1}</td>
       <td><div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div></td>
@@ -393,7 +1397,7 @@ function renderTop10(posts){
         <div class="stat-chip">팔로우 <strong>${p.newFollows}</strong></div>
         <div class="stat-chip">북마크 <strong>${p.bookmarks}</strong></div>
       </td>
-      <td><a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a></td>
+      <td>${p.link ? `<a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a>` : ""}</td>
     </tr>`).join("");
   wrap.innerHTML=`
     <table>
@@ -403,11 +1407,14 @@ function renderTop10(posts){
       <tbody>${rows}</tbody>
     </table>`;
 }
-
 function renderGrade(list){
   const wrap=document.getElementById("grade-table-wrap");
-  if(!list.length){wrap.innerHTML="<div class='empty'>데이터가 없습니다.</div>";return;}
-  const rows=list.map((p,i)=>`
+  if(!list.length){
+    wrap.innerHTML="<div class='empty'>데이터가 없습니다.</div>";
+    return;
+  }
+  const base = sortForView(list.slice());
+  const rows=base.map((p,i)=>`
     <tr>
       <td>#${i+1}</td>
       <td><div class="grade-badge ${p.grade.toLowerCase()}">${p.grade}</div></td>
@@ -423,7 +1430,7 @@ function renderGrade(list){
         <div class="stat-chip">팔로우 <strong>${p.newFollows}</strong></div>
         <div class="stat-chip">북마크 <strong>${p.bookmarks}</strong></div>
       </td>
-      <td><a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a></td>
+      <td>${p.link ? `<a href="${p.link}" class="link-pill" target="_blank">트윗 보기 ↗</a>` : ""}</td>
     </tr>`).join("");
   wrap.innerHTML=`
     <table>
@@ -434,21 +1441,173 @@ function renderGrade(list){
     </table>`;
 }
 
-/* ===========================
-   4. CSV 업로드 파싱
-=========================== */
+/* ========== 코치 봇 출력 ========== */
+function updateCoach(){
+  const el = document.getElementById("coach-output");
+  if(!el) return;
+
+  if(!ALL_BASE.length){
+    el.textContent =
+      "아직 CSV를 올리지 않았어.\n상단에서 애널리틱스 CSV를 업로드하면\n이 구간의 마인드쉐어 상태를 코치 봇이 요약해 줄 거야.";
+    return;
+  }
+  if(!CURRENT_LIST.length || !ANALYSIS){
+    el.textContent = "선택한 기간에 해당하는 데이터가 없어서 분석할 수 없어.";
+    return;
+  }
+
+  const gradeCounts = { S:0, A:0, B:0, C:0, D:0 };
+  CURRENT_LIST.forEach(p=>{
+    if(gradeCounts[p.grade] !== undefined){
+      gradeCounts[p.grade]++;
+    }
+  });
+
+  const tAvg = ANALYSIS.trimmedAvg || 0;
+  let overallGrade, mood;
+  if(tAvg >= 80){
+    overallGrade = "S";
+    mood = "이번 구간은 사실상 폭발 구간이야. 지금 페이스 그대로 유지하면서, 터졌던 패턴을 반복하면 돼.";
+  }else if(tAvg >= 60){
+    overallGrade = "A";
+    mood = "상위권에서 잘 버티고 있어. 조금만 더 정교하게 실험하면 언제든 S로 올라갈 수 있는 위치야.";
+  }else if(tAvg >= 45){
+    overallGrade = "B";
+    mood = "무난하게 우상향 준비 중인 구간이야. 몇 개 강한 시그널을 더 만들면 한 단계 위로 올라갈 수 있어.";
+  }else if(tAvg >= 30){
+    overallGrade = "C";
+    mood = "실험은 많이 했지만 아직 빵 터지는 패턴이 부족한 구간이야. 잘 터진 글 기준으로 공통 패턴을 뽑아보자.";
+  }else{
+    overallGrade = "D";
+    mood = "데이터가 쌓이는 단계라서, 지금은 ‘테스트 기간’이라 보면 돼. 다양한 형식을 부담 없이 던지는 게 좋아.";
+  }
+
+  const bestPost = CURRENT_LIST.slice().sort((a,b)=>b.score-a.score)[0];
+
+  let projectLine = "아직 프로젝트 키워드에 매칭된 글이 없어서 프로젝트별 평가는 생략할게.";
+  if(PROJECT_STATS && PROJECT_STATS.length){
+    const bestProj = PROJECT_STATS.slice().sort((a,b)=> (b.trimmedAvg||0)-(a.trimmedAvg||0))[0];
+    projectLine = `프로젝트 중에서는 「${bestProj.label}」가 가장 강하게 나와. 이 구간에서 평균 스코어는 대략 ${bestProj.trimmedAvg.toFixed(1)}점이야.`;
+  }
+
+  const text =
+`● 이번 기간 한 줄 요약
+- 전체 트림드 평균: 약 ${tAvg.toFixed(1)}점 → 체감 등급으로는 ${overallGrade} 구간이야.
+- 등급 분포: S ${gradeCounts.S} / A ${gradeCounts.A} / B ${gradeCounts.B} / C ${gradeCounts.C} / D ${gradeCounts.D}
+
+● 코치 코멘트
+- ${mood}
+
+● 가장 잘 터진 글
+- 날짜: ${bestPost.date || "-"}
+- 스코어: ${bestPost.score.toFixed(1)}
+${bestPost.link ? "- 링크: " + bestPost.link : ""}
+
+● 프로젝트 관점 한 줄 평
+- ${projectLine}
+
+※ 팁: 상위 S/A 글들만 모아서 “길이, 톤, 밈 사용 여부, 시간대, 해시태그, 이너서클 태그 여부”를 비교해 보면,
+지금 계정만의 마쉐 패턴을 더 빨리 찾을 수 있어.`;
+
+  el.textContent = text;
+}
+
+/* ========== 전체 뷰 업데이트 (기간 필터 적용) ========== */
+function updateView(){
+  if(!ALL_BASE.length) return;
+  const summaryEl = document.getElementById("summary");
+  const errorEl = document.getElementById("error");
+  const filtered = applyDateFilter(ALL_BASE, CURRENT_RANGE);
+  CURRENT_LIST = filtered;
+
+  if(!filtered.length){
+    ANALYSIS = null;
+    summaryEl.innerHTML = "";
+    summaryEl.style.display = "none";
+    errorEl.textContent = "선택한 기간에 해당하는 데이터가 없습니다.";
+    document.getElementById("top10-table-wrap").innerHTML = "<div class='empty'>데이터가 없습니다.</div>";
+    document.getElementById("grade-table-wrap").innerHTML = "<div class='empty'>데이터가 없습니다.</div>";
+    PROJECT_STATS = [];
+    renderProjectSummary([]);
+    buildProjectSelect([]);
+    renderProjectPieChart([]);
+    const countSpan = document.getElementById("top10-count");
+    if(countSpan) countSpan.textContent = "";
+    updateCoach();
+    return;
+  }
+
+  errorEl.textContent = "";
+  assignGrades(filtered);
+
+  buckets = { S:[], A:[], B:[], C:[], D:[] };
+  filtered.forEach(p=>{
+    const g = p.grade;
+    if(buckets[g] && buckets[g].length < 10){
+      buckets[g].push(p);
+    }
+  });
+
+  const total = filtered.length;
+  const avgScore = filtered.reduce((s,p)=>s+p.score,0)/total;
+  const trimmedAvg = computeTrimmedAverage(filtered, TRIM_RATIO);
+  const best = filtered[0];
+
+  ANALYSIS = {
+    trimmedAvg,
+    avgScore,
+    bestScore: best.score,
+    bestDate: best.date,
+    bestLink: best.link,
+    totalPosts: total
+  };
+
+  summaryEl.innerHTML=`
+    <div class="summary-card"><div class="summary-label">원글 개수</div>
+      <div class="summary-value">${total}</div><div class="summary-sub">답글 제외 · 기간 필터 적용</div></div>
+    <div class="summary-card"><div class="summary-label">평균 스코어</div>
+      <div class="summary-value">${avgScore.toFixed(1)}</div>
+      <div class="summary-sub">현재 선택된 기간의 전체 원글 기준</div></div>
+    <div class="summary-card"><div class="summary-label">트림드 평균</div>
+      <div class="summary-value">${trimmedAvg.toFixed(1)}</div>
+      <div class="summary-sub">상·하위 10% 제거 후 평균</div></div>
+    <div class="summary-card"><div class="summary-label">가장 터진 글</div>
+      <div class="summary-value">${best.score.toFixed(1)}</div>
+      <div class="summary-sub">${best.date || ""}</div></div>`;
+  summaryEl.style.display="grid";
+
+  renderTop10(filtered);
+  if(CURRENT_GRADE === "ALL"){
+    renderGrade(filtered.slice(0,30));
+  }else{
+    renderGrade(buckets[CURRENT_GRADE] || []);
+  }
+
+  PROJECT_STATS = computeProjectStats(filtered);
+  renderProjectSummary(PROJECT_STATS);
+  buildProjectSelect(PROJECT_STATS);
+  renderProjectPieChart(PROJECT_STATS);
+
+  updateCoach();
+}
+
+/* ========== CSV 업로드 ========== */
 document.getElementById("csvInput").addEventListener("change", e=>{
   const file=e.target.files[0]; if(!file) return;
   Papa.parse(file,{
     header:true,skipEmptyLines:true,
     complete:res=>{
-      ALL=[];
+      ALL_BASE=[];
       res.data.forEach(row=>{
         const r=autoMap(row);
         const t=(r.text||"").trim();
         if(!t || t.startsWith("@")) return;
+        const dateObj = parseDateValue(r.date);
         const p={
-          text:t,date:r.date,link:r.link,
+          text:t,
+          date:r.date || "",
+          dateObj,
+          link:r.link,
           impressions:num(r.impressions),
           engagements:num(r.engagements),
           likes:num(r.likes),
@@ -462,58 +1621,25 @@ document.getElementById("csvInput").addEventListener("change", e=>{
           uniqueClicks:num(r.uniqueClicks),
         };
         p.score=computeScore(p);
-        ALL.push(p);
+        tagProjectsForPost(p);
+        ALL_BASE.push(p);
       });
 
-      if(!ALL.length){
+      if(!ALL_BASE.length){
         document.getElementById("error").textContent="CSV에서 분석 가능한 원글이 없습니다.";
-        return;
+      }else{
+        document.getElementById("error").textContent="";
+        CURRENT_RANGE = "ALL";
+        CURRENT_GRADE = "ALL";
+        const rangeTabs = document.getElementById("range-tabs");
+        if(rangeTabs) rangeTabs.style.display = "flex";
+        updateView();
       }
-      document.getElementById("error").textContent="";
-
-      assignGrades(ALL);
-      buckets={S:[],A:[],B:[],C:[],D:[]};
-      ALL.forEach(p=>{ if(buckets[p.grade].length<10) buckets[p.grade].push(p); });
-
-      const total=ALL.length;
-      const avgScore=ALL.reduce((s,p)=>s+p.score,0)/total;
-      const avgEng=ALL.reduce((s,p)=>s+p.engagements,0)/total;
-      const avgImp=Math.round(ALL.reduce((s,p)=>s+p.impressions,0)/total);
-      const best=ALL[0];
-      const trimmedAvg=computeTrimmedAverage(ALL,TRIM_RATIO);
-
-      ANALYSIS = {
-        trimmedAvg,
-        avgScore,
-        bestScore: best.score,
-        bestDate: best.date,
-        bestLink: best.link,
-        totalPosts: total
-      };
-
-      document.getElementById("summary").innerHTML=`
-        <div class="summary-card"><div class="summary-label">원글 개수</div>
-          <div class="summary-value">${total}</div><div class="summary-sub">답글 제외</div></div>
-        <div class="summary-card"><div class="summary-label">평균 스코어</div>
-          <div class="summary-value">${avgScore.toFixed(1)}</div>
-          <div class="summary-sub">전체 원글 기준</div></div>
-        <div class="summary-card"><div class="summary-label">트림드 평균</div>
-          <div class="summary-value">${trimmedAvg.toFixed(1)}</div>
-          <div class="summary-sub">상·하위 10% 제거 후 평균</div></div>
-        <div class="summary-card"><div class="summary-label">가장 터진 글</div>
-          <div class="summary-value">${best.score.toFixed(1)}</div>
-          <div class="summary-sub">${best.date}</div></div>`;
-      document.getElementById("summary").style.display="grid";
-
-      renderTop10(ALL);
-      renderGrade(ALL.slice(0,30));
     }
   });
 });
 
-/* ===========================
-   5. 리더보드 저장
-=========================== */
+/* ========== 리더보드 저장/불러오기 ========== */
 async function saveToLeaderboard(){
   if(!ANALYSIS){
     alert("먼저 CSV를 업로드해서 분석을 돌려줘.");
@@ -527,8 +1653,10 @@ async function saveToLeaderboard(){
     return;
   }
   if(ANALYSIS.totalPosts < MIN_POSTS_FOR_LEADERBOARD){
-    if(!confirm(`원글이 ${ANALYSIS.totalPosts}개입니다. 최소 ${MIN_POSTS_FOR_LEADERBOARD}개 이상일 때 리더보드에 올라가는 걸 추천해.\n그래도 저장할래?`)) return;
+    if(!confirm(`원글이 ${ANALYSIS.totalPosts}개입니다. 최소 ${MIN_POSTS_FOR_LEADERBOARD}개 이상일 때 추천해.\n그래도 저장할래?`)) return;
   }
+
+  const bestPost = CURRENT_LIST.slice().sort((a,b)=>b.score-a.score)[0];
 
   const payload = {
     handle,
@@ -537,6 +1665,8 @@ async function saveToLeaderboard(){
     bestScore: ANALYSIS.bestScore,
     bestDate: ANALYSIS.bestDate,
     bestLink: ANALYSIS.bestLink,
+    bestText: bestPost?.text || "",
+    bestGrade: bestPost?.grade || "",
     totalPosts: ANALYSIS.totalPosts
   };
 
@@ -547,53 +1677,39 @@ async function saveToLeaderboard(){
       body: JSON.stringify(payload)
     });
     alert("리더보드에 기록 저장 완료! 🔥");
-
-    // 저장한 핸들 기준으로 내 순위 포함해서 다시 불러오기
     loadLeaderboard(handle);
   }catch(err){
     console.error(err);
     alert("리더보드 저장 중 오류가 발생했다.");
   }
 }
-
-/* ===========================
-   6. 리더보드 불러오기
-=========================== */
 async function loadLeaderboard(handle){
   const tableWrap = document.getElementById("leaderboard-wrap");
   const myRankWrap = document.getElementById("my-rank-wrap");
   if(!tableWrap) return;
-
   try{
-    // 내 핸들을 쿼리로 보내서 myRank까지 받아오기
     const url = handle
       ? `${SCRIPT_URL}?handle=${encodeURIComponent(handle)}`
       : SCRIPT_URL;
-
     const res  = await fetch(url);
     const data = await res.json();
-
     const list   = Array.isArray(data) ? data : (data.top || []);
     const myRank = !Array.isArray(data) ? data.myRank : null;
-
     if(myRankWrap) myRankWrap.innerHTML = "";
 
     if(!list || !list.length){
-      tableWrap.innerHTML = "<div class='empty'>아직 리더보드 데이터가 없습니다.<br>최소 20개 이상 원글로 분석 후 저장하면 순위에 반영돼.</div>";
+      tableWrap.innerHTML = "<div class='empty'>아직 리더보드 데이터가 없습니다.</div>";
       return;
     }
-
-    // 🔹 내 순위 카드 HTML
     if(myRank && myRankWrap){
       const trimmedAvg = Number(myRank.trimmedAvg || 0).toFixed(1);
       const avgScore   = Number(myRank.avgScore   || 0).toFixed(1);
       const totalPosts = myRank.totalPosts || 0;
-
       myRankWrap.innerHTML = `
-        <div style="padding:10px 12px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(148,163,184,.6);background:rgba(15,23,42,.95);font-size:12px;">
+        <div style="padding:10px 12px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(209,213,219,1);background:#f9fafb;font-size:12px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:4px;">내 현재 순위</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-            <span style="font-weight:700;color:#fbbf24;">#${myRank.rank}위</span>
+            <span style="font-weight:700;color:#f97316;">#${myRank.rank}위</span>
             <span>· 트림드 평균 <strong>${trimmedAvg}</strong></span>
             <span>· 평균 스코어 <strong>${avgScore}</strong></span>
             <span>· 원글 수 <strong>${totalPosts}</strong></span>
@@ -602,7 +1718,6 @@ async function loadLeaderboard(handle){
       `;
     }
 
-    // 🔹 상위 20명 테이블 HTML
     const rows = list.map((item, idx) => {
       const handle      = item.handle || "";
       const handleClean = handle.replace("@","").trim();
@@ -610,13 +1725,12 @@ async function loadLeaderboard(handle){
       const avgScore    = Number(item.avgScore   || 0).toFixed(1);
       const totalPosts  = item.totalPosts || 0;
       const bestLink    = item.bestLink || (handleClean ? `https://twitter.com/${handleClean}` : "#");
-
       return `
         <tr>
           <td>#${idx+1}</td>
           <td>
-            <a href="${bestLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#e5e7eb">
-              <img src="https://unavatar.io/twitter/${handleClean}" style="width:20px;height:20px;border-radius:999px;border:1px solid rgba(148,163,184,.6)"/>
+            <a href="${bestLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#111827">
+              <img src="https://unavatar.io/twitter/${handleClean}" style="width:20px;height:20px;border-radius:999px;border:1px solid rgba(209,213,219,1)"/>
               <span>${handle}</span>
             </a>
           </td>
@@ -626,7 +1740,6 @@ async function loadLeaderboard(handle){
           <td>${item.bestLink ? `<a href="${item.bestLink}" class="link-pill" target="_blank">대표 트윗 보기 ↗</a>` : ""}</td>
         </tr>`;
     }).join("");
-
     tableWrap.innerHTML = `
       <table>
         <thead>
@@ -647,25 +1760,77 @@ async function loadLeaderboard(handle){
   }
 }
 
-/* ===========================
-   7. 탭 & 이벤트
-=========================== */
+/* ========== 탭 & 이벤트 ========== */
 document.querySelectorAll(".grade-tab").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".grade-tab").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     const g=btn.dataset.grade;
-    if(g==="ALL") renderGrade(ALL.slice(0,30));
-    else renderGrade(buckets[g]);
+    CURRENT_GRADE = g;
+    if(g==="ALL") renderGrade(CURRENT_LIST.slice(0,30));
+    else renderGrade(buckets[g] || []);
   });
 });
 
+document.querySelectorAll(".range-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".range-tab").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    CURRENT_RANGE = btn.dataset.range || "ALL";
+    updateView();
+  });
+});
+
+const sortSelect = document.getElementById("sort-key");
+if(sortSelect){
+  sortSelect.addEventListener("change", e=>{
+    SORT_KEY = e.target.value || "score";
+    if(!CURRENT_LIST.length) return;
+    renderTop10(CURRENT_LIST);
+    if(CURRENT_GRADE === "ALL") renderGrade(CURRENT_LIST.slice(0,30));
+    else renderGrade(buckets[CURRENT_GRADE] || []);
+  });
+}
+
 document.getElementById("leader-save-btn").addEventListener("click", saveToLeaderboard);
-
-// 처음에는 그냥 상위 20명만 불러오기 (내 순위 없이)
 loadLeaderboard();
-</script>
 
+/* ========== 사이드바 뷰 토글 ========== */
+const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
+const viewDashboard = document.getElementById("view-dashboard");
+const viewLeaderboard = document.getElementById("view-leaderboard");
+const viewProjects = document.getElementById("view-projects");
+
+viewNavItems.forEach(item => {
+  item.addEventListener("click", () => {
+    const view = item.dataset.view;
+
+    viewNavItems.forEach(i => i.classList.remove("active"));
+    item.classList.add("active");
+
+    if (view === "leaderboard") {
+      viewDashboard.style.display = "none";
+      viewLeaderboard.style.display = "block";
+      viewProjects.style.display = "none";
+      loadLeaderboard();
+    } else if (view === "projects") {
+      viewDashboard.style.display = "none";
+      viewLeaderboard.style.display = "none";
+      viewProjects.style.display = "block";
+    } else {
+      viewDashboard.style.display = "block";
+      viewLeaderboard.style.display = "none";
+      viewProjects.style.display = "none";
+    }
+  });
+});
+
+/* 사이드바 접기 / 펼치기 */
+const layout = document.querySelector(".layout");
+const sidebarToggle = document.getElementById("sidebar-toggle");
+sidebarToggle.addEventListener("click", () => {
+  layout.classList.toggle("collapsed");
+});
+</script>
 </body>
 </html>
-
