@@ -690,13 +690,8 @@ tbody tr:hover td{background:#f9fafb}
   text-align:center;
   margin-bottom:8px;
 }
-.project-chart-wrap{
+.project-chart-wrap,
 .project-grade-chart-wrap{
-  width:100%;
-  max-width:420px;
-  margin:0 auto 16px;
-}
-
   width:100%;
   max-width:420px;
   margin:0 auto 12px;
@@ -1038,7 +1033,7 @@ tbody tr:hover td{background:#f9fafb}
 
 <script>
 // ===== Supabase Google 로그인 설정 =====
-const SUPABASE_URL = "https://ejqrnapdwblbqvnperid.supabase.co";
+const SUPABASE_URL = "https://ejqrnapdwlbqvnperid.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_ltaNA7nnVozoSCOcZljg";
 
 let supabaseClient = null;
@@ -1200,6 +1195,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
+<script>
 /* ========= 설정 ========= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0yJIOdUoeRNwMn9fys-5ePI6UX6wkqBVhWNLrZ-gomO1sGNgTUJbhO0Kfj0n2QgdC/exec";
 const MIN_POSTS_FOR_LEADERBOARD = 20;
@@ -2155,7 +2151,7 @@ function updateView(){
     </div>
 
     <div class="summary-card summary-card--trimmed">
-      <div class="summary-ring"><span>⚖️</span></div>
+      <div class="summary-ring"><span⚖️</span></div>
       <div class="summary-text">
         <div class="summary-label">트림드 평균</div>
         <div class="summary-value">${trimmedAvg.toFixed(1)}</div>
@@ -2760,6 +2756,6 @@ sidebarToggle.addEventListener("click", () => {
   layout.classList.toggle("collapsed");
 });
 </script>
+</script>
 </body>
 </html>
-
