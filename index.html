@@ -991,6 +991,39 @@ tbody tr:hover td{background:#f9fafb}
     padding:10px 10px 12px;
   }
 }
+
+.infofi-form-card{
+  margin-top:10px;
+}
+.infofi-form-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+.infofi-form-row{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  flex:1 1 140px;
+  min-width:140px;
+}
+.infofi-form-row label{
+  font-size:11px;
+  color:var(--text-muted);
+}
+.infofi-form-row input{
+  border-radius:8px;
+  border:1px solid rgba(209,213,219,1);
+  padding:6px 10px;
+  font-size:12px;
+}
+.infofi-note{
+  margin-top:6px;
+  font-size:10px;
+  color:var(--text-muted);
+}
+
 </style>
 </head>
 
@@ -1366,10 +1399,10 @@ tbody tr:hover td{background:#f9fafb}
     <div id="view-infofi" style="display:none;">
       <div class="top-nav">
         <div>
-          <div class="top-title">InfoFi 리더보드 스냅샷</div>
+          <div class="top-title">InfoFi 리더보드 </div>
           <div class="top-sub">
-            Kaito / Cookie / MemeMax 등 InfoFi 프로젝트의 <b>프로젝트별 리더보드 순위</b>를
-            곰투처럼 <b>핸들 검색</b>으로 보여주는 화면이야. (우리가 만든 스냅샷 DB 기준)
+            Kaito / Cookie /등 InfoFi 프로젝트의 리더보드 순위<b></b>
+            <b></b>
           </div>
         </div>
       </div>
@@ -1390,6 +1423,59 @@ tbody tr:hover td{background:#f9fafb}
           ※  <code></code> 딜레이 있음
         </div>
       </section>
+      <section class="card card-soft infofi-form-card">
+        <div class="infofi-hero-title">📥 내 InfoFi 스냅샷 등록하기</div>
+        <div class="infofi-hero-sub">
+          <b></b>
+          <b></b>
+        </div>
+
+        <div class="infofi-form-grid">
+          <div class="infofi-form-row">
+            <label for="infofi-form-handle">핸들</label>
+            <input id="infofi-form-handle" placeholder="@bud_dha__">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-project">프로젝트</label>
+            <input id="infofi-form-project" placeholder="MemeMax / Symphony 등">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-eco">에코</label>
+            <input id="infofi-form-eco" placeholder="MemeMax / Kaito / River...">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-segment">세그먼트</label>
+            <input id="infofi-form-segment" placeholder="Creator / Community 등">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-window">윈도우</label>
+            <input id="infofi-form-window" placeholder="7D / 30D / 3M 등">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-rank">순위</label>
+            <input id="infofi-form-rank" type="number" placeholder="예: 93">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-mindshare">Mindshare</label>
+            <input id="infofi-form-mindshare" type="number" step="0.0001" placeholder="예: 0.28">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-last">Last</label>
+            <input id="infofi-form-last" type="number" step="0.0001" placeholder="예: 0.27">
+          </div>
+          <div class="infofi-form-row">
+            <label for="infofi-form-firstPercent">1st %</label>
+            <input id="infofi-form-firstPercent" type="number" step="0.01" placeholder="예: 2.03">
+          </div>
+        </div>
+
+        <div class="infofi-note">
+          ※ 최소한 <b>핸들, 프로젝트, 윈도우, 순위</b> 정도만 넣어도 저장 가능하게 설계했어.
+        </div>
+
+        <button type="button" class="infofi-search-btn" onclick="submitInfofiSnapshot()">스냅샷 저장</button>
+      </section>
+
 
       <section class="infofi-results card">
         <div id="infofi-result-wrap" class="infofi-projects-grid">
@@ -1413,6 +1499,9 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0yJIOdUoeRNwMn9fys
 const MIN_POSTS_FOR_LEADERBOARD = 20;
 const TRIM_RATIO = 0.1;
 let CURRENT_LANG = "ko";
+
+// ✅ InfoFi 전용 백엔드 주소
+const INFOFI_API_BASE = "https://script.google.com/macros/s/AKfycbwKgIZ0FN7MDnfjSZGVf6hsu1BnFH6vFSM6R68PbNPc3dd1dxiQM1TE86oPYhOkNTCfkw/exec";
 
 const NICKNAME_KEY = "mindshare_nickname_v1";
 
@@ -3210,54 +3299,6 @@ const INFOFI_PROJECT_LOGOS = {
   //       "Symphony": "https://.../symphony-logo.png"
 };
 
-// ===== InfoFi 리더보드 스냅샷 DB =====
-const INFOFI_SNAPSHOTS = [
-  {
-    handle: "bud_dha__",
-    project: "MemeMax",
-    segment: "Creator",
-    eco: "MemeMax",
-    window: "7D",
-    rank: 93,
-    mindshare: 0.2800,
-    last: 0.2700,
-    firstPercent: 2.03
-  },
-  {
-    handle: "bud_dha__",
-    project: "Symphony",
-    segment: "Community",
-    eco: "Symphony",
-    window: "30D",
-    rank: 7,
-    mindshare: 8.20,
-    last: 0.01,
-    firstPercent: 8.20
-  },
-  {
-    handle: "bud_dha__",
-    project: "Symphony",
-    segment: "Community",
-    eco: "Symphony",
-    window: "3M",
-    rank: 7,
-    mindshare: 2.90,
-    last: 0.06,
-    firstPercent: 2.90
-  },
-  {
-    handle: "bud_dha__",
-    project: "Symphony",
-    segment: "Community",
-    eco: "Symphony",
-    window: "6M",
-    rank: 10,
-    mindshare: 1.40,
-    last: 0.01,
-    firstPercent: 1.40
-  }
-  // TODO: 여기 아래로 다른 핸들/프로젝트들 계속 추가하면 됨
-];
 
 // ===== InfoFi 리더보드 검색 =====
 function normalizeHandle(raw){
@@ -3265,129 +3306,182 @@ function normalizeHandle(raw){
   return raw.trim().replace(/^@/, "").toLowerCase();
 }
 
-function handleInfofiSearch(){
+
+async function handleInfofiSearch(){
   const input = document.getElementById("infofi-handle-input");
   const label = document.getElementById("infofi-handle-label");
   const wrap  = document.getElementById("infofi-result-wrap");
-  if(!input || !wrap) return;
+  if (!input || !wrap) return;
 
   const h = normalizeHandle(input.value);
-  if(!h){
+  if (!h) {
     label.textContent = "";
-    wrap.innerHTML = '<div class="infofi-empty">먼저 @핸들을 입력해 줘.</div>';
+    wrap.innerHTML = '<div class="infofi-empty">먼저 @핸들을 입력해줘.</div>';
     return;
   }
 
-  const rows = INFOFI_SNAPSHOTS.filter(r => normalizeHandle(r.handle) === h);
   label.innerHTML = `검색 핸들: <b>@${h}</b>`;
+  wrap.innerHTML = '<div class="infofi-empty">불러오는 중...</div>';
 
-  if(!rows.length){
-    wrap.innerHTML = '<div class="infofi-empty">아직 이 핸들에 대한 InfoFi 스냅샷이 없습니다. (곰투처럼 우리 DB에 한 번 넣어줘야 보여져)</div>';
+  try {
+    const res = await fetch(`${INFOFI_API_BASE}?mode=search&handle=${encodeURIComponent(h)}`);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const rows = await res.json();
+
+    if (!Array.isArray(rows) || !rows.length) {
+      wrap.innerHTML = '<div class="infofi-empty">아직 이 핸들에 대한 InfoFi 스냅샷이 없습니다. 아래 폼에서 한 번 등록해줘.</div>';
+      return;
+    }
+
+    // 프로젝트/에코 기준으로 그룹핑
+    const groups = {};
+    rows.forEach(r => {
+      const key = (r.eco || r.project || "") + "|" + (r.segment || "");
+      if (!groups[key]) {
+        groups[key] = {
+          project: r.project,
+          eco: r.eco || "",
+          segment: r.segment || "",
+          rows: []
+        };
+      }
+      groups[key].rows.push(r);
+    });
+
+    let html = "";
+    Object.values(groups).forEach(g => {
+      // 윈도우 정렬 (7D, 30D, 3M 순서 등 단순 문자열 정렬)
+      g.rows.sort((a, b) => String(a.window || "").localeCompare(String(b.window || ""));
+
+      const eco = g.eco || "";
+      const seg = g.segment || "";
+      const metaText = eco + (eco && seg ? " · " : "") + seg;
+
+      const rowsHtml = g.rows.map(r => {
+        const win = r.window || "-";
+        const rank = r.rank ?? "-";
+        const ms = r.mindshare ?? "-";
+        const last = r.last ?? "-";
+        const firstP = r.firstPercent ?? "-";
+        const ts = r.timestamp ? new Date(r.timestamp).toLocaleDateString() : "";
+
+        return `
+          <tr>
+            <td>${win}</td>
+            <td>${rank}</td>
+            <td>${ms}</td>
+            <td>${last}</td>
+            <td>${firstP}</td>
+            <td>${ts}</td>
+          </tr>
+        `;
+      }).join("");
+
+      html += `
+        <div class="infofi-project-card">
+          <div class="infofi-project-header">
+            <div class="infofi-header-left">
+              <div class="infofi-logo infofi-logo-initial">
+                <span>${(g.project || "?").slice(0, 2)}</span>
+              </div>
+              <div>
+                <div class="infofi-project-title">${g.project || "-"}</div>
+                <div class="infofi-project-meta">${metaText}</div>
+              </div>
+            </div>
+          </div>
+          <div class="infofi-table-wrap">
+            <table class="infofi-table">
+              <thead>
+                <tr>
+                  <th>윈도우</th>
+                  <th>순위</th>
+                  <th>Mindshare</th>
+                  <th>Last</th>
+                  <th>1st %</th>
+                  <th>업데이트</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    });
+
+    wrap.innerHTML = html || '<div class="infofi-empty">데이터가 없습니다.</div>';
+  } catch (err) {
+    console.error(err);
+    wrap.innerHTML = '<div class="infofi-empty">불러오는 중 오류가 발생했어. 잠시 후 다시 시도해줘.</div>';
+  }
+}
+
+
+
+async function submitInfofiSnapshot(){
+  const handleInput = document.getElementById("infofi-form-handle");
+  const projectInput = document.getElementById("infofi-form-project");
+  const ecoInput = document.getElementById("infofi-form-eco");
+  const segmentInput = document.getElementById("infofi-form-segment");
+  const windowInput = document.getElementById("infofi-form-window");
+  const rankInput = document.getElementById("infofi-form-rank");
+  const mindshareInput = document.getElementById("infofi-form-mindshare");
+  const lastInput = document.getElementById("infofi-form-last");
+  const firstPercentInput = document.getElementById("infofi-form-firstPercent");
+
+  const h = normalizeHandle(handleInput.value);
+  if (!h) {
+    alert("핸들은 꼭 입력해줘!");
+    handleInput.focus();
+    return;
+  }
+  if (!windowInput.value.trim()) {
+    alert("윈도우(7D/30D/3M 등)를 입력해줘.");
+    windowInput.focus();
+    return;
+  }
+  if (!rankInput.value.trim()) {
+    alert("순위(rank)를 적어줘.");
+    rankInput.focus();
     return;
   }
 
-  // 프로젝트/에코 기준으로 그룹핑
-  const groups = {};
-  rows.forEach(r => {
-    const key = (r.eco || r.project) + "|" + r.segment;
-    if(!groups[key]){
-      groups[key] = {
-        project: r.project,
-        eco: r.eco || "",
-        segment: r.segment || "",
-        rows: []
-      };
-    }
-    groups[key].rows.push(r);
-  });
+  const payload = {
+    handle: h,
+    project: projectInput.value.trim(),
+    eco: ecoInput.value.trim(),
+    segment: segmentInput.value.trim(),
+    window: windowInput.value.trim(),
+    rank: rankInput.value.trim(),
+    mindshare: mindshareInput.value.trim(),
+    last: lastInput.value.trim(),
+    firstPercent: firstPercentInput.value.trim()
+  };
 
-  
-  
-  let html = "";
-  Object.values(groups).forEach(g => {
-    // 기간 정렬
-    g.rows.sort((a,b)=>{
-      const order = ["24H","7D","30D","90D","3M","6M","1Y"];
-      const ia = order.indexOf(a.window);
-      const ib = order.indexOf(b.window);
-      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+  try {
+    const res = await fetch(INFOFI_API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "unknown");
 
-    // 각 기간별 행 HTML
-    let rowsHtml = "";
-    g.rows.forEach(r => {
-      const win = r.window || "";
-      const rank = r.rank != null ? r.rank : "";
-      const ms = (r.mindshare ?? 0).toFixed(4);
-      const last = (r.last ?? 0).toFixed(4);
-      const firstP = (r.firstPercent ?? 0).toFixed(4);
+    alert("✅ InfoFi 스냅샷 저장 완료! 이제 위에서 @핸들 검색하면 바로 보여.");
 
-      rowsHtml += '<tr>'
-        + '<td>' + win + '</td>'
-        + '<td>#' + rank + '</td>'
-        + '<td>' + ms + '%</td>'
-        + '<td>' + last + '%</td>'
-        + '<td>' + firstP + '%</td>'
-        + '</tr>';
-    });
-
-    const eco = g.eco || "";
-    const seg = g.segment || "";
-    const metaText = eco + (eco && seg ? " · " : "") + seg;
-
-    // 로고: 우선 순위
-    // 1) INFOFI_PROJECT_LOGOS에 직접 지정된 URL
-    // 2) INFOFI_PROJECT_X_HANDLES에 등록된 X 핸들의 아바타 (unavatar.io)
-    // 3) 둘 다 없으면 프로젝트 이름 이니셜 원형 뱃지
-    const xHandles = (typeof INFOFI_PROJECT_X_HANDLES === "object") ? INFOFI_PROJECT_X_HANDLES : {};
-    const logos = (typeof INFOFI_PROJECT_LOGOS === "object") ? INFOFI_PROJECT_LOGOS : {};
-    const xHandle = xHandles[g.project] || "";
-    let logoUrl = logos[g.project] || "";
-    if (!logoUrl && xHandle) {
-      logoUrl = "https://unavatar.io/twitter/" + encodeURIComponent(xHandle);
+    // 저장 후 검색창에 자동 세팅 + 검색 실행
+    const searchInput = document.getElementById("infofi-handle-input");
+    if (searchInput) {
+      searchInput.value = "@" + h;
+      handleInfofiSearch();
     }
-    const initial = (g.project || "?").charAt(0).toUpperCase();
-    let logoHtml = "";
-    if (logoUrl) {
-      logoHtml = '<div class="infofi-logo"><img src="' + logoUrl + '" alt="' + g.project + ' logo"></div>';
-    } else {
-      logoHtml = '<div class="infofi-logo">' + initial + '</div>';
-    }
-
-    html += ''
-      + '<div class="infofi-project-card">'
-        + '<div class="infofi-project-header">'
-          + '<div class="infofi-header-left">'
-            + logoHtml
-            + '<div class="infofi-project-main">'
-              + '<div class="infofi-project-name">' + g.project + '</div>'
-              + '<div class="infofi-project-meta">' + metaText + '</div>'
-            + '</div>'
-          + '</div>'
-          + '<div class="infofi-badge">프로젝트 리더보드 스냅샷</div>'
-        + '</div>'
-        + '<div class="infofi-table-wrap">'
-          + '<table class="infofi-table">'
-            + '<thead>'
-              + '<tr>'
-                + '<th>기간</th>'
-                + '<th>Rank</th>'
-                + '<th>Mindshare</th>'
-                + '<th>마지막 스냅샷</th>'
-                + '<th>1위 대비</th>'
-              + '</tr>'
-            + '</thead>'
-            + '<tbody>'
-              + rowsHtml +
-            '</tbody>'
-          + '</table>'
-        + '</div>'
-      + '</div>';
-  });
-
-  wrap.innerHTML = html;
-
-
+  } catch (err) {
+    console.error(err);
+    alert("저장 중 오류가 발생했어. 잠시 후 다시 시도해줘.");
+  }
 }
 
 // Enter 키로 검색
