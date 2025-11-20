@@ -67,6 +67,7 @@ body{
   gap:24px;
   box-shadow: 10px 0 35px rgba(148,163,184,.45);
   position:relative;
+  z-index:10;
   transition:width .2s ease;
   overflow:hidden;
   border-right:1px solid rgba(209,213,219,.9);
@@ -744,7 +745,253 @@ tbody tr:hover td{background:#f9fafb}
   color:var(--text-muted);
   margin-top:6px;
 }
-  </style>
+  
+/* ===== 야핑 플래너 전용 레이아웃 ===== */
+.yap-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr);
+  gap:16px;
+  margin-top:8px;
+}
+@media (max-width:1024px){
+  .yap-layout{
+    grid-template-columns:1fr;
+  }
+}
+.yap-form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.yap-form-grid-1{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.yap-label{
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.yap-input,
+.yap-select{
+  width:100%;
+  padding:7px 9px;
+  border-radius:10px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+  font-size:12px;
+}
+.yap-input::placeholder{
+  color:#9ca3af;
+}
+.yap-add-btn{
+  margin-top:8px;
+  width:100%;
+  border:none;
+  border-radius:999px;
+  padding:8px 0;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  box-shadow:0 10px 24px rgba(79,70,229,.45);
+}
+.yap-list-empty{
+  font-size:12px;
+  color:var(--text-muted);
+}
+.yap-item{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:8px;
+  align-items:flex-start;
+  padding:8px 9px;
+  border-radius:12px;
+  border:1px solid rgba(226,232,240,1);
+  background:#f9fafb;
+  margin-bottom:6px;
+  font-size:11px;
+}
+.yap-item.done{
+  opacity:.6;
+  text-decoration:line-through;
+}
+.yap-tags{
+  margin-top:2px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+.yap-tag{
+  padding:2px 6px;
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+}
+.yap-delete{
+  border:none;
+  background:transparent;
+  color:#9ca3af;
+  cursor:pointer;
+  font-size:12px;
+}
+
+/* ===== InfoFi 리더보드 ===== */
+.infofi-hero{
+  margin-top:8px;
+  margin-bottom:12px;
+}
+.infofi-hero-title{
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:4px;
+}
+.infofi-hero-sub{
+  font-size:11px;
+  color:var(--text-muted);
+  line-height:1.5;
+}
+.infofi-search-row{
+  margin-top:10px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.infofi-search-input{
+  flex:1;
+  min-width:220px;
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+  padding:9px 14px;
+  font-size:12px;
+}
+.infofi-search-btn{
+  border-radius:999px;
+  border:none;
+  padding:9px 16px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  box-shadow:0 10px 22px rgba(79,70,229,.45);
+}
+.infofi-handle-label{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--text-muted);
+}
+.infofi-handle-label b{
+  color:#111827;
+}
+.infofi-hint{
+  margin-top:6px;
+  font-size:11px;
+  color:var(--text-muted);
+}
+.infofi-projects-grid{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.infofi-project-card{
+  border-radius:16px;
+  border:1px solid rgba(226,232,240,1);
+  background:#f9fafb;
+  padding:10px 12px 12px;
+}
+.infofi-project-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+  gap:8px;
+}
+.infofi-header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.infofi-logo{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:700;
+  background:#e0f2fe;
+  color:#0369a1;
+  flex-shrink:0;
+}
+.infofi-logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.infofi-project-main{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.infofi-project-name{
+  font-size:13px;
+  font-weight:700;
+}
+.infofi-project-meta{
+  font-size:11px;
+  color:var(--text-muted);
+}
+.infofi-badge{
+  font-size:10px;
+  padding:3px 7px;
+  border-radius:999px;
+  border:1px solid rgba(191,219,254,1);
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+.infofi-table-wrap{
+  margin-top:6px;
+}
+.infofi-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px;
+}
+.infofi-table th,
+.infofi-table td{
+  padding:6px 6px;
+  border-bottom:1px solid rgba(226,232,240,1);
+}
+.infofi-table th{
+  background:#f8fafc;
+  color:var(--text-muted);
+  text-align:left;
+  font-size:10px;
+}
+.infofi-table tr:last-child td{
+  border-bottom:none;
+}
+.infofi-empty{
+  font-size:12px;
+  color:var(--text-muted);
+  text-align:center;
+  padding:8px 4px;
+}
+@media (max-width:768px){
+  .infofi-project-card{
+    padding:10px 10px 12px;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -754,25 +1001,27 @@ tbody tr:hover td{background:#f9fafb}
   <aside class="sidebar">
     <button id="sidebar-toggle" class="sidebar-toggle">⟨</button>
 
-    <!-- 로그인 카드 (상단 고정) -->
-    <div class="side-profile">
-      <div class="side-avatar">
-        <img id="side-avatar-img" src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
+    <div>
+      <div class="side-profile">
+        <div class="side-avatar">
+          <img id="side-avatar-img" src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
+        </div>
+        <div>
+          <div class="side-name" id="side-username">게스트</div>
+          <a id="side-handle-link" href="https://twitter.com" target="_blank" class="side-handle">@익명</a>
+          <button type="button" class="side-login-btn" id="nickname-btn">닉네임 설정</button>
+        </div>
       </div>
-      <div>
-        <div class="side-name" id="side-name">게스트</div>
-        <a class="side-handle" id="side-handle" href="https://twitter.com" target="_blank">@로그인 필요</a>
-        <button id="x-login-btn" class="side-login-btn">Google로 로그인</button>
-      </div>
-    </div>
 
-    <div
-<div class="side-nav">
+      <div class="side-nav">
         <div class="side-nav-item active" data-view="dashboard">
           <span class="icon">📊</span><span class="side-label" id="nav-dashboard-label">Dashboard</span>
         </div>
         <div class="side-nav-item" data-view="leaderboard">
           <span class="icon">🏆</span><span class="side-label" id="nav-leaderboard-label">리더보드</span>
+        </div>
+        <div class="side-nav-item" data-view="infofi">
+          <span class="icon">📡</span><span class="side-label" id="nav-infofi-label">InfoFi 리더보드</span>
         </div>
         <div class="side-nav-item" data-view="history">
           <span class="icon">🗂</span><span class="side-label" id="nav-history-label">내 히스토리</span>
@@ -780,15 +1029,13 @@ tbody tr:hover td{background:#f9fafb}
         <div class="side-nav-item" data-view="projects">
           <span class="icon">📚</span><span class="side-label" id="nav-projects-label">프로젝트별 마인드쉐어</span>
         </div>
+        <div class="side-nav-item" data-view="yapping">
+          <span class="icon">📝</span><span class="side-label" id="nav-yapping-label">야핑 플래너</span>
+        </div>
         <a class="side-nav-item" href="https://buddha913.github.io/crypto-fullcourse/" target="_blank">
           <span class="icon">📘</span><span class="side-label" id="nav-course-label">크립토 풀코스</span>
         </a>
-      
-<div class="side-profile-bottom">
-        <div class="side-avatar">
-          <img src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
-        </div>
-</div>
+      </div>
     </div>
 
     <div class="side-footer">
@@ -1029,106 +1276,135 @@ tbody tr:hover td{background:#f9fafb}
         </div>
       </section>
     </div>
-    <!-- ▲▲ 프로젝트 화면 끝 ▲▲ -->
+    
+    <!-- ▼▼ 야핑 플래너 화면 ▼▼ -->
+    <div id="view-yapping" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">야핑 & 보상 플래너</div>
+          <div class="top-sub">
+            스프레드시트에서 관리하던 <b>필수/보조 야핑 · 주기 · 기간 · 보상</b>을 이 화면에서 직접 관리할 수 있습니다.
+            (브라우저 <code>localStorage</code>에 저장)
+          </div>
+        </div>
+      </div>
+
+      <div class="yap-layout">
+        <section class="card card-soft">
+          <div class="section-header">
+            <div class="section-title">새 야핑 계획 추가</div>
+            <div class="section-sub">엑셀 한 줄 = 아래 폼 한 줄이라고 생각하면 편해.</div>
+          </div>
+
+          <form id="yap-form">
+            <div class="yap-form-grid">
+              <div>
+                <div class="yap-label">한국명</div>
+                <input id="yap-kor" class="yap-input" placeholder="카이토, 리버, 뱅커 ..." />
+              </div>
+              <div>
+                <div class="yap-label">프로젝트</div>
+                <input id="yap-project" class="yap-input" placeholder="Kaito, River, Bankr ..." />
+              </div>
+              <div>
+                <div class="yap-label">계열</div>
+                <input id="yap-segment" class="yap-input" placeholder="장기 / 단기 등" />
+              </div>
+              <div>
+                <div class="yap-label">야핑 타입</div>
+                <select id="yap-type" class="yap-select">
+                  <option value="필수">필수</option>
+                  <option value="보조">보조</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="yap-form-grid">
+              <div>
+                <div class="yap-label">야핑 주기</div>
+                <input id="yap-frequency" class="yap-input" placeholder="일2회 / 일1회 / 주1회 ..." />
+              </div>
+              <div>
+                <div class="yap-label">보상</div>
+                <input id="yap-reward" class="yap-input" placeholder="$200, 포인트, WL 등" />
+              </div>
+              <div>
+                <div class="yap-label">시작일</div>
+                <input id="yap-start" type="date" class="yap-input" />
+              </div>
+              <div>
+                <div class="yap-label">종료일</div>
+                <input id="yap-end" type="date" class="yap-input" />
+              </div>
+            </div>
+
+            <div class="yap-form-grid-1">
+              <div>
+                <div class="yap-label">메모</div>
+                <input id="yap-memo" class="yap-input" placeholder="예: 일2회 스레드 + 디스코드 후기, 최소 2개월 유지" />
+              </div>
+            </div>
+
+            <button class="yap-add-btn" type="submit">+ 야핑 계획 추가</button>
+          </form>
+        </section>
+
+        <section class="card card-soft">
+          <div class="section-header">
+            <div class="section-title">나의 야핑 리스트</div>
+            <div class="section-sub">왼쪽 체크박스는 전체 완료 여부 체크 용도, 메모까지 한 눈에 정리.</div>
+          </div>
+          <div id="yap-list">
+            <div class="yap-list-empty">등록된 야핑 계획이 없습니다. 왼쪽에서 새 계획을 추가해줘.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <!-- ▲▲ 야핑 플래너 화면 끝 ▲▲ -->
+
+    <!-- ▼▼ InfoFi 리더보드 화면 ▼▼ -->
+    <div id="view-infofi" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">InfoFi 리더보드 스냅샷</div>
+          <div class="top-sub">
+            Kaito / Cookie / MemeMax 등 InfoFi 프로젝트의 <b>프로젝트별 리더보드 순위</b>를
+            곰투처럼 <b>핸들 검색</b>으로 보여주는 화면이야. (우리가 만든 스냅샷 DB 기준)
+          </div>
+        </div>
+      </div>
+
+      <section class="card card-soft infofi-hero">
+        <div class="infofi-hero-title">🔍 핸들로 내 InfoFi 순위 찾기</div>
+        <div class="infofi-hero-sub">
+          예: <code>@bud_dha__</code> 처럼 입력하면됨
+        </div>
+
+        <div class="infofi-search-row">
+          <input id="infofi-handle-input" class="infofi-search-input" placeholder="@핸들 입력 (예: @bud_dha__)" />
+          <button type="button" class="infofi-search-btn" onclick="handleInfofiSearch()">검색</button>
+        </div>
+
+        <div class="infofi-handle-label" id="infofi-handle-label"></div>
+        <div class="infofi-hint">
+          ※  <code></code> 딜레이 있음
+        </div>
+      </section>
+
+      <section class="infofi-results card">
+        <div id="infofi-result-wrap" class="infofi-projects-grid">
+          <div class="empty">먼저 위에서 @핸들을 입력하고 검색을 눌러줘.</div>
+        </div>
+      </section>
+    </div>
+    <!-- ▲▲ InfoFi 리더보드 화면 끝 ▲▲ -->
+
+<!-- ▲▲ 프로젝트 화면 끝 ▲▲ -->
 
   </main>
 </div>
 
-<!-- Supabase JS (Google 로그인용) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
 
-<script>
-// ===== Supabase Google 로그인 (단순 버전) =====
-const SUPABASE_URL = "https://ejqrnapdwblbqvnperid.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_ltaNA7nnVozoSCOcZljg";
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-});
-
-// 로그인 상태에 따라 사이드바 UI 변경
-function applyAuthUI(user) {
-  const nameEl   = document.getElementById("side-name");
-  const handleEl = document.getElementById("side-handle");
-  const avatarEl = document.getElementById("side-avatar-img");
-  const btnEl    = document.getElementById("x-login-btn");
-  if (!nameEl || !handleEl || !btnEl) return;
-
-  if (!user) {
-    // 게스트
-    nameEl.textContent = "게스트";
-    handleEl.textContent = "@로그인 필요";
-    handleEl.href = "https://twitter.com";
-    if (avatarEl) avatarEl.src = "https://unavatar.io/twitter/bud_dha__";
-    btnEl.textContent = "Google로 로그인";
-    btnEl.onclick = loginWithGoogle;
-  } else {
-    // 로그인된 유저
-    const meta = user.user_metadata || {};
-    const fullName = meta.name || meta.full_name || user.email || "X 사용자";
-    const nick = meta.user_name || meta.preferred_username || "";
-    const handle = nick ? "@" + nick : "@x-user";
-
-    nameEl.textContent = fullName;
-    handleEl.textContent = handle + " ↗";
-    handleEl.href = nick ? ("https://twitter.com/" + nick) : "https://twitter.com";
-
-    if (avatarEl) {
-      const avatarUrl = meta.avatar_url || meta.picture;
-      if (avatarUrl) avatarEl.src = avatarUrl;
-    }
-    btnEl.textContent = "로그아웃";
-    btnEl.onclick = logout;
-  }
-}
-
-// 현재 세션 불러오기
-async function initAuth() {
-  try {
-    const { data, error } = await supabaseClient.auth.getSession();
-    console.log("[Auth] getSession:", data, error);
-    const user = data?.session?.user || null;
-    applyAuthUI(user);
-  } catch (e) {
-    console.warn("[Auth] initAuth error:", e);
-  }
-
-  // 상태 변경 감지
-  supabaseClient.auth.onAuthStateChange((_event, session) => {
-    console.log("[Auth] onAuthStateChange:", _event, session);
-    applyAuthUI(session?.user || null);
-  });
-}
-
-// 구글 로그인
-async function loginWithGoogle() {
-  console.log("[Auth] loginWithGoogle");
-  const { data, error } = await supabaseClient.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: "https://www.buddha-mindshare.com"
-    }
-  });
-  if (error) console.error("[Auth] signInWithOAuth error:", error);
-  else console.log("[Auth] signInWithOAuth data:", data);
-}
-
-// 로그아웃
-async function logout() {
-  console.log("[Auth] logout");
-  await supabaseClient.auth.signOut();
-}
-
-// 페이지 로드 시 초기화
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("[Auth] DOMContentLoaded");
-  initAuth();
-});
-</script>
-</script>
 
 
 <script>
@@ -1137,6 +1413,62 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0yJIOdUoeRNwMn9fys
 const MIN_POSTS_FOR_LEADERBOARD = 20;
 const TRIM_RATIO = 0.1;
 let CURRENT_LANG = "ko";
+
+const NICKNAME_KEY = "mindshare_nickname_v1";
+
+function applyNicknameSidebar(){
+  const nameSpan   = document.getElementById("side-username");
+  const handleLink = document.getElementById("side-handle-link");
+  const avatarImg  = document.getElementById("side-avatar-img");
+  if (!nameSpan || !handleLink) return;
+
+  const stored = (typeof localStorage !== "undefined")
+    ? localStorage.getItem(NICKNAME_KEY)
+    : null;
+
+  if (!stored) {
+    // 기본값: 게스트 모드
+    nameSpan.textContent = "게스트";
+    handleLink.textContent = "@익명";
+    handleLink.href = "javascript:void(0)";
+    if (avatarImg) {
+      avatarImg.src = "https://unavatar.io/twitter/guest";
+    }
+    return;
+  }
+
+  const nick = stored.trim().slice(0, 30) || "게스트";
+  nameSpan.textContent = nick;
+  handleLink.textContent = "@" + nick;
+  handleLink.href = "javascript:void(0)";
+  if (avatarImg) {
+    // 완전 익명 느낌으로, 닉네임 기반 아바타
+    avatarImg.src = "https://unavatar.io/twitter/" + encodeURIComponent(nick);
+  }
+}
+
+function openNicknamePrompt(){
+  let current = "";
+  if (typeof localStorage !== "undefined") {
+    current = localStorage.getItem(NICKNAME_KEY) || "";
+  }
+  const input = prompt("이 브라우저에서 사용할 익명 닉네임을 정해줘 (예: 붓다-야핑장인)", current);
+  if (!input) return;
+  const nick = input.trim().slice(0, 30);
+  if (!nick) return;
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(NICKNAME_KEY, nick);
+  }
+  applyNicknameSidebar();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyNicknameSidebar();
+  const btn = document.getElementById("nickname-btn");
+  if (btn) {
+    btn.addEventListener("click", openNicknamePrompt);
+  }
+});
 
 /* 프로젝트 키워드 (원하면 여기 수정) */
 /* 프로젝트 키워드 (이미지에 나온 프로젝트 + 주요 야핑 프로젝트) */
@@ -2643,47 +2975,199 @@ document.getElementById("leader-save-btn").addEventListener("click", saveToLeade
 loadLeaderboard();
 
 /* ========== 사이드바 뷰 토글 ========== */
-const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
-const viewDashboard = document.getElementById("view-dashboard");
-const viewLeaderboard = document.getElementById("view-leaderboard");
-const viewProjects = document.getElementById("view-projects");
-const viewHistory = document.getElementById("view-history");
 
-viewNavItems.forEach(item => {
-  item.addEventListener("click", () => {
-    const view = item.dataset.view;
 
-    viewNavItems.forEach(i => i.classList.remove("active"));
-    item.classList.add("active");
+// ===== 사이드바 탭 전환 로직 (최적화 버전) =====
+document.addEventListener("DOMContentLoaded", () => {
+  const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
+  const viewDashboard = document.getElementById("view-dashboard");
+  const viewLeaderboard = document.getElementById("view-leaderboard");
+  const viewProjects = document.getElementById("view-projects");
+  const viewHistory = document.getElementById("view-history");
+  const viewYapping = document.getElementById("view-yapping");
+  const viewInfofi = document.getElementById("view-infofi");
 
-    if (view === "leaderboard") {
-      viewDashboard.style.display = "none";
-      viewLeaderboard.style.display = "block";
-      viewProjects.style.display = "none";
-      if (viewHistory) viewHistory.style.display = "none";
-      loadLeaderboard();
-    } else if (view === "projects") {
-      viewDashboard.style.display = "none";
-      viewLeaderboard.style.display = "none";
-      viewProjects.style.display = "block";
-      if (viewHistory) viewHistory.style.display = "none";
-    } else if (view === "history") {
-      viewDashboard.style.display = "none";
-      viewLeaderboard.style.display = "none";
-      viewProjects.style.display = "none";
-      if (viewHistory) {
-        viewHistory.style.display = "block";
-        renderHistoryList();
-      }
-    } else {
-      viewDashboard.style.display = "block";
-      viewLeaderboard.style.display = "none";
-      viewProjects.style.display = "none";
-      if (viewHistory) viewHistory.style.display = "none";
+  function showView(target){
+    if (!viewDashboard || !viewLeaderboard || !viewProjects) return;
+
+    // 기본값: 전부 숨기기
+    viewDashboard.style.display = "none";
+    viewLeaderboard.style.display = "none";
+    viewProjects.style.display = "none";
+    if (viewHistory) viewHistory.style.display = "none";
+    if (viewYapping) viewYapping.style.display = "none";
+    if (viewInfofi) viewInfofi.style.display = "none";
+
+    switch(target){
+      case "leaderboard":
+        viewLeaderboard.style.display = "block";
+        // 리더보드 데이터 로딩
+        if (typeof loadLeaderboard === "function") {
+          loadLeaderboard();
+        }
+        break;
+      case "projects":
+        viewProjects.style.display = "block";
+        break;
+      case "history":
+        if (viewHistory) {
+          viewHistory.style.display = "block";
+          if (typeof renderHistoryList === "function") {
+            renderHistoryList();
+          }
+        }
+        break;
+      case "yapping":
+        if (viewYapping) {
+          viewYapping.style.display = "block";
+        }
+        break;
+      case "infofi":
+        if (viewInfofi) {
+          viewInfofi.style.display = "block";
+        }
+        break;
+      case "dashboard":
+      default:
+        viewDashboard.style.display = "block";
+        break;
     }
+  }
+
+  // 처음 로드시 대시보드 보이도록
+  showView("dashboard");
+
+  viewNavItems.forEach(item => {
+    item.addEventListener("click", () => {
+      const view = item.dataset.view || "dashboard";
+
+      // active 클래스 토글
+      viewNavItems.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+
+      // 뷰 전환
+      showView(view);
+    });
   });
 });
 
+
+/* ===== 야핑 플래너 로컬 저장 / 렌더링 ===== */
+const YAP_STORAGE_KEY = "mindshare_yapping_planner_v1";
+let YAPS = [];
+
+function loadYaps(){
+  try{
+    const raw = localStorage.getItem(YAP_STORAGE_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    if(Array.isArray(parsed)) YAPS = parsed;
+  }catch(e){
+    console.warn("야핑 플래너 로드 오류", e);
+  }
+}
+
+function saveYaps(){
+  try{
+    localStorage.setItem(YAP_STORAGE_KEY, JSON.stringify(YAPS));
+  }catch(e){
+    console.warn("야핑 플래너 저장 오류", e);
+  }
+}
+
+function renderYaps(){
+  const wrap = document.getElementById("yap-list");
+  if(!wrap) return;
+  if(!YAPS.length){
+    wrap.innerHTML = '<div class="yap-list-empty">등록된 야핑 계획이 없습니다. 왼쪽에서 새 계획을 추가해줘.</div>';
+    return;
+  }
+  wrap.innerHTML = "";
+  YAPS.forEach((yap, idx)=>{
+    const div = document.createElement("div");
+    div.className = "yap-item" + (yap.done ? " done" : "");
+    div.innerHTML = `
+      <input type="checkbox" data-idx="${idx}" ${yap.done ? "checked" : ""}>
+      <div>
+        <div style="font-weight:600;font-size:12px;">
+          [${yap.type}] ${yap.kor || ""}${yap.kor && yap.project ? " / " : ""}${yap.project || ""}
+        </div>
+        <div class="yap-tags">
+          ${yap.segment ? `<span class="yap-tag">계열: ${yap.segment}</span>` : ""}
+          ${yap.frequency ? `<span class="yap-tag">주기: ${yap.frequency}</span>` : ""}
+          ${yap.reward ? `<span class="yap-tag">보상: ${yap.reward}</span>` : ""}
+          ${yap.start ? `<span class="yap-tag">시작: ${yap.start}</span>` : ""}
+          ${yap.end ? `<span class="yap-tag">종료: ${yap.end}</span>` : ""}
+        </div>
+        ${yap.memo ? `<div style="margin-top:4px;font-size:11px;">메모: ${yap.memo}</div>` : ""}
+      </div>
+      <button class="yap-delete" data-del="${idx}">✕</button>
+    `;
+    wrap.appendChild(div);
+  });
+
+  wrap.querySelectorAll("input[type=checkbox]").forEach(chk=>{
+    chk.addEventListener("change", e=>{
+      const i = Number(e.target.dataset.idx);
+      if(isNaN(i)) return;
+      YAPS[i].done = !!e.target.checked;
+      saveYaps();
+      renderYaps();
+    });
+  });
+  wrap.querySelectorAll(".yap-delete").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      const i = Number(e.target.dataset.del);
+      if(isNaN(i)) return;
+      YAPS.splice(i,1);
+      saveYaps();
+      renderYaps();
+    });
+  });
+}
+
+function setupYapForm(){
+  const form = document.getElementById("yap-form");
+  if(!form) return;
+  form.addEventListener("submit", e=>{
+    e.preventDefault();
+    const kor   = document.getElementById("yap-kor").value.trim();
+    const proj  = document.getElementById("yap-project").value.trim();
+    const segment  = document.getElementById("yap-segment").value.trim();
+    const type     = document.getElementById("yap-type").value;
+    const freq     = document.getElementById("yap-frequency").value.trim();
+    const reward   = document.getElementById("yap-reward").value.trim();
+    const start    = document.getElementById("yap-start").value;
+    const end      = document.getElementById("yap-end").value;
+    const memo     = document.getElementById("yap-memo").value.trim();
+
+    if(!kor && !proj){
+      alert("최소한 한국명 또는 프로젝트명은 입력해줘.");
+      return;
+    }
+
+    YAPS.push({
+      kor: kor,
+      project: proj,
+      segment,
+      type,
+      frequency: freq,
+      reward,
+      start,
+      end,
+      memo,
+      done:false
+    });
+    saveYaps();
+    renderYaps();
+    form.reset();
+  });
+}
+
+// 초기화
+loadYaps();
+setupYapForm();
+renderYaps();
 
 /* 사이드바 접기 / 펼치기 */
 const layout = document.querySelector(".layout");
@@ -2692,6 +3176,232 @@ sidebarToggle.addEventListener("click", () => {
   layout.classList.toggle("collapsed");
 });
 </script>
+
+<script>
+
+// 프로젝트별 로고 URL 매핑 (원하면 여기 URL 채워 넣기)
+
+// 프로젝트별 X 핸들 매핑 (X 아바타를 로고로 자동 사용)
+const INFOFI_PROJECT_X_HANDLES = {
+  "MemeMax": "MemeMax_Fi",
+  "Symphony": "symphonyio",
+  "Kaito / Yapper": "KaitoAI_Labs",
+  "Orderly": "OrderlyNetwork",
+  "STBL": "stbldefi",
+  "Theo": "TheoNetwork",
+  "Sonic (L1)": "Sonic_onSui",
+  "Tria": "useTria",
+  "Superform": "superformxyz",
+  "Glint Analytics": "GlintAnalytics",
+  "Solv Protocol": "SolvProtocol",
+  "Pacifica": "pacifica_fi",
+  "LayerBank": "LayerBankFi",
+  "Rayls": "RaylsLabs",
+  "Velora": "VeloraDEX",
+  "Antix": "antix_in",
+  "Almanak": "AlmanakFi",
+  "BOB (Build on Bit…)": "build_on_bob",
+  "TEN": "tenprotocol",
+  "vooi": "vooi_io"
+};
+
+const INFOFI_PROJECT_LOGOS = {
+  // 예시) "MemeMax": "https://.../mememax-logo.png",
+  //       "Symphony": "https://.../symphony-logo.png"
+};
+
+// ===== InfoFi 리더보드 스냅샷 DB =====
+const INFOFI_SNAPSHOTS = [
+  {
+    handle: "bud_dha__",
+    project: "MemeMax",
+    segment: "Creator",
+    eco: "MemeMax",
+    window: "7D",
+    rank: 93,
+    mindshare: 0.2800,
+    last: 0.2700,
+    firstPercent: 2.03
+  },
+  {
+    handle: "bud_dha__",
+    project: "Symphony",
+    segment: "Community",
+    eco: "Symphony",
+    window: "30D",
+    rank: 7,
+    mindshare: 8.20,
+    last: 0.01,
+    firstPercent: 8.20
+  },
+  {
+    handle: "bud_dha__",
+    project: "Symphony",
+    segment: "Community",
+    eco: "Symphony",
+    window: "3M",
+    rank: 7,
+    mindshare: 2.90,
+    last: 0.06,
+    firstPercent: 2.90
+  },
+  {
+    handle: "bud_dha__",
+    project: "Symphony",
+    segment: "Community",
+    eco: "Symphony",
+    window: "6M",
+    rank: 10,
+    mindshare: 1.40,
+    last: 0.01,
+    firstPercent: 1.40
+  }
+  // TODO: 여기 아래로 다른 핸들/프로젝트들 계속 추가하면 됨
+];
+
+// ===== InfoFi 리더보드 검색 =====
+function normalizeHandle(raw){
+  if(!raw) return "";
+  return raw.trim().replace(/^@/, "").toLowerCase();
+}
+
+function handleInfofiSearch(){
+  const input = document.getElementById("infofi-handle-input");
+  const label = document.getElementById("infofi-handle-label");
+  const wrap  = document.getElementById("infofi-result-wrap");
+  if(!input || !wrap) return;
+
+  const h = normalizeHandle(input.value);
+  if(!h){
+    label.textContent = "";
+    wrap.innerHTML = '<div class="infofi-empty">먼저 @핸들을 입력해 줘.</div>';
+    return;
+  }
+
+  const rows = INFOFI_SNAPSHOTS.filter(r => normalizeHandle(r.handle) === h);
+  label.innerHTML = `검색 핸들: <b>@${h}</b>`;
+
+  if(!rows.length){
+    wrap.innerHTML = '<div class="infofi-empty">아직 이 핸들에 대한 InfoFi 스냅샷이 없습니다. (곰투처럼 우리 DB에 한 번 넣어줘야 보여져)</div>';
+    return;
+  }
+
+  // 프로젝트/에코 기준으로 그룹핑
+  const groups = {};
+  rows.forEach(r => {
+    const key = (r.eco || r.project) + "|" + r.segment;
+    if(!groups[key]){
+      groups[key] = {
+        project: r.project,
+        eco: r.eco || "",
+        segment: r.segment || "",
+        rows: []
+      };
+    }
+    groups[key].rows.push(r);
+  });
+
+  
+  
+  let html = "";
+  Object.values(groups).forEach(g => {
+    // 기간 정렬
+    g.rows.sort((a,b)=>{
+      const order = ["24H","7D","30D","90D","3M","6M","1Y"];
+      const ia = order.indexOf(a.window);
+      const ib = order.indexOf(b.window);
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+
+    // 각 기간별 행 HTML
+    let rowsHtml = "";
+    g.rows.forEach(r => {
+      const win = r.window || "";
+      const rank = r.rank != null ? r.rank : "";
+      const ms = (r.mindshare ?? 0).toFixed(4);
+      const last = (r.last ?? 0).toFixed(4);
+      const firstP = (r.firstPercent ?? 0).toFixed(4);
+
+      rowsHtml += '<tr>'
+        + '<td>' + win + '</td>'
+        + '<td>#' + rank + '</td>'
+        + '<td>' + ms + '%</td>'
+        + '<td>' + last + '%</td>'
+        + '<td>' + firstP + '%</td>'
+        + '</tr>';
+    });
+
+    const eco = g.eco || "";
+    const seg = g.segment || "";
+    const metaText = eco + (eco && seg ? " · " : "") + seg;
+
+    // 로고: 우선 순위
+    // 1) INFOFI_PROJECT_LOGOS에 직접 지정된 URL
+    // 2) INFOFI_PROJECT_X_HANDLES에 등록된 X 핸들의 아바타 (unavatar.io)
+    // 3) 둘 다 없으면 프로젝트 이름 이니셜 원형 뱃지
+    const xHandles = (typeof INFOFI_PROJECT_X_HANDLES === "object") ? INFOFI_PROJECT_X_HANDLES : {};
+    const logos = (typeof INFOFI_PROJECT_LOGOS === "object") ? INFOFI_PROJECT_LOGOS : {};
+    const xHandle = xHandles[g.project] || "";
+    let logoUrl = logos[g.project] || "";
+    if (!logoUrl && xHandle) {
+      logoUrl = "https://unavatar.io/twitter/" + encodeURIComponent(xHandle);
+    }
+    const initial = (g.project || "?").charAt(0).toUpperCase();
+    let logoHtml = "";
+    if (logoUrl) {
+      logoHtml = '<div class="infofi-logo"><img src="' + logoUrl + '" alt="' + g.project + ' logo"></div>';
+    } else {
+      logoHtml = '<div class="infofi-logo">' + initial + '</div>';
+    }
+
+    html += ''
+      + '<div class="infofi-project-card">'
+        + '<div class="infofi-project-header">'
+          + '<div class="infofi-header-left">'
+            + logoHtml
+            + '<div class="infofi-project-main">'
+              + '<div class="infofi-project-name">' + g.project + '</div>'
+              + '<div class="infofi-project-meta">' + metaText + '</div>'
+            + '</div>'
+          + '</div>'
+          + '<div class="infofi-badge">프로젝트 리더보드 스냅샷</div>'
+        + '</div>'
+        + '<div class="infofi-table-wrap">'
+          + '<table class="infofi-table">'
+            + '<thead>'
+              + '<tr>'
+                + '<th>기간</th>'
+                + '<th>Rank</th>'
+                + '<th>Mindshare</th>'
+                + '<th>마지막 스냅샷</th>'
+                + '<th>1위 대비</th>'
+              + '</tr>'
+            + '</thead>'
+            + '<tbody>'
+              + rowsHtml +
+            '</tbody>'
+          + '</table>'
+        + '</div>'
+      + '</div>';
+  });
+
+  wrap.innerHTML = html;
+
+
+}
+
+// Enter 키로 검색
+document.addEventListener("DOMContentLoaded", ()=>{
+  const input = document.getElementById("infofi-handle-input");
+  if(input){
+    input.addEventListener("keydown", e=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+        handleInfofiSearch();
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>
