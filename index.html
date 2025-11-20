@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <title>X 크리에이터 마인드쉐어 분석기 Beta8.3</title>
+  <title>X 크리에이터 마인드쉐어 분석기 5.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- CSV 파서 -->
@@ -767,7 +767,7 @@ tbody tr:hover td{background:#f9fafb}
         <div>
           <div class="side-name" id="side-username">게스트</div>
           <a id="side-handle-link" href="https://twitter.com" target="_blank" class="side-handle">@로그인 필요</a>
-          <button type="button" class="side-login-btn" id="x-login-btn" onclick="handleAuthClick()">Google로 로그인</button>
+          <button type="button" class="side-login-btn" id="x-login-btn">Google로 로그인</button>
         </div>
       </div>
 
@@ -1036,160 +1036,102 @@ tbody tr:hover td{background:#f9fafb}
 <!-- Supabase JS (Google 로그인용) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<!-- ✅ STEP 3에서 이 안에 JS 전체를 붙여 넣어 -->
 <script>
 // ===== Supabase Google 로그인 설정 =====
-const SUPABASE_URL = "https://ejqrnapdwblbqvnperid.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_ltaNA7nnVozoSCOcZljg";
+// 아래 두 값은 네 Supabase 프로젝트에서 복사해서 넣어야 해.
+// 1) https://supabase.com 에서 새 프로젝트를 만든 뒤
+// 2) Project Settings → API → project URL / anon public key 복사
+// 3) Authentication → Providers 에서 Twitter(X) 활성화 + 콜백 URL 등록
+const SUPABASE_URL = "https://ejqrnapdwblbqvnperid.supabase.co"; // TODO: 네 URL로 교체
+const SUPABASE_ANON_KEY = "sb_publishable_ltaNA7nnVozoSCOcZljg"; // TODO: 네 키로 교체
 
 let supabaseClient = null;
 
-// 사이드바에 사용자 정보 반영
-function applyUserToSidebar(user){
-  const nameSpan   = document.getElementById("side-username");
-  const handleLink = document.getElementById("side-handle-link");
-  const avatarImg  = document.getElementById("side-avatar-img");
-  const btn        = document.getElementById("x-login-btn");
-  if (!nameSpan || !handleLink || !btn) return;
+function initSupabaseAuth(){
+  if (typeof supabase === "undefined") {
+    console.warn("Supabase JS 로드 안 됨");
+    return;
+  }
+  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  if (!user) {
+  // 페이지 로드 시 현재 세션 체크
+  supabaseClient.auth.getUser().then(({ data, error }) => {
+    if (error) {
+      console.warn("auth.getUser 오류", error);
+      return;
+    }
+    const user = data?.user || null;
+    applyUserToSidebar(user);
+  });
+
+  const btn = document.getElementById("x-login-btn");
+  if(btn){
+    btn.addEventListener("click", async ()=>{
+      if(!supabaseClient) return;
+      const { data, error } = await supabaseClient.auth.getUser();
+      const user = data?.user || null;
+      if(user){
+        // 이미 로그인 상태면 로그아웃
+        await supabaseClient.auth.signOut();
+        applyUserToSidebar(null);
+        alert("로그아웃 되었습니다.");
+      }else{
+        // Google로 로그인 시도
+        const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: window.location.origin
+          }
+        });
+        if(signInErr){
+          console.error(signInErr);
+          alert("Google 로그인 중 오류가 발생했습니다.");
+        }
+        // 로그인 후에는 Supabase가 redirect 처리 → 다시 들어오면 auth.getUser()에서 잡힘
+      }
+    });
+  }
+}
+
+function applyUserToSidebar(user){
+  const nameSpan = document.getElementById("side-username");
+  const handleLink = document.getElementById("side-handle-link");
+  const avatarImg = document.getElementById("side-avatar-img");
+  const btn = document.getElementById("x-login-btn");
+  if(!nameSpan || !handleLink || !btn) return;
+
+  if(!user){
     nameSpan.textContent = "게스트";
     handleLink.textContent = "@로그인 필요";
     handleLink.href = "https://twitter.com";
-    if (avatarImg) {
+    if(avatarImg){
       avatarImg.src = "https://unavatar.io/twitter/bud_dha__";
     }
     btn.textContent = "Google로 로그인";
-  } else {
-    const fullName = user.user_metadata?.name
-                  || user.user_metadata?.full_name
-                  || "X 사용자";
-    const nick = user.user_metadata?.user_name
-              || user.user_metadata?.preferred_username
-              || "";
+  }else{
+    const fullName = user.user_metadata?.name || user.user_metadata?.full_name || "X 사용자";
+    const nick = user.user_metadata?.user_name || user.user_metadata?.preferred_username || "";
     const handle = nick ? "@" + nick : "@x-user";
-
     nameSpan.textContent = fullName;
     handleLink.textContent = handle + " ↗";
     handleLink.href = nick ? ("https://twitter.com/" + nick) : "https://twitter.com";
-
-    if (avatarImg) {
+    if(avatarImg){
       const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-      if (avatarUrl) avatarImg.src = avatarUrl;
+      if(avatarUrl) avatarImg.src = avatarUrl;
     }
     btn.textContent = "로그아웃";
   }
 }
 
-// OAuth 리다이렉트 code 처리 + 세션 로드
-async function initSupabaseAuth(){
-  if (typeof supabase === "undefined") {
-    console.warn("Supabase JS 로드 안 됨");
-    return;
-  }
-
-  if (!supabaseClient) {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  // 1) 리다이렉트로 돌아온 경우 code → 세션 교환
-  try {
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
-    const errorDesc = url.searchParams.get("error_description");
-
-    if (errorDesc) {
-      console.warn("OAuth error:", errorDesc);
-    }
-
-    if (code) {
-      const { error } = await supabaseClient.auth.exchangeCodeForSession(url.href);
-      if (error) {
-        console.error("exchangeCodeForSession error", error);
-      } else {
-        // URL 정리 (code 파라미터 제거)
-        window.history.replaceState({}, document.title, url.origin + url.pathname + url.hash);
-      }
-    }
-  } catch (e) {
-    console.warn("OAuth 코드 처리 중 오류", e);
-  }
-
-  // 2) 현재 세션 기준 사이드바 업데이트
-  try {
-    const { data, error } = await supabaseClient.auth.getUser();
-    if (error) {
-      console.warn("auth.getUser 오류", error);
-    }
-    const user = data?.user || null;
-    applyUserToSidebar(user);
-  } catch (e) {
-    console.warn("getUser 호출 중 오류", e);
-  }
-
-  // 3) 로그인 상태 변경 시마다 사이드바 자동 갱신
-  try {
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-      applyUserToSidebar(session?.user ?? null);
-    });
-  } catch(e) {
-    console.warn("onAuthStateChange 등록 오류", e);
-  }
-}
-
-// 로그인/로그아웃 버튼 이벤트 등록
-function setupAuthButton(){
-  const btn = document.getElementById("x-login-btn");
-  if (!btn) return;
-  // 이벤트 리스너로 한 번, 인라인 onclick으로 한 번 – 둘 중 하나만 먹어도 동작하게
-  btn.addEventListener("click", handleAuthClick);
-}
-
-async function handleAuthClick(){
-  if (typeof supabase === "undefined") {
-    alert("Supabase 스크립트 로드 오류입니다. 잠시 후 새로고침해줘.");
-    return;
-  }
-  if (!supabaseClient) {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  try {
-    const { data } = await supabaseClient.auth.getUser();
-    const user = data?.user || null;
-
-    if (user) {
-      // 이미 로그인 상태면 로그아웃
-      await supabaseClient.auth.signOut();
-      applyUserToSidebar(null);
-      alert("로그아웃 되었습니다.");
-    } else {
-      // Google로 로그인 시도
-      const { error: signInErr } = await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin  // 실제 배포 도메인이라면 그대로 사용
-        }
-      });
-      if (signInErr) {
-        console.error("Google 로그인 오류", signInErr);
-        alert("Google 로그인 중 오류가 발생했습니다.");
-      }
-      // 이후에는 Supabase가 redirect → initSupabaseAuth에서 다시 세션 로드
-    }
-  } catch(e) {
-    console.warn("로그인/로그아웃 처리 중 오류", e);
-  }
-}
-// 페이지 로드 후 초기화
-document.addEventListener("DOMContentLoaded", () => {
-  try {
+// 페이지 로드 후 Supabase 초기화
+document.addEventListener("DOMContentLoaded", ()=>{
+  try{
     initSupabaseAuth();
-  } catch(e) {
+  }catch(e){
     console.warn("Supabase 초기화 실패", e);
   }
-  setupAuthButton();
 });
-</script>
 
 
 /* ========= 설정 ========= */
