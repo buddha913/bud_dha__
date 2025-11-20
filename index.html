@@ -10,7 +10,7 @@
   <!-- 프로젝트별 원형 그래프용 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- ✅ STEP 2에서 이 안에 CSS 전체를 붙여 넣어 -->
+  <!-- ✅ STEP 2 -->
   <style>
   html {
   scroll-behavior: smooth;
@@ -96,6 +96,18 @@ body{
   gap:12px;
   align-items:center;
   margin-top:18px;
+}
+.side-login-btn{
+  margin-top:6px;
+  padding:4px 8px;
+  font-size:11px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.6);
+  background:rgba(248,250,252,.9);
+  cursor:pointer;
+}
+.side-login-btn:hover{
+  background:#e5edff;
 }
 .side-avatar{
   width:44px;height:44px;
@@ -221,6 +233,28 @@ body{
   gap:8px;
   align-items:center;
 }
+.lang-toggle{
+  display:flex;
+  gap:4px;
+  align-items:center;
+  font-size:11px;
+}
+
+.lang-btn{
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+  padding:4px 8px;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.lang-btn.active{
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  border-color:transparent;
+}
+
 .top-link{
   font-size:12px;
   padding:7px 12px;
@@ -379,38 +413,122 @@ body{
 }
 
 @media (max-width:960px){
-  .layout{flex-direction:column;}
+  .layout{
+    flex-direction:column;
+  }
   .sidebar{
     width:100%;
     flex-direction:row;
     align-items:center;
     justify-content:space-between;
   }
-  .layout.collapsed .sidebar{width:100%;}
+  .layout.collapsed .sidebar{
+    width:100%;
+  }
   .main{
     max-width:100%;
     padding:16px;
   }
-  .summary-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
+}  /* 👈 여기에서 media를 꼭 닫아줘! */
+/* 성장 그래프 카드 */
+.growth-card{
+  margin-top:16px;
 }
-@media (max-width:640px){
-  .summary-grid{
-    grid-template-columns:1fr;
-  }
+
+.growth-card-title{
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:4px;
+}
+
+.growth-card-sub{
+  font-size:11px;
+  color:var(--text-muted);
+}
+
+.growth-chart-wrap{
+  margin-top:10px;
+}
+
+/* 요약 카드 (원글 개수 / 평균 스코어 / 트림드 평균 / 가장 터진 글) */
+.summary-grid{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+
+/* 요약 카드 (원글 개수 / 평균 스코어 / 트림드 평균 / 가장 터진 글) */
+.summary-grid{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
 }
 
 .summary-card{
-  border-radius:14px;padding:10px 10px;font-size:11px;
-  border:1px solid rgba(226,232,240,0.9);
-  background:
-    radial-gradient(circle at top left,#eef2ff,transparent 60%),
-    #ffffff;
+  position:relative;
+  overflow:hidden;
+  border-radius:18px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:#f9fafb;
+  box-shadow:0 16px 40px rgba(15,23,42,.25);
+  border:1px solid rgba(148,163,184,.45);
 }
-.summary-label{color:var(--text-muted);margin-bottom:4px}
-.summary-value{font-size:16px;font-weight:700}
-.summary-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+
+/* 카드별 그라디언트 색 */
+.summary-card--posts{
+  background:linear-gradient(135deg,#6366f1,#3b82f6);
+}
+.summary-card--avg{
+  background:linear-gradient(135deg,#0ea5e9,#22c55e);
+}
+.summary-card--trimmed{
+  background:linear-gradient(135deg,#ec4899,#8b5cf6);
+}
+.summary-card--best{
+  background:linear-gradient(135deg,#14b8a6,#38bdf8);
+}
+
+/* 왼쪽 동그란 링 */
+.summary-ring{
+  width:46px;
+  height:46px;
+  border-radius:999px;
+  border:3px solid rgba(248,250,252,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(15,23,42,.18);
+  backdrop-filter:blur(6px);
+  flex-shrink:0;
+}
+.summary-ring span{
+  font-size:18px;
+}
+
+.summary-text{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.summary-label{
+  font-size:11px;
+  opacity:0.9;
+}
+.summary-value{
+  font-size:18px;
+  font-weight:800;
+}
+.summary-sub{
+  font-size:10px;
+  opacity:0.9;
+}
+
 
 .section-header{
   display:flex;
@@ -535,7 +653,7 @@ tbody tr:hover td{background:#f9fafb}
 .leader-note{font-size:11px;color:var(--text-muted);margin-top:2px}
 .empty{font-size:12px;color:var(--text-muted);padding:8px 4px;text-align:center}
 
-.text-main{font-size:11px;}
+.text-main{font-size:11px;word-break:break-word;}
 .text-meta{font-size:10px;color:var(--text-muted);margin-top:2px;}
 .grade-chip{font-size:11px;color:var(--text-muted);}
 
@@ -549,7 +667,36 @@ tbody tr:hover td{background:#f9fafb}
 }
 
 /* 프로젝트 뷰 추가 스타일 */
+.project-charts-row{
+  overflow:hidden;
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  justify-content:center;
+}
+.project-chart-single{
+  flex:1;
+  min-width:220px;
+  max-width:320px;
+}
+.project-charts-row canvas{
+  width:100% !important;
+  height:160px;
+}
+.project-chart-title{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-main);
+  text-align:center;
+  margin-bottom:8px;
+}
 .project-chart-wrap{
+.project-grade-chart-wrap{
+  width:100%;
+  max-width:420px;
+  margin:0 auto 16px;
+}
+
   width:100%;
   max-width:420px;
   margin:0 auto 12px;
@@ -615,26 +762,30 @@ tbody tr:hover td{background:#f9fafb}
     <div>
       <div class="side-profile">
         <div class="side-avatar">
-          <img src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
+          <img id="side-avatar-img" src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
         </div>
         <div>
-          <div class="side-name">🧘‍♂️ 붓다</div>
-          <a href="https://twitter.com/bud_dha__" target="_blank" class="side-handle">@bud_dha__ ↗</a>
+          <div class="side-name" id="side-username">게스트</div>
+          <a id="side-handle-link" href="https://twitter.com" target="_blank" class="side-handle">@로그인 필요</a>
+          <button type="button" class="side-login-btn" id="x-login-btn">X로 로그인</button>
         </div>
       </div>
 
       <div class="side-nav">
         <div class="side-nav-item active" data-view="dashboard">
-          <span class="icon">📊</span><span class="side-label">Dashboard</span>
+          <span class="icon">📊</span><span class="side-label" id="nav-dashboard-label">Dashboard</span>
         </div>
         <div class="side-nav-item" data-view="leaderboard">
-          <span class="icon">🏆</span><span class="side-label">리더보드</span>
+          <span class="icon">🏆</span><span class="side-label" id="nav-leaderboard-label">리더보드</span>
+        </div>
+        <div class="side-nav-item" data-view="history">
+          <span class="icon">🗂</span><span class="side-label" id="nav-history-label">내 히스토리</span>
         </div>
         <div class="side-nav-item" data-view="projects">
-          <span class="icon">📚</span><span class="side-label">프로젝트별 마인드쉐어</span>
+          <span class="icon">📚</span><span class="side-label" id="nav-projects-label">프로젝트별 마인드쉐어</span>
         </div>
         <a class="side-nav-item" href="https://buddha913.github.io/crypto-fullcourse/" target="_blank">
-          <span class="icon">📘</span><span class="side-label">크립토 풀코스</span>
+          <span class="icon">📘</span><span class="side-label" id="nav-course-label">크립토 풀코스</span>
         </a>
       </div>
     </div>
@@ -658,6 +809,10 @@ tbody tr:hover td{background:#f9fafb}
           <div class="top-sub">애널리틱스 CSV로 내 계정의 진짜 임팩트를 보는 대시보드</div>
         </div>
         <div class="top-cta">
+          <div class="lang-toggle">
+            <button class="lang-btn" data-lang="ko">한국어</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+          </div>
           <a class="top-link" href="https://analytics.twitter.com/user" target="_blank">
             X 애널리틱스 열기 ↗
           </a>
@@ -701,9 +856,20 @@ tbody tr:hover td{background:#f9fafb}
       <!-- 메인 그리드: 왼쪽(표), 오른쪽(봇/요약) -->
       <div class="grid-1">
         <div class="column-main">
+<!-- 📈 계정 성장 그래프 카드 -->
+    <section class="card growth-card">
+      <div class="growth-card-title" id="growth-title">📈 계정 성장 그래프</div>
+      <div class="growth-card-sub" id="growth-sub">
+        최근 기간 동안 원글 개수 / 평균 스코어 추이를 그래프로 보여줍니다.
+      </div>
+      <div class="growth-chart-wrap">
+        <!-- 나중에 JS에서 채울 캔버스 -->
+        <canvas id="growth-chart" height="140"></canvas>
+      </div>
+    </section>
           <section class="card">
             <div class="section-header">
-              <div class="section-title">
+              <div class="section-title" id="top10-title">
                 💥 마인드쉐어 폭발 Top 10 <span id="top10-count"></span>
               </div>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -722,7 +888,7 @@ tbody tr:hover td{background:#f9fafb}
 
           <section class="card">
             <div class="section-header">
-              <div class="section-title">🎚 등급별 상위 게시글 <span>(S~D)</span></div>
+              <div class="section-title" id="grade-section-title">🎚 등급별 상위 게시글 <span>(S~D)</span></div>
               <div class="grade-legend">
                 <span><span class="grade-dot s"></span>S 상위 5%</span>
                 <span><span class="grade-dot a"></span>A 상위 20%</span>
@@ -749,10 +915,10 @@ tbody tr:hover td{background:#f9fafb}
         <div class="column-side">
           <section class="card bot-card">
             <div class="section-header">
-              <div class="section-title">🤖 마인드쉐어 코치 봇 <span style="font-size:11px;color:var(--text-muted);">(Beta)</span></div>
+              <div class="section-title" id="coach-title">🤖 마인드쉐어 코치 봇 <span style="font-size:11px;color:var(--text-muted);">(Beta)</span></div>
             </div>
             <div class="bot-chip">
-              <span>📌</span><span>현재 선택한 기간 기준 한 줄 요약 + 피드백</span>
+              <span>📌</span><span id="coach-chip-text">현재 선택한 기간 기준 한 줄 요약 + 피드백</span>
             </div>
             <div id="coach-output" class="bot-output">
               아직 CSV를 올리지 않았어.<br>
@@ -787,13 +953,35 @@ tbody tr:hover td{background:#f9fafb}
           <input id="leader-handle" class="leader-input" placeholder="X 핸들 입력 (예: @bud_dha__)" />
           <button id="leader-save-btn" class="leader-btn">현재 분석 결과 저장</button>
         </div>
-        <div class="leader-note">※ 최소 원글 수 20개 이상일 때 리더보드 점수가 더 정확합니다.</div>
+        <div class="leader-note" id="leader-note">※ 최소 원글 수 20개 이상일 때 리더보드 점수가 더 정확합니다.</div>
 
         <div id="my-rank-wrap" style="margin-top:10px"></div>
         <div class="table-wrap" id="leaderboard-wrap" style="margin-top:10px"></div>
       </section>
     </div>
     <!-- ▲▲ 리더보드 화면 끝 ▲▲ -->
+
+
+    <!-- ▼▼ 내 히스토리 화면 ▼▼ -->
+    <div id="view-history" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">내 분석 히스토리</div>
+          <div class="top-sub">CSV를 업로드할 때마다 이곳에 요약 기록이 자동으로 쌓입니다.</div>
+        </div>
+      </div>
+
+      <section class="card" style="margin-top:8px;">
+        <div class="section-header">
+          <div class="section-title">📆 업로드 기록</div>
+          <div class="section-sub">최근 업로드 기준으로 정렬됩니다. (브라우저에만 저장)</div>
+        </div>
+        <div class="table-wrap" id="history-wrap">
+          <div class="empty">아직 저장된 분석 히스토리가 없습니다. CSV를 업로드하면 여기 기록이 쌓입니다.</div>
+        </div>
+      </section>
+    </div>
+    <!-- ▲▲ 히스토리 화면 끝 ▲▲ -->
 
     <!-- ▼▼ 프로젝트별 마인드쉐어 화면 ▼▼ -->
     <div id="view-projects" style="display:none;">
@@ -806,12 +994,23 @@ tbody tr:hover td{background:#f9fafb}
 
       <section class="card card-soft">
         <div class="section-header">
-          <div class="section-title">📚 프로젝트 요약 + 원형 그래프</div>
-          <div class="section-sub">코드 상단 <code>PROJECTS</code> 배열의 키워드를 네가 트는 프로젝트에 맞게 바꿔줘.</div>
+          <div class="section-title" id="project-summary-title">📚 프로젝트 요약 + 원형 그래프</div>
+          <div class="section-sub" id="project-summary-sub">코드 상단 <code>PROJECTS</code> 배열의 키워드를 네가 트는 프로젝트에 맞게 바꿔줘.</div>
         </div>
 
-        <div class="project-chart-wrap">
-          <canvas id="project-pie" height="160"></canvas>
+        <div class="project-charts-row">
+          <div class="project-chart-single">
+            <div class="project-chart-title" id="proj-chart-title-1">프로젝트별 게시글 비율</div>
+            <canvas id="project-pie"></canvas>
+          </div>
+          <div class="project-chart-single">
+            <div class="project-chart-title" id="proj-chart-title-2">선택 기간 전체 S~D 등급 분포</div>
+            <canvas id="grade-distribution-pie"></canvas>
+          </div>
+          <div class="project-chart-single">
+            <div class="project-chart-title" id="proj-chart-title-3">선택 프로젝트 S~D 등급 분포</div>
+            <canvas id="project-grade-pie"></canvas>
+          </div>
         </div>
 
         <div class="table-wrap" id="project-summary-wrap">
@@ -834,12 +1033,112 @@ tbody tr:hover td{background:#f9fafb}
   </main>
 </div>
 
+<!-- Supabase JS (X 로그인용) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <!-- ✅ STEP 3에서 이 안에 JS 전체를 붙여 넣어 -->
 <script>
+// ===== Supabase X 로그인 설정 =====
+// 아래 두 값은 네 Supabase 프로젝트에서 복사해서 넣어야 해.
+// 1) https://supabase.com 에서 새 프로젝트를 만든 뒤
+// 2) Project Settings → API → project URL / anon public key 복사
+// 3) Authentication → Providers 에서 Twitter(X) 활성화 + 콜백 URL 등록
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co"; // TODO: 네 URL로 교체
+const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY"; // TODO: 네 키로 교체
+
+let supabaseClient = null;
+
+function initSupabaseAuth(){
+  if (typeof supabase === "undefined") {
+    console.warn("Supabase JS 로드 안 됨");
+    return;
+  }
+  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // 페이지 로드 시 현재 세션 체크
+  supabaseClient.auth.getUser().then(({ data, error }) => {
+    if (error) {
+      console.warn("auth.getUser 오류", error);
+      return;
+    }
+    const user = data?.user || null;
+    applyUserToSidebar(user);
+  });
+
+  const btn = document.getElementById("x-login-btn");
+  if(btn){
+    btn.addEventListener("click", async ()=>{
+      if(!supabaseClient) return;
+      const { data, error } = await supabaseClient.auth.getUser();
+      const user = data?.user || null;
+      if(user){
+        // 이미 로그인 상태면 로그아웃
+        await supabaseClient.auth.signOut();
+        applyUserToSidebar(null);
+        alert("로그아웃 되었습니다.");
+      }else{
+        // X로 로그인 시도
+        const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithOAuth({
+          provider: "twitter",
+          options: {
+            redirectTo: window.location.origin
+          }
+        });
+        if(signInErr){
+          console.error(signInErr);
+          alert("X 로그인 중 오류가 발생했습니다.");
+        }
+        // 로그인 후에는 Supabase가 redirect 처리 → 다시 들어오면 auth.getUser()에서 잡힘
+      }
+    });
+  }
+}
+
+function applyUserToSidebar(user){
+  const nameSpan = document.getElementById("side-username");
+  const handleLink = document.getElementById("side-handle-link");
+  const avatarImg = document.getElementById("side-avatar-img");
+  const btn = document.getElementById("x-login-btn");
+  if(!nameSpan || !handleLink || !btn) return;
+
+  if(!user){
+    nameSpan.textContent = "게스트";
+    handleLink.textContent = "@로그인 필요";
+    handleLink.href = "https://twitter.com";
+    if(avatarImg){
+      avatarImg.src = "https://unavatar.io/twitter/bud_dha__";
+    }
+    btn.textContent = "X로 로그인";
+  }else{
+    const fullName = user.user_metadata?.name || user.user_metadata?.full_name || "X 사용자";
+    const nick = user.user_metadata?.user_name || user.user_metadata?.preferred_username || "";
+    const handle = nick ? "@" + nick : "@x-user";
+    nameSpan.textContent = fullName;
+    handleLink.textContent = handle + " ↗";
+    handleLink.href = nick ? ("https://twitter.com/" + nick) : "https://twitter.com";
+    if(avatarImg){
+      const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+      if(avatarUrl) avatarImg.src = avatarUrl;
+    }
+    btn.textContent = "로그아웃";
+  }
+}
+
+// 페이지 로드 후 Supabase 초기화
+document.addEventListener("DOMContentLoaded", ()=>{
+  try{
+    initSupabaseAuth();
+  }catch(e){
+    console.warn("Supabase 초기화 실패", e);
+  }
+});
+
+
 /* ========= 설정 ========= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0yJIOdUoeRNwMn9fys-5ePI6UX6wkqBVhWNLrZ-gomO1sGNgTUJbhO0Kfj0n2QgdC/exec";
 const MIN_POSTS_FOR_LEADERBOARD = 20;
 const TRIM_RATIO = 0.1;
+let CURRENT_LANG = "ko";
 
 /* 프로젝트 키워드 (원하면 여기 수정) */
 /* 프로젝트 키워드 (이미지에 나온 프로젝트 + 주요 야핑 프로젝트) */
@@ -1028,25 +1327,29 @@ let SORT_KEY = "score";
 /* 프로젝트 통계/차트용 */
 let PROJECT_STATS = [];
 let projectChart = null;
+let globalGradeChart = null;
+let projectGradeChart = null;
 
 /* ========== CSV 헤더 매핑/숫자 ========== */
 function autoMap(row) {
   const map = {
     "게시물 본문": "text", "Post text": "text", "Tweet text": "text",
-    "날짜": "date", "Date": "date",
+    "ツイートテキスト": "text", "ツイート本文": "text", "推文文本": "text", "帖子文本": "text",
+    "날짜": "date", "Date": "date", "日付": "date", "日期": "date",
     "게시물 링크": "link", "Tweet permalink": "link","URL":"link","Link":"link",
+    "ツイートリンク": "link", "推文链接": "link",
     "게시물 ID":"id","Tweet ID":"id",
-    "노출수":"impressions","Impressions":"impressions",
-    "참여수":"engagements","Engagements":"engagements",
-    "마음에 들어요":"likes","Likes":"likes",
-    "북마크":"bookmarks","Bookmarks":"bookmarks",
-    "재게시":"retweets","Retweets":"retweets","Reposts":"retweets",
-    "답글":"replies","Replies":"replies",
-    "공유 수":"shares","Shares":"shares",
-    "새로운 팔로우":"newFollows","New follows":"newFollows",
-    "프로필 조회수":"profileClicks","Profile clicks":"profileClicks",
-    "URL 클릭수":"urlClicks","URL clicks":"urlClicks",
-    "고유 링크 클릭수":"uniqueClicks","Unique link clicks":"uniqueClicks",
+    "노출수":"impressions","Impressions":"impressions","インプレッション数":"impressions","展示次数":"impressions","曝光次数":"impressions",
+    "참여수":"engagements","Engagements":"engagements","エンゲージメント数":"engagements","互动次数":"engagements",
+    "마음에 들어요":"likes","Likes":"likes","いいね":"likes","点赞数":"likes",
+    "북마크":"bookmarks","Bookmarks":"bookmarks","ブックマーク":"bookmarks","书签":"bookmarks",
+    "재게시":"retweets","Retweets":"retweets","Reposts":"retweets","リツイート":"retweets","转推":"retweets","轉推":"retweets","转发":"retweets",
+    "답글":"replies","Replies":"replies","返信":"replies","回复":"replies",
+    "공유 수":"shares","Shares":"shares","シェア":"shares","分享":"shares",
+    "새로운 팔로우":"newFollows","New follows":"newFollows","新しいフォロワー":"newFollows","新关注者":"newFollows",
+    "프로필 조회수":"profileClicks","Profile clicks":"profileClicks","プロフィールクリック数":"profileClicks","个人资料点击次数":"profileClicks",
+    "URL 클릭수":"urlClicks","URL clicks":"urlClicks","URL クリック数":"urlClicks","URL 点击次数":"urlClicks",
+    "고유 링크 클릭수":"uniqueClicks","Unique link clicks":"uniqueClicks","ユニークリンククリック数":"uniqueClicks","唯一链接点击次数":"uniqueClicks",
   };
   const result = {};
   for (const key in row) {
@@ -1095,28 +1398,66 @@ function num(v){
 function parseDateValue(v){
   if(!v) return null;
   let s = String(v).trim();
-  const m = s.match(/(\d{4})[^\d]?(\d{1,2})[^\d]?(\d{1,2})/);
-  if(!m) return null;
-  const year = parseInt(m[1],10);
-  const month = parseInt(m[2],10)-1;
-  const day = parseInt(m[3],10);
-  const d = new Date(year, month, day);
-  return isNaN(d.getTime()) ? null : d;
+
+  // 1) YYYY-MM-DD, YYYY/MM/DD, etc.
+  let m = s.match(/(\d{4})[^\d]?(\d{1,2})[^\d]?(\d{1,2})/);
+  if(m){
+    const year = parseInt(m[1],10);
+    const month = parseInt(m[2],10)-1;
+    const day = parseInt(m[3],10);
+    const d = new Date(year, month, day);
+    if(!isNaN(d.getTime())) return d;
+  }
+
+  // 2) MM-DD-YYYY or DD-MM-YYYY 형태 보완
+  m = s.match(/(\d{1,2})[^\d]?(\d{1,2})[^\d]?(\d{4})/);
+  if(m){
+    const a = parseInt(m[1],10);
+    const b = parseInt(m[2],10);
+    const year = parseInt(m[3],10);
+    // 월/일 추정 (a>12면 a=day, b=month 로 가정)
+    let month, day;
+    if(a > 12){
+      day = a;
+      month = b - 1;
+    }else{
+      month = a - 1;
+      day = b;
+    }
+    const d = new Date(year, month, day);
+    if(!isNaN(d.getTime())) return d;
+  }
+
+  // 3) Date.parse가 가능한 문자열이면 그대로 사용
+  const parsed = Date.parse(s);
+  if(!isNaN(parsed)){
+    const d = new Date(parsed);
+    if(!isNaN(d.getTime())) return d;
+  }
+  return null;
 }
 
 function applyDateFilter(list, range){
   if(range === "ALL") return list.slice();
   const days = Number(range);
   if(!days || !list.length) return list.slice();
-  const dates = list.map(p=>p.dateObj).filter(Boolean);
-  if(!dates.length) {
-    return list.slice();
+
+  // 날짜가 있는 데이터만 우선 사용
+  const withDates = list.filter(p => p.dateObj);
+  if(!withDates.length){
+    // 날짜 파싱이 안 된 경우: 단순히 뒤에서 N개만 보여주는 fallback
+    const count = Math.min(list.length, days);
+    return list.slice(list.length - count);
   }
+
+  const dates = withDates.map(p=>p.dateObj);
   const latestTime = Math.max.apply(null, dates.map(d=>d.getTime()));
   const latest = new Date(latestTime);
   const ms = 24*60*60*1000;
   const threshold = new Date(latest.getTime() - (days-1)*ms);
-  return list.filter(p => !p.dateObj || p.dateObj >= threshold);
+
+  // 기간 필터에서는 날짜 없는 글은 제외 (ALL에서만 포함)
+  return list.filter(p => p.dateObj && p.dateObj >= threshold);
 }
 
 /* ========== 스코어/등급 ========== */
@@ -1275,14 +1616,20 @@ function buildProjectSelect(list){
   if(!list.length){
     select.innerHTML = `<option value="">매칭된 프로젝트가 없습니다.</option>`;
     detailWrap.innerHTML = `<div class="empty">프로젝트 키워드에 매칭된 글이 아직 없습니다.</div>`;
+    renderProjectGradePie(null);
     return;
   }
 
   select.innerHTML = list.map(p=>`<option value="${p.id}">${p.label} (${p.count})</option>`).join("");
   select.onchange = () => {
+    const stat = PROJECT_STATS.find(p=>p.id===select.value);
+    if(stat) renderProjectGradePie(stat);
     renderProjectDetail(select.value);
   };
-  renderProjectDetail(list[0].id);
+  const first = list[0];
+  select.value = first.id;
+  renderProjectDetail(first.id);
+  renderProjectGradePie(first);
 }
 
 function renderProjectDetail(projectId){
@@ -1356,15 +1703,136 @@ function renderProjectPieChart(list){
           "rgba(59,130,246,0.9)",
           "rgba(45,212,191,0.9)",
           "rgba(251,191,36,0.9)",
-          "rgba(244,114,182,0.9)"
+          "rgba(244,114,182,0.9)",
+          "rgba(129,140,248,0.9)",
+          "rgba(16,185,129,0.9)",
+          "rgba(249,115,22,0.9)",
+          "rgba(236,72,153,0.9)"
         ]
       }]
     },
     options: {
+      responsive:false,
+      maintainAspectRatio:false,
       plugins: {
         legend: { position: "bottom" }
       },
-      cutout: "60%"
+      cutout:"55%",
+      onClick(evt, elements){
+        if(!elements.length) return;
+        const idx = elements[0].index;
+        const proj = list[idx];
+        if(!proj) return;
+        const select = document.getElementById("project-select");
+        if(select){
+          select.value = proj.id;
+        }
+        renderProjectDetail(proj.id);
+        const stat = PROJECT_STATS.find(p=>p.id===proj.id);
+        if(stat){
+          renderProjectGradePie(stat);
+        }
+      }
+    }
+  });
+}
+
+function renderGlobalGradePie(stats){
+  const canvas = document.getElementById("grade-distribution-pie");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  if(globalGradeChart){
+    globalGradeChart.destroy();
+    globalGradeChart = null;
+  }
+
+  if(!stats || !stats.length){
+    canvas.style.display = "none";
+    return;
+  }
+  canvas.style.display = "block";
+
+  const labels = stats.map(p=>p.label);
+  const data = stats.map(p=> (p.trimmedAvg || p.avgScore || 0));
+
+  globalGradeChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: [
+          "rgba(59,130,246,0.9)",
+          "rgba(45,212,191,0.9)",
+          "rgba(251,191,36,0.9)",
+          "rgba(244,114,182,0.9)",
+          "rgba(129,140,248,0.9)",
+          "rgba(16,185,129,0.9)",
+          "rgba(249,115,22,0.9)",
+          "rgba(236,72,153,0.9)"
+        ]
+      }]
+    },
+    options: {
+      responsive:false,
+      maintainAspectRatio:false,
+      plugins: {
+        legend: { position: "bottom" }
+      },
+      cutout:"55%"
+    }
+  });
+}
+
+function renderProjectGradePie(stat){
+  const canvas = document.getElementById("project-grade-pie");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  if(projectGradeChart){
+    projectGradeChart.destroy();
+    projectGradeChart = null;
+  }
+
+  if(!stat || !stat.posts || !stat.posts.length){
+    canvas.style.display = "none";
+    return;
+  }
+  canvas.style.display = "block";
+
+  const counts = { S:0, A:0, B:0, C:0, D:0 };
+  stat.posts.forEach(p=>{
+    if(counts[p.grade] !== undefined){
+      counts[p.grade]++;
+    }
+  });
+
+  const labels = ["S","A","B","C","D"];
+  const data = labels.map(g=>counts[g]);
+
+  projectGradeChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: [
+          "rgba(245,158,11,0.9)",  // S
+          "rgba(56,189,248,0.9)",  // A
+          "rgba(34,197,94,0.9)",   // B
+          "rgba(168,85,247,0.9)",  // C
+          "rgba(148,163,184,0.9)"  // D
+        ]
+      }]
+    },
+    options: {
+      responsive:false,
+      maintainAspectRatio:false,
+      plugins: {
+        legend: { position: "bottom" }
+      },
+      cutout:"55%"
     }
   });
 }
@@ -1447,12 +1915,23 @@ function updateCoach(){
   if(!el) return;
 
   if(!ALL_BASE.length){
-    el.textContent =
-      "아직 CSV를 올리지 않았어.\n상단에서 애널리틱스 CSV를 업로드하면\n이 구간의 마인드쉐어 상태를 코치 봇이 요약해 줄 거야.";
+    if(CURRENT_LANG === "en"){
+      el.textContent =
+        "No CSV has been uploaded yet.\n" +
+        "Download your X Analytics CSV and upload it above,\n" +
+        "then the coach bot will summarize your mindshare status for this period.";
+    }else{
+      el.textContent =
+        "아직 CSV를 올리지 않았어.\n" +
+        "상단에서 애널리틱스 CSV를 업로드하면\n" +
+        "이 구간의 마인드쉐어 상태를 코치 봇이 요약해 줄 거야.";
+    }
     return;
   }
   if(!CURRENT_LIST.length || !ANALYSIS){
-    el.textContent = "선택한 기간에 해당하는 데이터가 없어서 분석할 수 없어.";
+    el.textContent = (CURRENT_LANG === "en")
+      ? "There is no data for the selected period, so I can't analyze it."
+      : "선택한 기간에 해당하는 데이터가 없어서 분석할 수 없어.";
     return;
   }
 
@@ -1464,39 +1943,67 @@ function updateCoach(){
   });
 
   const tAvg = ANALYSIS.trimmedAvg || 0;
-  let overallGrade, mood;
+  let overallGrade, moodKo, moodEn;
   if(tAvg >= 80){
     overallGrade = "S";
-    mood = "이번 구간은 사실상 폭발 구간이야. 지금 페이스 그대로 유지하면서, 터졌던 패턴을 반복하면 돼.";
+    moodKo = "이번 구간은 사실상 폭발 구간이야. 지금 페이스 그대로 유지하면서, 터졌던 패턴을 반복하면 돼.";
+    moodEn = "This period is basically an explosion zone. Keep this pace and repeat the patterns that already worked.";
   }else if(tAvg >= 60){
     overallGrade = "A";
-    mood = "상위권에서 잘 버티고 있어. 조금만 더 정교하게 실험하면 언제든 S로 올라갈 수 있는 위치야.";
+    moodKo = "상위권에서 잘 버티고 있어. 조금만 더 정교하게 실험하면 언제든 S로 올라갈 수 있는 위치야.";
+    moodEn = "You are holding solid in the upper tier. With a bit more fine‑tuned experimentation, you can jump into S range.";
   }else if(tAvg >= 45){
     overallGrade = "B";
-    mood = "무난하게 우상향 준비 중인 구간이야. 몇 개 강한 시그널을 더 만들면 한 단계 위로 올라갈 수 있어.";
+    moodKo = "무난하게 우상향 준비 중인 구간이야. 몇 개 강한 시그널을 더 만들면 한 단계 위로 올라갈 수 있어.";
+    moodEn = "This is a steady preparation phase for an uptrend. A few stronger signals could push you to the next tier.";
   }else if(tAvg >= 30){
     overallGrade = "C";
-    mood = "실험은 많이 했지만 아직 빵 터지는 패턴이 부족한 구간이야. 잘 터진 글 기준으로 공통 패턴을 뽑아보자.";
+    moodKo = "실험은 많이 했지만 아직 빵 터치는 패턴이 부족한 구간이야. 잘 터진 글 기준으로 공통 패턴을 뽑아보자.";
+    moodEn = "You’re experimenting a lot, but lack a consistently explosive pattern. Try extracting common traits from your best‑performing posts.";
   }else{
     overallGrade = "D";
-    mood = "데이터가 쌓이는 단계라서, 지금은 ‘테스트 기간’이라 보면 돼. 다양한 형식을 부담 없이 던지는 게 좋아.";
+    moodKo = "데이터가 쌓이는 단계라서, 지금은 ‘테스트 기간’이라 보면 돼. 다양한 형식을 부담 없이 던지는 게 좋아.";
+    moodEn = "This is still a data‑gathering phase. Treat it as a test period and throw out various formats without overthinking.";
   }
 
   const bestPost = CURRENT_LIST.slice().sort((a,b)=>b.score-a.score)[0];
 
-  let projectLine = "아직 프로젝트 키워드에 매칭된 글이 없어서 프로젝트별 평가는 생략할게.";
+  let projectKo = "아직 프로젝트 키워드에 매칭된 글이 없어서 프로젝트별 평가는 생략할게.";
+  let projectEn = "No posts matched the configured project keywords yet, so I’ll skip project‑level evaluation for now.";
   if(PROJECT_STATS && PROJECT_STATS.length){
     const bestProj = PROJECT_STATS.slice().sort((a,b)=> (b.trimmedAvg||0)-(a.trimmedAvg||0))[0];
-    projectLine = `프로젝트 중에서는 「${bestProj.label}」가 가장 강하게 나와. 이 구간에서 평균 스코어는 대략 ${bestProj.trimmedAvg.toFixed(1)}점이야.`;
+    projectKo = `프로젝트 중에서는 「${bestProj.label}」가 가장 강하게 나와. 이 구간에서 평균 스코어는 대략 ${bestProj.trimmedAvg.toFixed(1)}점이야.`;
+    projectEn = `Among your projects, “${bestProj.label}” stands out the most, with an average score around ${bestProj.trimmedAvg.toFixed(1)} in this period.`;
   }
 
-  const text =
+  let text;
+  if(CURRENT_LANG === "en"){
+    text =
+`● One‑line summary for this period
+- Trimmed average score: about ${tAvg.toFixed(1)} → roughly in the ${overallGrade} band
+- Grade distribution: S ${gradeCounts.S} / A ${gradeCounts.A} / B ${gradeCounts.B} / C ${gradeCounts.C} / D ${gradeCounts.D}
+
+● Coach comment
+- ${moodEn}
+
+● Best‑performing post
+- Date: ${bestPost.date || "-"}
+- Score: ${bestPost.score.toFixed(1)}
+${bestPost.link ? "- Link: " + bestPost.link : ""}
+
+● Project‑level note
+- ${projectEn}
+
+※ Tip: Collect your S/A‑tier posts and compare length, tone, meme usage, time of posting, hashtags, and inner‑circle tags.
+That’s the fastest way to reverse‑engineer your own “mindshare pattern”.`;
+  }else{
+    text =
 `● 이번 기간 한 줄 요약
 - 전체 트림드 평균: 약 ${tAvg.toFixed(1)}점 → 체감 등급으로는 ${overallGrade} 구간이야.
 - 등급 분포: S ${gradeCounts.S} / A ${gradeCounts.A} / B ${gradeCounts.B} / C ${gradeCounts.C} / D ${gradeCounts.D}
 
 ● 코치 코멘트
-- ${mood}
+- ${moodKo}
 
 ● 가장 잘 터진 글
 - 날짜: ${bestPost.date || "-"}
@@ -1504,14 +2011,14 @@ function updateCoach(){
 ${bestPost.link ? "- 링크: " + bestPost.link : ""}
 
 ● 프로젝트 관점 한 줄 평
-- ${projectLine}
+- ${projectKo}
 
 ※ 팁: 상위 S/A 글들만 모아서 “길이, 톤, 밈 사용 여부, 시간대, 해시태그, 이너서클 태그 여부”를 비교해 보면,
 지금 계정만의 마쉐 패턴을 더 빨리 찾을 수 있어.`;
+  }
 
   el.textContent = text;
 }
-
 /* ========== 전체 뷰 업데이트 (기간 필터 적용) ========== */
 function updateView(){
   if(!ALL_BASE.length) return;
@@ -1562,20 +2069,47 @@ function updateView(){
     totalPosts: total
   };
 
-  summaryEl.innerHTML=`
-    <div class="summary-card"><div class="summary-label">원글 개수</div>
-      <div class="summary-value">${total}</div><div class="summary-sub">답글 제외 · 기간 필터 적용</div></div>
-    <div class="summary-card"><div class="summary-label">평균 스코어</div>
-      <div class="summary-value">${avgScore.toFixed(1)}</div>
-      <div class="summary-sub">현재 선택된 기간의 전체 원글 기준</div></div>
-    <div class="summary-card"><div class="summary-label">트림드 평균</div>
-      <div class="summary-value">${trimmedAvg.toFixed(1)}</div>
-      <div class="summary-sub">상·하위 10% 제거 후 평균</div></div>
-    <div class="summary-card"><div class="summary-label">가장 터진 글</div>
-      <div class="summary-value">${best.score.toFixed(1)}</div>
-      <div class="summary-sub">${best.date || ""}</div></div>`;
+    summaryEl.innerHTML = `
+    <div class="summary-card summary-card--posts">
+      <div class="summary-ring"><span>📝</span></div>
+      <div class="summary-text">
+        <div class="summary-label">원글 개수</div>
+        <div class="summary-value">${total}</div>
+        <div class="summary-sub">답글 제외 · 기간 필터 적용</div>
+      </div>
+    </div>
+
+    <div class="summary-card summary-card--avg">
+      <div class="summary-ring"><span>📈</span></div>
+      <div class="summary-text">
+        <div class="summary-label">평균 스코어</div>
+        <div class="summary-value">${avgScore.toFixed(1)}</div>
+        <div class="summary-sub">현재 선택된 기간의 전체 원글 기준</div>
+      </div>
+    </div>
+
+    <div class="summary-card summary-card--trimmed">
+      <div class="summary-ring"><span>⚖️</span></div>
+      <div class="summary-text">
+        <div class="summary-label">트림드 평균</div>
+        <div class="summary-value">${trimmedAvg.toFixed(1)}</div>
+        <div class="summary-sub">상·하위 10% 제거 후 평균</div>
+      </div>
+    </div>
+
+    <div class="summary-card summary-card--best">
+      <div class="summary-ring"><span>💥</span></div>
+      <div class="summary-text">
+        <div class="summary-label">가장 터진 글</div>
+        <div class="summary-value">${best.score.toFixed(1)}</div>
+        <div class="summary-sub">${best.date || ""}</div>
+      </div>
+    </div>
+  `;
+
   summaryEl.style.display="grid";
 
+  renderGrowthChart(filtered);
   renderTop10(filtered);
   if(CURRENT_GRADE === "ALL"){
     renderGrade(filtered.slice(0,30));
@@ -1587,8 +2121,199 @@ function updateView(){
   renderProjectSummary(PROJECT_STATS);
   buildProjectSelect(PROJECT_STATS);
   renderProjectPieChart(PROJECT_STATS);
+  renderGlobalGradePie(PROJECT_STATS);
 
   updateCoach();
+}
+/* ========== 로컬 분석 히스토리 저장 ========== */
+function getHistoryList(){
+  try{
+    const raw = localStorage.getItem("ms_history");
+    if(!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  }catch(e){
+    console.warn("히스토리 불러오기 중 오류", e);
+    return [];
+  }
+}
+
+function saveHistoryEntry(){
+  try{
+    if(!ANALYSIS || !ALL_BASE.length) return;
+    const entry = {
+      timestamp: new Date().toISOString(),
+      range: CURRENT_RANGE || "ALL",
+      trimmedAvg: ANALYSIS.trimmedAvg,
+      avgScore: ANALYSIS.avgScore,
+      bestScore: ANALYSIS.bestScore,
+      bestDate: ANALYSIS.bestDate,
+      totalPosts: ANALYSIS.totalPosts
+    };
+    const list = getHistoryList();
+    list.push(entry);
+    const trimmed = list.slice(-50); // 최근 50개만 유지
+    localStorage.setItem("ms_history", JSON.stringify(trimmed));
+  }catch(e){
+    console.warn("히스토리 저장 실패", e);
+  }
+}
+
+function renderHistoryList(){
+  const wrap = document.getElementById("history-wrap");
+  if(!wrap) return;
+  const list = getHistoryList();
+  if(!list.length){
+    wrap.innerHTML = "<div class='empty'>아직 저장된 분석 히스토리가 없습니다. CSV를 업로드하면 여기 기록이 쌓입니다.</div>";
+    return;
+  }
+
+  const rows = list
+    .slice()
+    .sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp))
+    .map((item, idx)=>{
+      const d = new Date(item.timestamp);
+      const dateStr = isNaN(d.getTime())
+        ? (item.timestamp || "")
+        : [
+            d.getFullYear(),
+            String(d.getMonth()+1).padStart(2,"0"),
+            String(d.getDate()).padStart(2,"0")
+          ].join("-") + " " +
+          String(d.getHours()).padStart(2,"0") + ":" +
+          String(d.getMinutes()).padStart(2,"0");
+
+      const avg = Number(item.avgScore || 0);
+      const trimmed = Number(item.trimmedAvg || 0);
+      const best = Number(item.bestScore || 0);
+
+      return `
+        <tr>
+          <td>${idx+1}</td>
+          <td>${dateStr}</td>
+          <td>${item.range || "ALL"}</td>
+          <td>${item.totalPosts || 0}</td>
+          <td>${avg.toFixed(1)}</td>
+          <td>${trimmed.toFixed(1)}</td>
+          <td>${best.toFixed(1)}</td>
+          <td>${item.bestDate || ""}</td>
+        </tr>
+      `;
+    }).join("");
+
+  wrap.innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>업로드 시각</th>
+          <th>기간 필터</th>
+          <th>원글 수</th>
+          <th>평균 스코어</th>
+          <th>트림드 평균</th>
+          <th>가장 터진 글</th>
+          <th>베스트 날짜</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `;
+}
+
+/* ========= 계정 성장 그래프 ========== */
+let growthChart = null;
+
+function renderGrowthChart(list) {
+  const canvas = document.getElementById("growth-chart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  // 기존 차트 제거
+  if (growthChart) {
+    growthChart.destroy();
+    growthChart = null;
+  }
+
+  // 데이터 없으면 숨김
+  if (!list || list.length < 4) {
+    canvas.style.display = "none";
+    return;
+  }
+  canvas.style.display = "block";
+
+  // 날짜 기준 정렬
+  const arr = list.slice().sort((a, b) => {
+    if (a.dateObj && b.dateObj) return a.dateObj - b.dateObj;
+    return 0;
+  });
+
+  // x축: 날짜
+  const labels = arr.map(p =>
+    p.dateObj
+      ? `${p.dateObj.getMonth() + 1}/${p.dateObj.getDate()}`
+      : ""
+  );
+
+  // y축: 점수(스코어)
+  const scores = arr.map(p => p.score);
+
+  // 그래디언트 생성
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, "rgba(59,130,246,0.4)");   // 파랑 40%
+  gradient.addColorStop(1, "rgba(59,130,246,0.05)");  // 아주 연함
+
+  const pointShadow = {
+    id: "pointShadow",
+    afterDraw(chart, args, options) {
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.shadowColor = "rgba(59,130,246,0.6)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+  };
+
+  growthChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "계정 성장 스코어",
+          data: scores,
+          fill: true,
+          backgroundColor: gradient,
+          borderColor: "rgba(59,130,246,1)",
+          borderWidth: 3,
+          tension: 0.35,
+          pointRadius: 0,
+          pointBackgroundColor: "rgba(59,130,246,1)",
+          pointBorderColor: "rgba(59,130,246,1)",
+          pointHoverRadius: 6,
+          pointHitRadius: 18
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          ticks: { color: "#9ca3af" },
+          grid: { display: false }
+        },
+        y: {
+          ticks: { color: "#9ca3af" },
+          grid: { color: "rgba(148,163,184,0.1)" }
+        }
+      }
+    },
+    plugins: [pointShadow]
+  });
 }
 
 /* ========== CSV 업로드 ========== */
@@ -1603,11 +2328,21 @@ document.getElementById("csvInput").addEventListener("change", e=>{
         const t=(r.text||"").trim();
         if(!t || t.startsWith("@")) return;
         const dateObj = parseDateValue(r.date);
+
+        // 링크가 없고 트윗 ID만 있는 경우 보완
+        let link = r.link;
+        if((!link || !String(link).trim()) && r.id){
+          const id = String(r.id).trim();
+          if(id){
+            link = `https://twitter.com/i/web/status/${id}`;
+          }
+        }
+
         const p={
           text:t,
           date:r.date || "",
           dateObj,
-          link:r.link,
+          link,
           impressions:num(r.impressions),
           engagements:num(r.engagements),
           likes:num(r.likes),
@@ -1634,6 +2369,7 @@ document.getElementById("csvInput").addEventListener("change", e=>{
         const rangeTabs = document.getElementById("range-tabs");
         if(rangeTabs) rangeTabs.style.display = "flex";
         updateView();
+        saveHistoryEntry();
       }
     }
   });
@@ -1760,6 +2496,119 @@ async function loadLeaderboard(handle){
   }
 }
 
+
+/* ========== 다국어 UI (KO/EN/JA/ZH) ========== */
+const MS_I18N = {
+  ko: {
+    "#view-dashboard .top-title": "X 크리에이터 마인드쉐어 분석기",
+    "#view-dashboard .top-sub": "애널리틱스 CSV로 내 계정의 진짜 임팩트를 보는 대시보드",
+    ".hero-main-title": "마인드쉐어 스코어 · S~D 등급 · 리더보드까지 한 번에",
+    ".hero-desc": "X 애널리틱스에서 CSV를 내려받고 이곳에 업로드하면,<br>원글 기준으로 마인드쉐어 점수와 상위 글, 리더보드까지 한 번에 분석할 수 있어.",
+    ".hero-pill": "<span class='hero-dot'></span> CSV 한 번 → 계정 분석 끝",
+    ".file-input-fake": "📁 CSV 파일 선택하기",
+    ".file-hint": "account_analytics_content_YYYY-MM-DD_YYYY-MM-DD.csv 그대로 업로드",
+    ".badge": "<span class='badge-dot'></span>한국어·영어 CSV 자동 인식 · 답글 제외 후 원글만 분석",
+    "#range-tabs button[data-range='ALL']": "전체 기간",
+    "#range-tabs button[data-range='7']": "최근 7일",
+    "#range-tabs button[data-range='30']": "최근 30일",
+    "#range-tabs button[data-range='90']": "최근 90일",
+    "#view-leaderboard .top-title": "크리에이터 마인드쉐어 리더보드",
+    "#view-leaderboard .top-sub": "내 순위 · 트림드 평균 · 대표 트윗을 한 눈에 보는 랭킹 보드",
+    "#view-projects .top-title": "프로젝트별 마인드쉐어",
+    "#view-projects .top-sub": "트윗 본문 키워드 기준으로 프로젝트별 임팩트와 게시글/등급을 분석합니다.",
+    ".side-badge": "오늘도 한 번<br>마쉐 터트려볼까? 💥",
+    "#leaderboard-section .section-title": "🏆 크리에이터 마인드쉐어 리더보드 (Beta)",
+    "#leader-handle::placeholder": "X 핸들 입력 (예: @bud_dha__)",
+    "#nav-dashboard-label": "Dashboard",
+    "#nav-leaderboard-label": "리더보드",
+    "#nav-projects-label": "프로젝트별 마인드쉐어",
+    "#nav-course-label": "크립토 풀코스",
+    "#growth-title": "📈 계정 성장 그래프",
+    "#growth-sub": "최근 기간 동안 원글 개수 / 평균 스코어 추이를 그래프로 보여줍니다.",
+    "#top10-title": "💥 마인드쉐어 폭발 Top 10 <span id='top10-count'></span>",
+    "#grade-section-title": "🎚 등급별 상위 게시글 <span>(S~D)</span>",
+    "#coach-title": "🤖 마인드쉐어 코치 봇 <span style='font-size:11px;color:var(--text-muted);'>(Beta)</span>",
+    "#coach-chip-text": "현재 선택한 기간 기준 한 줄 요약 + 피드백",
+    "#leader-note": "※ 최소 원글 수 20개 이상일 때 리더보드 점수가 더 정확합니다.",
+    "#project-summary-title": "📚 프로젝트 요약 + 원형 그래프",
+    "#project-summary-sub": "코드 상단 <code>PROJECTS</code> 배열의 키워드를 네가 트는 프로젝트에 맞게 바꿔줘.",
+    "#proj-chart-title-1": "프로젝트별 게시글 비율",
+    "#proj-chart-title-2": "프로젝트별 평균 점수 (트림드 기준)",
+    "#proj-chart-title-3": "선택 프로젝트 S~D 등급 분포"
+  },
+  en: {
+    "#view-dashboard .top-title": "X Creator Mindshare Analyzer",
+    "#view-dashboard .top-sub": "Dashboard to see your real impact using X Analytics CSV",
+    ".hero-main-title": "Mindshare score · S~D grades · Leaderboard in one place",
+    ".hero-desc": "Download CSV from X Analytics and upload here.<br>You can analyze mindshare scores, top posts, and leaderboard based on original posts only.",
+    ".hero-pill": "<span class='hero-dot'></span> One CSV → Full account analysis",
+    ".file-input-fake": "📁 Choose CSV file",
+    ".file-hint": "Upload account_analytics_content_YYYY-MM-DD_YYYY-MM-DD.csv as is",
+    ".badge": "<span class='badge-dot'></span>KO/EN CSV auto-detect · replies excluded, originals only",
+    "#range-tabs button[data-range='ALL']": "All time",
+    "#range-tabs button[data-range='7']": "Last 7 days",
+    "#range-tabs button[data-range='30']": "Last 30 days",
+    "#range-tabs button[data-range='90']": "Last 90 days",
+    "#view-leaderboard .top-title": "Creator Mindshare Leaderboard",
+    "#view-leaderboard .top-sub": "Check your rank, trimmed average score, and key tweet at a glance",
+    "#view-projects .top-title": "Project-wise Mindshare",
+    "#view-projects .top-sub": "Analyze impact and grades per project based on tweet text keywords.",
+    ".side-badge": "Shall we blow up<br>mindshare again today? 💥",
+    "#leaderboard-section .section-title": "🏆 Creator Mindshare Leaderboard (Beta)",
+    "#leader-handle::placeholder": "Enter X handle (e.g., @bud_dha__)",
+    "#nav-dashboard-label": "Dashboard",
+    "#nav-leaderboard-label": "Leaderboard",
+    "#nav-projects-label": "Project Mindshare",
+    "#nav-course-label": "Crypto Fullcourse",
+    "#growth-title": "📈 Account Growth Chart",
+    "#growth-sub": "Shows the trend of original post count and average score over time.",
+    "#top10-title": "💥 Top 10 Mindshare Posts <span id='top10-count'></span>",
+    "#grade-section-title": "🎚 Top Posts by Grade <span>(S~D)</span>",
+    "#coach-title": "🤖 Mindshare Coach Bot <span style='font-size:11px;color:var(--text-muted);'>(Beta)</span>",
+    "#coach-chip-text": "One-line summary & feedback for the selected period",
+    "#leader-note": "※ For best accuracy, use at least 20 original posts before saving to the leaderboard.",
+    "#project-summary-title": "📚 Project Summary + Donut Chart",
+    "#project-summary-sub": "Edit the <code>PROJECTS</code> array at the top of the code to match the projects you tweet about."
+  },
+};
+
+function applyLang(lang) {
+  CURRENT_LANG = lang;
+  const dict = MS_I18N[lang] || MS_I18N.ko;
+  Object.keys(dict).forEach(sel => {
+    // placeholder 처리
+    if (sel.endsWith("::placeholder")) {
+      const realSel = sel.replace("::placeholder", "");
+      const el = document.querySelector(realSel);
+      if (el) el.setAttribute("placeholder", dict[sel]);
+    } else {
+      const el = document.querySelector(sel);
+      if (el) el.innerHTML = dict[sel];
+    }
+  });
+  document.documentElement.setAttribute("lang", lang);
+  localStorage.setItem("ms_lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lang === lang);
+  });
+  // 언어가 바뀔 때 코치봇 텍스트도 바로 언어에 맞게 다시 렌더링
+  if (typeof updateCoach === "function") {
+    try { updateCoach(); } catch(e) {}
+  }
+}
+
+function initLangToggle() {
+  const saved = localStorage.getItem("ms_lang") || "ko";
+  applyLang(saved);
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      applyLang(btn.dataset.lang);
+    });
+  });
+}
+
+initLangToggle();
+
 /* ========== 탭 & 이벤트 ========== */
 document.querySelectorAll(".grade-tab").forEach(btn=>{
   btn.addEventListener("click",()=>{
@@ -1800,6 +2649,7 @@ const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
 const viewDashboard = document.getElementById("view-dashboard");
 const viewLeaderboard = document.getElementById("view-leaderboard");
 const viewProjects = document.getElementById("view-projects");
+const viewHistory = document.getElementById("view-history");
 
 viewNavItems.forEach(item => {
   item.addEventListener("click", () => {
@@ -1812,18 +2662,30 @@ viewNavItems.forEach(item => {
       viewDashboard.style.display = "none";
       viewLeaderboard.style.display = "block";
       viewProjects.style.display = "none";
+      if (viewHistory) viewHistory.style.display = "none";
       loadLeaderboard();
     } else if (view === "projects") {
       viewDashboard.style.display = "none";
       viewLeaderboard.style.display = "none";
       viewProjects.style.display = "block";
+      if (viewHistory) viewHistory.style.display = "none";
+    } else if (view === "history") {
+      viewDashboard.style.display = "none";
+      viewLeaderboard.style.display = "none";
+      viewProjects.style.display = "none";
+      if (viewHistory) {
+        viewHistory.style.display = "block";
+        renderHistoryList();
+      }
     } else {
       viewDashboard.style.display = "block";
       viewLeaderboard.style.display = "none";
       viewProjects.style.display = "none";
+      if (viewHistory) viewHistory.style.display = "none";
     }
   });
 });
+
 
 /* 사이드바 접기 / 펼치기 */
 const layout = document.querySelector(".layout");
