@@ -754,19 +754,20 @@ tbody tr:hover td{background:#f9fafb}
   <aside class="sidebar">
     <button id="sidebar-toggle" class="sidebar-toggle">⟨</button>
 
-    <div>
-      <div class="side-profile">
-        <div class="side-avatar">
-          <img id="side-avatar-img" src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
-        </div>
-        <div>
-          <div class="side-name" id="side-username">게스트</div>
-          <a id="side-handle-link" href="https://twitter.com" target="_blank" class="side-handle">@로그인 필요</a>
-          <button type="button" class="side-login-btn" id="x-login-btn" onclick="handleAuthClick()">Google로 로그인</button>
-        </div>
+    <!-- 로그인 카드 (상단 고정) -->
+    <div class="side-profile">
+      <div class="side-avatar">
+        <img id="side-avatar-img" src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
       </div>
+      <div>
+        <div class="side-name" id="side-name">게스트</div>
+        <a class="side-handle" id="side-handle" href="https://twitter.com" target="_blank">@로그인 필요</a>
+        <button id="x-login-btn" class="side-login-btn">Google로 로그인</button>
+      </div>
+    </div>
 
-      <div class="side-nav">
+    <div
+<div class="side-nav">
         <div class="side-nav-item active" data-view="dashboard">
           <span class="icon">📊</span><span class="side-label" id="nav-dashboard-label">Dashboard</span>
         </div>
@@ -782,7 +783,12 @@ tbody tr:hover td{background:#f9fafb}
         <a class="side-nav-item" href="https://buddha913.github.io/crypto-fullcourse/" target="_blank">
           <span class="icon">📘</span><span class="side-label" id="nav-course-label">크립토 풀코스</span>
         </a>
-      </div>
+      
+<div class="side-profile-bottom">
+        <div class="side-avatar">
+          <img src="https://unavatar.io/twitter/bud_dha__" alt="avatar">
+        </div>
+</div>
     </div>
 
     <div class="side-footer">
@@ -1033,10 +1039,18 @@ tbody tr:hover td{background:#f9fafb}
 
 <script>
 // ===== Supabase Google 로그인 설정 =====
+
 const SUPABASE_URL = "https://ejqrnapdwblbqvnperid.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_ltaNA7nnVozoSCOcZljg";
 
-let supabaseClient = null;
+// 브라우저용 Supabase 클라이언트 (세션 자동 감지/저장)
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
 
 // 사이드바에 사용자 정보 반영
 function applyUserToSidebar(user){
@@ -1075,41 +1089,8 @@ function applyUserToSidebar(user){
   }
 }
 
-// OAuth 리다이렉트 code 처리 + 세션 로드
+// 현재 세션 불러와서 UI 초기화
 async function initSupabaseAuth(){
-  if (typeof supabase === "undefined") {
-    console.warn("Supabase JS 로드 안 됨");
-    return;
-  }
-
-  if (!supabaseClient) {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  // 1) 리다이렉트로 돌아온 경우 code → 세션 교환
-  try {
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
-    const errorDesc = url.searchParams.get("error_description");
-
-    if (errorDesc) {
-      console.warn("OAuth error:", errorDesc);
-    }
-
-    if (code) {
-      const { error } = await supabaseClient.auth.exchangeCodeForSession(url.href);
-      if (error) {
-        console.error("exchangeCodeForSession error", error);
-      } else {
-        // URL 정리 (code 파라미터 제거)
-        window.history.replaceState({}, document.title, url.origin + url.pathname + url.hash);
-      }
-    }
-  } catch (e) {
-    console.warn("OAuth 코드 처리 중 오류", e);
-  }
-
-  // 2) 현재 세션 기준 사이드바 업데이트
   try {
     const { data, error } = await supabaseClient.auth.getUser();
     if (error) {
@@ -1121,18 +1102,17 @@ async function initSupabaseAuth(){
     console.warn("getUser 호출 중 오류", e);
   }
 
-  // 3) 로그인 상태 변경 시마다 사이드바 자동 갱신
   try {
     supabaseClient.auth.onAuthStateChange((_event, session) => {
       applyUserToSidebar(session?.user ?? null);
     });
-  } catch(e) {
+  } catch (e) {
     console.warn("onAuthStateChange 등록 오류", e);
   }
 }
-
 // 로그인/로그아웃 버튼 이벤트 등록
 function setupAuthButton(){
+  console.log('[MS Auth] setupAuthButton 실행');
   const btn = document.getElementById("x-login-btn");
   if (!btn) return;
   // 이벤트 리스너로 한 번, 인라인 onclick으로 한 번 – 둘 중 하나만 먹어도 동작하게
@@ -1140,6 +1120,7 @@ function setupAuthButton(){
 }
 
 async function handleAuthClick(){
+  console.log('[MS Auth] handleAuthClick 클릭 트리거');
   if (typeof supabase === "undefined") {
     alert("Supabase 스크립트 로드 오류입니다. (CDN 차단 여부 확인)");
     return;
@@ -1185,6 +1166,7 @@ async function handleAuthClick(){
 }
 // 페이지 로드 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("[MS Auth] DOMContentLoaded 진입");
   try {
     initSupabaseAuth();
   } catch(e) {
