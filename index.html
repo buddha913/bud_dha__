@@ -1035,145 +1035,99 @@ tbody tr:hover td{background:#f9fafb}
 </div>
 
 <!-- Supabase JS (Google 로그인용) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
 
 <script>
-// ===== Supabase Google 로그인 설정 =====
-
+// ===== Supabase Google 로그인 (단순 버전) =====
 const SUPABASE_URL = "https://ejqrnapdwblbqvnperid.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_ltaNA7nnVozoSCOcZljg";
 
-// 브라우저용 Supabase 클라이언트 (세션 자동 감지/저장)
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
+    detectSessionInUrl: true
+  }
 });
 
-// 사이드바에 사용자 정보 반영
-function applyUserToSidebar(user){
-  const nameSpan   = document.getElementById("side-username");
-  const handleLink = document.getElementById("side-handle-link");
-  const avatarImg  = document.getElementById("side-avatar-img");
-  const btn        = document.getElementById("x-login-btn");
-  if (!nameSpan || !handleLink || !btn) return;
+// 로그인 상태에 따라 사이드바 UI 변경
+function applyAuthUI(user) {
+  const nameEl   = document.getElementById("side-name");
+  const handleEl = document.getElementById("side-handle");
+  const avatarEl = document.getElementById("side-avatar-img");
+  const btnEl    = document.getElementById("x-login-btn");
+  if (!nameEl || !handleEl || !btnEl) return;
 
   if (!user) {
-    nameSpan.textContent = "게스트";
-    handleLink.textContent = "@로그인 필요";
-    handleLink.href = "https://twitter.com";
-    if (avatarImg) {
-      avatarImg.src = "https://unavatar.io/twitter/bud_dha__";
-    }
-    btn.textContent = "Google로 로그인";
+    // 게스트
+    nameEl.textContent = "게스트";
+    handleEl.textContent = "@로그인 필요";
+    handleEl.href = "https://twitter.com";
+    if (avatarEl) avatarEl.src = "https://unavatar.io/twitter/bud_dha__";
+    btnEl.textContent = "Google로 로그인";
+    btnEl.onclick = loginWithGoogle;
   } else {
-    const fullName = user.user_metadata?.name
-                  || user.user_metadata?.full_name
-                  || "X 사용자";
-    const nick = user.user_metadata?.user_name
-              || user.user_metadata?.preferred_username
-              || "";
+    // 로그인된 유저
+    const meta = user.user_metadata || {};
+    const fullName = meta.name || meta.full_name || user.email || "X 사용자";
+    const nick = meta.user_name || meta.preferred_username || "";
     const handle = nick ? "@" + nick : "@x-user";
 
-    nameSpan.textContent = fullName;
-    handleLink.textContent = handle + " ↗";
-    handleLink.href = nick ? ("https://twitter.com/" + nick) : "https://twitter.com";
+    nameEl.textContent = fullName;
+    handleEl.textContent = handle + " ↗";
+    handleEl.href = nick ? ("https://twitter.com/" + nick) : "https://twitter.com";
 
-    if (avatarImg) {
-      const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-      if (avatarUrl) avatarImg.src = avatarUrl;
+    if (avatarEl) {
+      const avatarUrl = meta.avatar_url || meta.picture;
+      if (avatarUrl) avatarEl.src = avatarUrl;
     }
-    btn.textContent = "로그아웃";
+    btnEl.textContent = "로그아웃";
+    btnEl.onclick = logout;
   }
 }
 
-// 현재 세션 불러와서 UI 초기화
-async function initSupabaseAuth(){
+// 현재 세션 불러오기
+async function initAuth() {
   try {
-    const { data, error } = await supabaseClient.auth.getUser();
-    if (error) {
-      console.warn("auth.getUser 오류", error);
-    }
-    const user = data?.user || null;
-    applyUserToSidebar(user);
+    const { data, error } = await supabaseClient.auth.getSession();
+    console.log("[Auth] getSession:", data, error);
+    const user = data?.session?.user || null;
+    applyAuthUI(user);
   } catch (e) {
-    console.warn("getUser 호출 중 오류", e);
+    console.warn("[Auth] initAuth error:", e);
   }
 
-  try {
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-      applyUserToSidebar(session?.user ?? null);
-    });
-  } catch (e) {
-    console.warn("onAuthStateChange 등록 오류", e);
-  }
-}
-// 로그인/로그아웃 버튼 이벤트 등록
-function setupAuthButton(){
-  console.log('[MS Auth] setupAuthButton 실행');
-  const btn = document.getElementById("x-login-btn");
-  if (!btn) return;
-  // 이벤트 리스너로 한 번, 인라인 onclick으로 한 번 – 둘 중 하나만 먹어도 동작하게
-  btn.addEventListener("click", handleAuthClick);
+  // 상태 변경 감지
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    console.log("[Auth] onAuthStateChange:", _event, session);
+    applyAuthUI(session?.user || null);
+  });
 }
 
-async function handleAuthClick(){
-  console.log('[MS Auth] handleAuthClick 클릭 트리거');
-  if (typeof supabase === "undefined") {
-    alert("Supabase 스크립트 로드 오류입니다. (CDN 차단 여부 확인)");
-    return;
-  }
-  if (!supabaseClient) {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  try {
-    const { data } = await supabaseClient.auth.getUser();
-    const user = data?.user || null;
-
-    if (user) {
-      // 이미 로그인 상태면 로그아웃
-      await supabaseClient.auth.signOut();
-      applyUserToSidebar(null);
-      alert("로그아웃 되었습니다.");
-    } else {
-      // ✅ 꼭 네 실제 서비스 주소로 바꿔 넣어야 하는 부분
-      const FRONTEND_URL = "https://www.buddha-mindshare.com";
-
-      const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: FRONTEND_URL,
-          skipBrowserRedirect: false   // 우리가 직접 location 이동
-        }
-      });
-      if (signInErr) {
-        console.error("Google 로그인 오류", signInErr);
-        alert("Google 로그인 중 오류가 발생했습니다: " + (signInErr.message || signInErr));
-      } else if (signInData?.url) {
-        // Supabase가 준 로그인 URL로 강제 이동
-        window.location.href = signInData.url;
-      } else {
-        alert("로그인 URL을 받지 못했습니다. Supabase 설정을 다시 확인해 주세요.");
-      }
+// 구글 로그인
+async function loginWithGoogle() {
+  console.log("[Auth] loginWithGoogle");
+  const { data, error } = await supabaseClient.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: "https://www.buddha-mindshare.com"
     }
-  } catch(e) {
-    console.warn("로그인/로그아웃 처리 중 오류", e);
-    alert("로그인/로그아웃 처리 중 오류가 발생했습니다: " + (e.message || e));
-  }
+  });
+  if (error) console.error("[Auth] signInWithOAuth error:", error);
+  else console.log("[Auth] signInWithOAuth data:", data);
 }
-// 페이지 로드 후 초기화
+
+// 로그아웃
+async function logout() {
+  console.log("[Auth] logout");
+  await supabaseClient.auth.signOut();
+}
+
+// 페이지 로드 시 초기화
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[MS Auth] DOMContentLoaded 진입");
-  try {
-    initSupabaseAuth();
-  } catch(e) {
-    console.warn("Supabase 초기화 실패", e);
-  }
-  setupAuthButton();
+  console.log("[Auth] DOMContentLoaded");
+  initAuth();
 });
+</script>
 </script>
 
 
