@@ -1165,7 +1165,7 @@ async function handleAuthClick(){
         provider: "google",
         options: {
           redirectTo: FRONTEND_URL,
-          skipBrowserRedirect: true   // 우리가 직접 location 이동
+          skipBrowserRedirect: false   // 우리가 직접 location 이동
         }
       });
       if (signInErr) {
@@ -2759,4 +2759,3 @@ sidebarToggle.addEventListener("click", () => {
 </script>
 </body>
 </html>
-
