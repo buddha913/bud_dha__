@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <title>X MUDDHA 1.0.0</title>
+  <title>X MUDDHA1.0.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- CSV 파서 -->
@@ -3237,12 +3237,24 @@ function updateCoach(){
 
   const bestPost = CURRENT_LIST.slice().sort((a,b)=>b.score-a.score)[0];
 
-  let projectKo = "아직 프로젝트 키워드에 매칭된 글이 없어서 프로젝트별 평가는 생략할게.";
-  let projectEn = "No posts matched the configured project keywords yet, so I’ll skip project‑level evaluation for now.";
-  if(PROJECT_STATS && PROJECT_STATS.length){
-    const bestProj = PROJECT_STATS.slice().sort((a,b)=> (b.trimmedAvg||0)-(a.trimmedAvg||0))[0];
-    projectKo = `프로젝트 중에서는 「${bestProj.label}」가 가장 강하게 나와. 이 구간에서 평균 스코어는 대략 ${bestProj.trimmedAvg.toFixed(1)}점이야.`;
-    projectEn = `Among your projects, “${bestProj.label}” stands out the most, with an average score around ${bestProj.trimmedAvg.toFixed(1)} in this period.`;
+  let accountStyleKo = "";
+  let accountStyleEn = "";
+  const totalPosts = ANALYSIS.totalPosts || CURRENT_LIST.length || 0;
+  const highPosts = gradeCounts.S + gradeCounts.A;
+  const highRate = totalPosts > 0 ? highPosts / totalPosts : 0;
+
+  if (totalPosts <= 40 && highRate >= 0.3) {
+    // 질로 승부형
+    accountStyleKo = "이 계정은 전형적인 ‘질로 승부’ 타입이야. 글 수는 상대적으로 많지 않은데 S/A급 비율이 높아서, 한 편 한 편을 꽤 공들여 쓰는 패턴이 보여.";
+    accountStyleEn = "This account is a classic “quality‑first” type. You don’t post huge volume, but the S/A‑tier ratio is high, so each post seems carefully crafted.";
+  } else if (totalPosts >= 80 && highRate < 0.2) {
+    // 양으로 압박형
+    accountStyleKo = "이 계정은 ‘양으로 압박’하는 타입에 가까워. 전체 글 수가 많고 S/A 비율은 낮은 편이라, 다양한 시도를 많이 던지면서 성공 패턴을 찾는 스타일이야.";
+    accountStyleEn = "This account leans toward a “volume‑driven” style. You post a lot, with a relatively lower S/A ratio, using sheer volume and experimentation to find what works.";
+  } else {
+    // 밸런스형
+    accountStyleKo = "이 계정은 질과 양이 적당히 섞인 밸런스형이야. 글 수도, S/A 비율도 모두 중간 이상이라, 꾸준한 볼륨을 유지하면서 실험도 병행하는 패턴이 보여.";
+    accountStyleEn = "This account is a balanced mix of quality and volume. Both your post count and S/A ratio are in a healthy middle range, keeping steady volume while continuing to experiment.";
   }
 
   let text;
@@ -3260,8 +3272,8 @@ function updateCoach(){
 - Score: ${bestPost.score.toFixed(1)}
 ${bestPost.link ? "- Link: " + bestPost.link : ""}
 
-● Project‑level note
-- ${projectEn}
+● Account style (quality vs volume)
+- ${accountStyleEn}
 
 ※ Tip: Collect your S/A‑tier posts and compare length, tone, meme usage, time of posting, hashtags, and inner‑circle tags.
 That’s the fastest way to reverse‑engineer your own “mindshare pattern”.`;
@@ -3279,8 +3291,8 @@ That’s the fastest way to reverse‑engineer your own “mindshare pattern”.
 - 스코어: ${bestPost.score.toFixed(1)}
 ${bestPost.link ? "- 링크: " + bestPost.link : ""}
 
-● 프로젝트 관점 한 줄 평
-- ${projectKo}
+● 계정 스타일 (질 vs 양)
+- ${accountStyleKo}
 
 ※ 팁: 상위 S/A 글들만 모아서 “길이, 톤, 밈 사용 여부, 시간대, 해시태그, 이너서클 태그 여부”를 비교해 보면,
 지금 계정만의 마쉐 패턴을 더 빨리 찾을 수 있어.`;
@@ -5725,4 +5737,3 @@ document.addEventListener("DOMContentLoaded", function(){
 
 </body>
 </html>
-
