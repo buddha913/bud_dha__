@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <title>X MUDDHA1.0.0</title>
+  <title> MUDDHA 1.0.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- CSV 파서 -->
@@ -1480,6 +1480,9 @@ html.dark-theme .section-sub{
         <div class="side-nav-item active" data-view="dashboard">
           <span class="icon">📊</span><span class="side-label" id="nav-dashboard-label">Dashboard</span>
         </div>
+<div class="side-nav-item" data-view="guide">
+          <span class="icon">❔</span><span class="side-label" id="nav-guide-label">사용방법</span>
+        </div>
         <div class="side-nav-item" data-view="csv">
           <span class="icon">🧮</span><span class="side-label" id="nav-csv-label">CSV로 분석</span>
         </div>
@@ -1592,6 +1595,89 @@ html.dark-theme .section-sub{
     </div>
 
     <!-- ▲▲ Dashboard 끝 ▲▲ -->
+
+
+    <!-- ▼▼ 사용방법 화면 ▼▼ -->
+    <div id="view-guide" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">MUDDHA 사용방법</div>
+          <div class="top-sub">
+            X 애널리틱스 CSV만 있으면 내 계정의 마인드쉐어를 한 번에 진단하는 가이드야.
+          </div>
+        </div>
+      </div>
+
+      <section class="card card-soft" style="margin-top:8px; max-width:920px;">
+        <div class="section-header">
+          <div class="section-title">1. X 애널리틱스 CSV 가져오기</div>
+        </div>
+        <div style="font-size:12px; line-height:1.8; color:var(--text-main);">
+          <ol style="padding-left:18px; margin:0;">
+            <li>오른쪽 상단 프로필 메뉴에서 <b>Premium</b> 메뉴를 눌러 <b>X Premium</b> 화면으로 이동한다.</li>
+            <li>왼쪽 메뉴에서 <b>애널리틱스(Analytics)</b>를 클릭한다.</li>
+            <li>상단 탭에서 <b>요약</b> 대신 <b>콘텐츠</b> 탭으로 이동한다.</li>
+            <li>브라우저를 전체 화면(창모드가 아닌 전체모드)으로 켠 뒤, 표 오른쪽 위의
+              <b>⬇︎ 내려받기 아이콘</b>을 클릭해 CSV를 저장한다.</li>
+            <li>보통 파일 이름이
+              <code style="font-size:11px; background:#f3f4f6; padding:2px 4px; border-radius:4px;">
+                account_analytics_content_YYYY-MM-DD_YYYY-MM-DD.csv
+              </code>
+              이런 형태로 저장된다.
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="card card-soft" style="margin-top:10px; max-width:920px;">
+        <div class="section-header">
+          <div class="section-title">2. MUDDHA 분석기에 CSV 올리기</div>
+        </div>
+        <div style="font-size:12px; line-height:1.8; color:var(--text-main);">
+          <ol style="padding-left:18px; margin:0;">
+            <li>왼쪽 사이드바에서 <b>CSV로 분석</b> 탭을 클릭한다.</li>
+            <li>화면 상단의 <b>CSV 파일 선택하기</b> 버튼을 눌러, 방금 저장한 CSV 파일을 선택한다.</li>
+            <li>파일을 올리면 자동으로 데이터가 로딩되고, <b>전체 / 7D / 30D</b> 같은 기간 탭을 눌러서
+              보고 싶은 구간을 바꿀 수 있다.</li>
+            <li>답글(리플라이)은 자동으로 제외되고, <b>원글 기준</b>으로만 점수와 등급이 계산된다.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="card card-soft" style="margin-top:10px; max-width:920px;">
+        <div class="section-header">
+          <div class="section-title">3. 이 분석기로 볼 수 있는 것들</div>
+        </div>
+        <div style="font-size:12px; line-height:1.8; color:var(--text-main);">
+          <ul style="padding-left:18px; margin:0;">
+            <li><b>요약 카드</b> – 원글 개수, 평균 스코어, 트림드 평균, 가장 터진 글을 한 줄로 확인.</li>
+            <li><b>계정 성장 그래프</b> – 날짜별 원글 수 / 평균 스코어 흐름을 한 번에 본다.</li>
+            <li><b>YAP 히트맵</b> – 날짜별 YAP 상승 신호 강도를 색으로 표시.</li>
+            <li><b>마인드쉐어 폭발 Top 10</b> – 스코어·노출·참여·북마크·신규 팔로우 기준 상위 글.</li>
+            <li><b>등급별 대표 글 (S~D)</b> – S, A, B, C, D 등급별로 대표 게시글을 모아본다.</li>
+            <li><b>코치 봇</b> – 최근 성과를 바탕으로 계정이 <b>질 중심인지 / 양 중심인지</b> 한 줄로 요약.</li>
+            <li><b>YAP 신호 카드</b> – 트림드 점수 · 평균 점수 · 원글 수를 이용한 YAP 상승 여부.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card card-soft" style="margin-top:10px; max-width:920px;">
+        <div class="section-header">
+          <div class="section-title">4. 리더보드 & 히스토리까지 활용하기</div>
+        </div>
+        <div style="font-size:12px; line-height:1.8; color:var(--text-main);">
+          <ul style="padding-left:18px; margin:0;">
+            <li><b>리더보드</b> – CSV 분석 후 내 핸들을 입력하고, <b>현재 분석 결과 저장</b>을 눌러 기록을 쌓는다.</li>
+            <li><b>내 히스토리</b> – 업로드했던 CSV별 요약이 시간순으로 정리된다.</li>
+            <li><b>프로젝트별 마인드쉐어</b> – 트윗 본문의 키워드 기반으로 프로젝트별 비중을 본다.</li>
+          </ul>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+            ※ 모든 데이터는 <b>현재 브라우저의 localStorage</b>에만 저장되고, 서버로 전송되지 않는다.
+          </p>
+        </div>
+      </section>
+    </div>
+    <!-- ▲▲ 사용방법 화면 끝 ▲▲ -->
 
     <!-- ▼▼ CSV 분석 화면 ▼▼ -->
 <div id="view-csv">
@@ -4721,6 +4807,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
   const viewDashboard = document.getElementById("view-dashboard");
+  const viewGuide = document.getElementById("view-guide");
   const viewCsv = document.getElementById("view-csv");
   const viewLeaderboard = document.getElementById("view-leaderboard");
   const viewProjects = document.getElementById("view-projects");
@@ -4734,6 +4821,7 @@ const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
 
     // 기본값: 전부 숨기기
     viewDashboard.style.display = "none";
+    if (viewGuide) viewGuide.style.display = "none";
     if (viewCsv) viewCsv.style.display = "none";
     viewLeaderboard.style.display = "none";
     viewProjects.style.display = "none";
@@ -4777,6 +4865,11 @@ const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
           if (typeof initCommunity === "function") {
             initCommunity();
           }
+        }
+        break;
+      case "guide":
+        if (viewGuide) {
+          viewGuide.style.display = "block";
         }
         break;
       case "csv":
