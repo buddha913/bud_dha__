@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <!-- 프로젝트별 원형 그래프용 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@3.3.0/dist/chartjs-chart-financial.umd.min.js"></script>
 
   <!-- ✅ STEP 2 -->
   <style>
@@ -67,6 +68,7 @@ body{
   gap:24px;
   box-shadow: 10px 0 35px rgba(148,163,184,.45);
   position:relative;
+  z-index:10;
   transition:width .2s ease;
   overflow:hidden;
   border-right:1px solid rgba(209,213,219,.9);
@@ -74,21 +76,37 @@ body{
 
 .sidebar-toggle{
   position:absolute;
-  top:14px;
-  right:12px;
-  width:26px;
-  height:26px;
-  border-radius:999px;
+  top:0;
+  right:-6px;
+  width:12px;
+  height:100%;
   border:none;
+  background:transparent;
+  padding:0;
+  cursor:pointer;
+  z-index:20;
+}
+.sidebar-toggle::before{
+  content:"⟨";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:24px;
+  height:24px;
+  border-radius:999px;
   background:linear-gradient(135deg,#4f46e5,#06b6d4);
   color:#f9fafb;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:14px;
-  cursor:pointer;
   box-shadow:0 10px 24px rgba(79,70,229,.65);
-  z-index:10;
+  opacity:0;
+  transition:opacity .15s ease;
+}
+.sidebar-toggle:hover::before{
+  opacity:1;
 }
 
 .side-profile{
@@ -196,8 +214,8 @@ body{
 .layout.collapsed .side-profile{
   justify-content:center;
 }
-.layout.collapsed .sidebar-toggle{
-  transform:rotate(180deg);
+.layout.collapsed .sidebar-toggle::before{
+  content:"⟩";
 }
 
 /* ========== MAIN AREA ========== */
@@ -430,6 +448,125 @@ body{
     padding:16px;
   }
 }  /* 👈 여기에서 media를 꼭 닫아줘! */
+
+/* Dashboard 3×3 메인 그리드 */
+.dash-grid{
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.dash-cell{
+  background:var(--card-bg);
+  border-radius:20px;
+  padding:12px 14px 14px;
+  box-shadow:0 14px 40px rgba(15,23,42,0.28);
+  border:1px solid rgba(148,163,184,0.35);
+  display:flex;
+  flex-direction:column;
+  min-height:120px;
+}
+
+.dash-cell-header{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  margin-bottom:6px;
+}
+
+.dash-cell-title{
+  font-size:13px;
+  font-weight:700;
+}
+
+.dash-cell-sub{
+  font-size:11px;
+  color:var(--text-muted);
+}
+
+.dash-chart-wrap{
+  margin-top:4px;
+  height:90px;
+}
+
+.dash-chart-wrap canvas{
+  width:100%;
+  height:100%;
+}
+
+.dash-price{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--text-main);
+}
+
+.dash-news-list{
+  list-style:none;
+  padding:0;
+  margin:4px 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:12px;
+}
+
+.dash-news-list li{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.dash-news-placeholder{
+  color:var(--text-muted);
+}
+
+.dash-projects-wrap{
+  margin-top:4px;
+  font-size:12px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.dash-project-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:6px;
+}
+
+.dash-project-name{
+  font-weight:600;
+}
+
+.dash-project-rank{
+  font-size:11px;
+  color:var(--text-muted);
+}
+
+.dash-extra-body{
+  margin-top:6px;
+  font-size:12px;
+}
+
+/* 작은 화면에서 1열 또는 2열로 변경 */
+@media (max-width: 1080px){
+  .dash-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #dash-leader{
+    grid-column:span 2;
+  }
+}
+@media (max-width: 720px){
+  .dash-grid{
+    grid-template-columns:1fr;
+  }
+  #dash-leader{
+    grid-column:span 1;
+  }
+}
 /* 성장 그래프 카드 */
 .growth-card{
   margin-top:16px;
@@ -744,7 +881,580 @@ tbody tr:hover td{background:#f9fafb}
   color:var(--text-muted);
   margin-top:6px;
 }
-  </style>
+  
+
+/* ===== YAP 신호 카드 ===== */
+.yap-card .yap-main{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.yap-level{
+  font-size:18px;
+  font-weight:700;
+  margin-top:2px;
+}
+.yap-sub{
+  font-size:11px;
+  color:var(--text-muted);
+  margin-top:4px;
+}
+.yap-metrics{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:6px;
+}
+.yap-metric{
+  flex:1 1 70px;
+  font-size:11px;
+}
+.yap-metric-label{
+  color:var(--text-muted);
+  margin-bottom:2px;
+}
+.yap-metric-value{
+  font-weight:600;
+  font-size:13px;
+}
+/* YAP 가중치 토글 */
+.yap-boost-toggles{
+  margin-top:6px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.yap-toggle{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  color:var(--text-muted);
+  cursor:pointer;
+}
+.yap-toggle input{
+  width:14px;
+  height:14px;
+}
+/* ===== 야핑 플래너 전용 레이아웃 ===== */
+.yap-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr);
+  gap:16px;
+  margin-top:8px;
+}
+@media (max-width:1024px){
+  .yap-layout{
+    grid-template-columns:1fr;
+  }
+}
+.yap-form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.yap-form-grid-1{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.yap-label{
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.yap-input,
+.yap-select{
+  width:100%;
+  padding:7px 9px;
+  border-radius:10px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+  font-size:12px;
+}
+.yap-input::placeholder{
+  color:#9ca3af;
+}
+.yap-add-btn{
+  margin-top:8px;
+  width:100%;
+  border:none;
+  border-radius:999px;
+  padding:8px 0;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  box-shadow:0 10px 24px rgba(79,70,229,.45);
+}
+.yap-list-empty{
+  font-size:12px;
+  color:var(--text-muted);
+}
+.yap-item{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:8px;
+  align-items:flex-start;
+  padding:8px 9px;
+  border-radius:12px;
+  border:1px solid rgba(226,232,240,1);
+  background:#f9fafb;
+  margin-bottom:6px;
+  font-size:11px;
+}
+.yap-item.done{
+  opacity:.6;
+  text-decoration:line-through;
+}
+.yap-tags{
+  margin-top:2px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+.yap-tag{
+  padding:2px 6px;
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+}
+.yap-delete{
+  border:none;
+  background:transparent;
+  color:#9ca3af;
+  cursor:pointer;
+  font-size:12px;
+}
+
+/* ===== InfoFi 리더보드  ===== */
+.infofi-hero{
+  margin-top:8px;
+  margin-bottom:12px;
+}
+.infofi-hero-title{
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:4px;
+}
+.infofi-hero-sub{
+  font-size:11px;
+  color:var(--text-muted);
+  line-height:1.5;
+}
+.infofi-search-row{
+  margin-top:10px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.infofi-search-input{
+  flex:1;
+  min-width:220px;
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  background:#ffffff;
+  padding:9px 14px;
+  font-size:12px;
+}
+.infofi-search-btn{
+  border-radius:999px;
+  border:none;
+  padding:9px 16px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  box-shadow:0 10px 22px rgba(79,70,229,.45);
+}
+.infofi-handle-label{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--text-muted);
+}
+.infofi-handle-label b{
+  color:#111827;
+}
+.infofi-hint{
+  margin-top:6px;
+  font-size:11px;
+  color:var(--text-muted);
+}
+.infofi-projects-grid{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.infofi-project-card{
+  border-radius:16px;
+  border:1px solid rgba(226,232,240,1);
+  background:#f9fafb;
+  padding:10px 12px 12px;
+}
+.infofi-project-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+  gap:8px;
+}
+.infofi-header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.infofi-logo{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:700;
+  background:#e0f2fe;
+  color:#0369a1;
+  flex-shrink:0;
+}
+.infofi-logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.infofi-project-main{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.infofi-project-name{
+  font-size:13px;
+  font-weight:700;
+}
+.infofi-project-meta{
+  font-size:11px;
+  color:var(--text-muted);
+}
+.infofi-badge{
+  font-size:10px;
+  padding:3px 7px;
+  border-radius:999px;
+  border:1px solid rgba(191,219,254,1);
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+.infofi-table-wrap{
+  margin-top:6px;
+}
+.infofi-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px;
+}
+.infofi-table th,
+.infofi-table td{
+  padding:6px 6px;
+  border-bottom:1px solid rgba(226,232,240,1);
+}
+.infofi-table th{
+  background:#f8fafc;
+  color:var(--text-muted);
+  text-align:left;
+  font-size:10px;
+}
+.infofi-table tr:last-child td{
+  border-bottom:none;
+}
+.infofi-empty{
+  font-size:12px;
+  color:var(--text-muted);
+  text-align:center;
+  padding:8px 4px;
+}
+@media (max-width:768px){
+  .infofi-project-card{
+    padding:10px 10px 12px;
+  }
+}
+
+/* ===== 다크 모드 ===== */
+html.dark-theme{
+  --bg:#020617;
+  --bg-soft:#020617;
+  --sidebar-bg:#020617;
+  --card-bg:#020617;
+  --card-soft:#020617;
+  --text-main:#e5e7eb;
+  --text-muted:#9ca3af;
+  --border-soft:rgba(30,64,175,.7);
+}
+html.dark-theme body{
+  background:#020617;
+}
+html.dark-theme .sidebar{
+  border-right-color:rgba(30,64,175,.8);
+  box-shadow:10px 0 35px rgba(15,23,42,.9);
+}
+html.dark-theme .card,
+html.dark-theme .dash-cell{
+  box-shadow:0 18px 45px rgba(15,23,42,.85);
+}
+html.dark-theme .top-sub,
+html.dark-theme .section-sub{
+  color:var(--text-muted);
+}
+
+/* 다크 모드 토글 */
+.side-theme{
+  margin-top:8px;
+}
+.theme-toggle-label{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  color:var(--text-muted);
+  cursor:pointer;
+}
+.theme-toggle-label input{
+  width:32px;
+  height:16px;
+  border-radius:999px;
+  appearance:none;
+  -webkit-appearance:none;
+  background:rgba(148,163,184,.6);
+  position:relative;
+  outline:none;
+  cursor:pointer;
+}
+.theme-toggle-label input::before{
+  content:"";
+  position:absolute;
+  top:2px;
+  left:2px;
+  width:12px;
+  height:12px;
+  border-radius:999px;
+  background:#f9fafb;
+  transition:transform .18s ease;
+}
+.theme-toggle-label input:checked{
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+}
+.theme-toggle-label input:checked::before{
+  transform:translateX(14px);
+}
+.theme-toggle-text{
+  opacity:.9;
+}
+
+/* YAP 히트맵 */
+.yap-heatmap-card{
+  margin-top:12px;
+}
+.yap-heatmap{
+  margin-top:6px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  min-height:22px;
+}
+.yap-heatbox{
+  width:18px;
+  height:18px;
+  border-radius:4px;
+  border:1px solid rgba(148,163,184,.45);
+  box-shadow:0 2px 4px rgba(148,163,184,.35);
+}
+.yap-heatbox.level-1{background:#e0f2fe;}
+.yap-heatbox.level-2{background:#bfdbfe;}
+.yap-heatbox.level-3{background:#a5b4fc;}
+.yap-heatbox.level-4{background:#f9a8d4;}
+.yap-heatbox.level-5{background:#fb7185;}
+.yap-heatmap-legend{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  color:var(--text-muted);
+  margin-top:4px;
+}
+.yap-heatmap-legend-bar{
+  display:inline-flex;
+  gap:2px;
+}
+.yap-heatmap-legend-bar span{
+  width:14px;
+  height:10px;
+  border-radius:4px;
+}
+.yap-heatmap-legend-bar .lvl-1{background:#e0f2fe;}
+.yap-heatmap-legend-bar .lvl-2{background:#bfdbfe;}
+.yap-heatmap-legend-bar .lvl-3{background:#a5b4fc;}
+.yap-heatmap-legend-bar .lvl-4{background:#f9a8d4;}
+.yap-heatmap-legend-bar .lvl-5{background:#fb7185;}
+
+
+/* 글쓰기 토글 */
+.community-toggle{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin-bottom:8px;
+}
+.community-toggle-btn{
+  align-self:flex-start;
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  padding:6px 14px;
+  font-size:12px;
+  background:#f9fafb;
+  cursor:pointer;
+}
+/* InfoFi 출처 */
+.infofi-source-note{
+  margin-top:6px;
+  font-size:11px;
+  color:var(--text-muted);
+}
+.infofi-source-note a{
+  color:var(--accent);
+  text-decoration:underline;
+}
+
+/* ===== 커뮤니티 탭 ===== */
+.community-layout{
+  margin-top:8px;
+  max-width:880px;
+  margin-left:auto;
+  margin-right:auto;
+}
+@media (max-width: 900px){
+  .community-layout{
+    grid-template-columns:1fr;
+  }
+}
+.community-form{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.community-form-label{
+  font-size:11px;
+  font-weight:600;
+  color:var(--text-main);
+}
+.community-textarea{
+  width:100%;
+  min-height:80px;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(209,213,219,1);
+  resize:vertical;
+  font-size:12px;
+}
+.community-input{
+  width:100%;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid rgba(209,213,219,1);
+  font-size:12px;
+}
+.community-submit{
+  align-self:flex-end;
+  margin-top:4px;
+  border:none;
+  border-radius:999px;
+  padding:8px 16px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  color:#f9fafb;
+  box-shadow:0 10px 22px rgba(79,70,229,.45);
+}
+.community-hint{
+  font-size:11px;
+  color:var(--text-muted);
+}
+.community-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.community-empty{
+  font-size:12px;
+  color:var(--text-muted);
+}
+.community-post{
+  border-radius:14px;
+  border:1px solid rgba(226,232,240,1);
+  background:#f9fafb;
+  padding:8px 10px;
+  font-size:12px;
+}
+.community-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:11px;
+  color:var(--text-muted);
+  margin-bottom:4px;
+}
+.community-body{
+  font-size:12px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.community-link{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-top:4px;
+  font-size:11px;
+  color:#1d4ed8;
+  text-decoration:none;
+}
+.community-actions{
+  margin-top:6px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  font-size:11px;
+  color:var(--text-muted);
+}
+.community-action-btn{
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:11px;
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  color:var(--text-muted);
+}
+.community-replies{
+  margin-top:6px;
+  padding-left:10px;
+  border-left:2px solid rgba(209,213,219,0.8);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.community-reply{
+  font-size:11px;
+}
+.community-reply-meta{
+  font-size:10px;
+  color:var(--text-muted);
+  margin-bottom:2px;
+}
+</style>
 </head>
 
 <body>
@@ -761,8 +1471,8 @@ tbody tr:hover td{background:#f9fafb}
         </div>
         <div>
           <div class="side-name" id="side-username">게스트</div>
-          <a id="side-handle-link" href="https://twitter.com" target="_blank" class="side-handle">@로그인 필요</a>
-          <button type="button" class="side-login-btn" id="x-login-btn" onclick="handleAuthClick()">Google로 로그인</button>
+          <a id="side-handle-link" href="https://twitter.com" target="_blank" class="side-handle">@익명</a>
+          <button type="button" class="side-login-btn" id="nickname-btn">닉네임 설정</button>
         </div>
       </div>
 
@@ -770,14 +1480,26 @@ tbody tr:hover td{background:#f9fafb}
         <div class="side-nav-item active" data-view="dashboard">
           <span class="icon">📊</span><span class="side-label" id="nav-dashboard-label">Dashboard</span>
         </div>
+        <div class="side-nav-item" data-view="csv">
+          <span class="icon">🧮</span><span class="side-label" id="nav-csv-label">CSV로 분석</span>
+        </div>
         <div class="side-nav-item" data-view="leaderboard">
           <span class="icon">🏆</span><span class="side-label" id="nav-leaderboard-label">리더보드</span>
+        </div>
+        <div class="side-nav-item" data-view="infofi">
+          <span class="icon">📡</span><span class="side-label" id="nav-infofi-label">Kaito 리더보드</span>
         </div>
         <div class="side-nav-item" data-view="history">
           <span class="icon">🗂</span><span class="side-label" id="nav-history-label">내 히스토리</span>
         </div>
         <div class="side-nav-item" data-view="projects">
           <span class="icon">📚</span><span class="side-label" id="nav-projects-label">프로젝트별 마인드쉐어</span>
+        </div>
+        <div class="side-nav-item" data-view="yapping">
+          <span class="icon">📝</span><span class="side-label" id="nav-yapping-label">야핑 플래너</span>
+        </div>
+        <div class="side-nav-item" data-view="community">
+          <span class="icon">💬</span><span class="side-label" id="nav-community-label">커뮤니티</span>
         </div>
         <a class="side-nav-item" href="https://buddha913.github.io/crypto-fullcourse/" target="_blank">
           <span class="icon">📘</span><span class="side-label" id="nav-course-label">크립토 풀코스</span>
@@ -790,6 +1512,12 @@ tbody tr:hover td{background:#f9fafb}
       <div class="side-badge">
         오늘도 한 번<br>마쉐 터트려볼까? 💥
       </div>
+      <div class="side-theme">
+        <label class="theme-toggle-label">
+          <input type="checkbox" id="theme-toggle">
+          <span class="theme-toggle-text">Dark</span>
+        </label>
+      </div>
     </div>
   </aside>
 
@@ -797,7 +1525,76 @@ tbody tr:hover td{background:#f9fafb}
   <main class="main">
 
     <!-- ▼▼ Dashboard 화면 ▼▼ -->
+    
     <div id="view-dashboard">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">X 크리에이터 마인드쉐어 분석기</div>
+          <div class="top-sub">BTC · ETH · 환율 · 오늘의 이슈 · 우리 사이트 리더보드를 한 번에 보는 홈 대시보드</div>
+        </div>
+        <div class="top-cta">
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="ko">한국어</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+          </div>
+          <a class="analytics-link" href="https://analytics.twitter.com" target="_blank">X 애널리틱스 열기 ↗</a>
+        </div>
+      </div>
+
+      <!-- 메인 그리드: BTC/ETH/이슈 · 환율 · 리더보드 -->
+      <div class="dash-grid">
+        <!-- 1행: BTC / ETH / 오늘의 이슈 -->
+        <section class="dash-cell dash-asset" id="dash-btc">
+          <div class="dash-cell-header">
+            <div class="dash-cell-title">BTC</div>
+            <div class="dash-cell-sub">실시간 가격 그래프 (USD)</div>
+          </div>
+          <div class="dash-chart-wrap">
+            <canvas id="btc-chart" height="90"></canvas>
+          </div>
+          <div class="dash-price" id="btc-price-text">로드 중...</div>
+        </section>
+
+        <section class="dash-cell dash-asset" id="dash-eth">
+          <div class="dash-cell-header">
+            <div class="dash-cell-title">ETH</div>
+            <div class="dash-cell-sub">실시간 가격 그래프 (USD)</div>
+          </div>
+          <div class="dash-chart-wrap">
+            <canvas id="eth-chart" height="90"></canvas>
+          </div>
+          <div class="dash-price" id="eth-price-text">로드 중...</div>
+        </section>
+
+        <!-- 2행: 원화 / 달러 / 프로젝트 -->
+
+        <section class="dash-cell dash-projects" id="dash-projects">
+          <div class="dash-cell-header">
+            <div class="dash-cell-title">🔥 서버 기반 프로젝트 Top5 (Beta)</div>
+            <div class="dash-cell-sub" id="csv-server-top5-sub">CSV를 업로드하면 서버 기준 상위 5개 프로젝트를 여기에 보여줄게.</div>
+          </div>
+          <div class="dash-projects-wrap" id="csv-server-top5-body">
+            <div class="empty">아직 서버 분석 결과가 없습니다.</div>
+          </div>
+        </section>
+
+        <!-- 3행: MUDDHA 리더보드 TOP 10 / 공백·추천 -->
+        <section class="dash-cell dash-leader" id="dash-leader" style="grid-column:span 3;">
+          <div class="dash-cell-header">
+            <div class="dash-cell-title">MUDDHA 리더보드 TOP 10</div>
+            <div class="dash-cell-sub">CSV 기반 마인드쉐어 리더보드 상위 10명</div>
+          </div>
+          <div class="table-wrap" id="dashboard-leaderboard-wrap">
+            <div class="empty">리더보드를 불러오는 중...</div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ▲▲ Dashboard 끝 ▲▲ -->
+
+    <!-- ▼▼ CSV 분석 화면 ▼▼ -->
+<div id="view-csv">
       <div class="top-nav">
         <div>
           <div class="top-title">X 크리에이터 마인드쉐어 분석기</div>
@@ -833,6 +1630,8 @@ tbody tr:hover td{background:#f9fafb}
             <input type="file" id="csvInput" accept=".csv"/>
           </div>
           <span class="file-hint">account_analytics_content_YYYY-MM-DD_YYYY-MM-DD.csv 그대로 업로드</span>
+          <button type="button" id="btn-last-csv" class="range-tab">마지막 CSV로 조회하기</button>
+          <div id="last-snapshot-info" style="font-size:11px;color:#9ca3af;margin-top:4px;"></div>
         </div>
 
         <div class="badge"><span class="badge-dot"></span>한국어/영어 CSV 자동 인식 · 답글 제외 후 원글만 분석</div>
@@ -841,7 +1640,6 @@ tbody tr:hover td{background:#f9fafb}
           <button class="range-tab active" data-range="ALL">전체 기간</button>
           <button class="range-tab" data-range="7">최근 7일</button>
           <button class="range-tab" data-range="30">최근 30일</button>
-          <button class="range-tab" data-range="90">최근 90일</button>
         </div>
 
         <div id="summary" class="summary-grid" style="display:none"></div>
@@ -860,6 +1658,26 @@ tbody tr:hover td{background:#f9fafb}
       <div class="growth-chart-wrap">
         <!-- 나중에 JS에서 채울 캔버스 -->
         <canvas id="growth-chart" height="140"></canvas>
+      </div>
+    </section>
+    <section class="card yap-heatmap-card">
+      <div class="section-header">
+        <div class="section-title">📡 YAP 히트맵</div>
+        <div class="section-sub">날짜별 트림드/평균 스코어와 원글 수를 기반으로 추정한 YAP 상승 신호 강도입니다.</div>
+      </div>
+      <div class="yap-heatmap-legend">
+        <span>낮음</span>
+        <div class="yap-heatmap-legend-bar">
+          <span class="lvl-1"></span>
+          <span class="lvl-2"></span>
+          <span class="lvl-3"></span>
+          <span class="lvl-4"></span>
+          <span class="lvl-5"></span>
+        </div>
+        <span>높음</span>
+      </div>
+      <div id="yap-heatmap" class="yap-heatmap">
+        <div class="empty">CSV를 업로드하고 기간을 선택하면 날짜별 YAP 신호를 색으로 보여줄게.</div>
       </div>
     </section>
           <section class="card">
@@ -913,21 +1731,66 @@ tbody tr:hover td{background:#f9fafb}
               <div class="section-title" id="coach-title">🤖 마인드쉐어 코치 봇 <span style="font-size:11px;color:var(--text-muted);">(Beta)</span></div>
             </div>
             <div class="bot-chip">
-              <span>📌</span><span id="coach-chip-text">현재 선택한 기간 기준 한 줄 요약 + 피드백</span>
+              <span>📌</span><span id="coach-chip-text">현재 선택한 기간 기준 · YAP 신호는 최근 7일 정확도↑ 한 줄 요약 + 피드백</span>
             </div>
             <div id="coach-output" class="bot-output">
               아직 CSV를 올리지 않았어.<br>
-              상단에서 애널리틱스 CSV를 업로드하고 기간 탭(전체/7/30/90일)을 바꾸면<br>
+              상단에서 애널리틱스 CSV를 업로드하고 기간 탭(전체/7/30일)을 바꾸면<br>
               이 구간의 마인드쉐어 상태를 코치 봇이 자동으로 요약해 줄 거야.
             </div>
             <div class="bot-hint">
               * 서버/LLM 호출 없이, 내 애널리틱스를 기반으로 규칙적으로 요약해 주는 오프라인 코치야.
             </div>
           </section>
+          <section class="card yap-card" id="yap-card">
+            <div class="section-header">
+              <div class="section-title">📡 YAP 신호 <span style="font-size:11px;color:var(--text-muted);">(Beta)</span></div>
+            </div>
+            <div class="yap-main">
+              <div>
+                <div class="yap-label" style="font-size:11px;color:var(--text-muted);">현재 선택한 기간 기준 · YAP 신호는 최근 7일 정확도↑</div>
+                <div class="yap-level" id="yap-level-text">-</div>
+                <div class="yap-sub" id="yap-level-sub">
+                  CSV를 업로드하면 최근 패턴을 기반으로 YAP 상승 신호를 간단히 보여줄게.
+                </div>
+                <div class="yap-boost-toggles">
+                  <label class="yap-toggle">
+                    <input type="checkbox" id="yap-inner-toggle">
+                    <span>이너서클 계정 (+30% 가중치)</span>
+                  </label>
+                  <label class="yap-toggle">
+                    <input type="checkbox" id="yap-100-toggle">
+                    <span>최근 YAP 100점↑ 경험 있음 (+15% 가중치)</span>
+                  </label>
+                </div>
+              </div>
+              <div class="yap-metrics">
+                <div class="yap-metric">
+                  <div class="yap-metric-label">트림드 점수</div>
+                  <div class="yap-metric-value" id="yap-trimmed">-</div>
+                </div>
+                <div class="yap-metric">
+                  <div class="yap-metric-label">평균 점수</div>
+                  <div class="yap-metric-value" id="yap-avg">-</div>
+                </div>
+                <div class="yap-metric">
+                  <div class="yap-metric-label">원글 수</div>
+                  <div class="yap-metric-value" id="yap-posts">-</div>
+                </div>
+                <div class="yap-metric">
+                  <div class="yap-metric-label">YAP 상승 확률</div>
+                  <div class="yap-metric-value" id="yap-prob">-</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
         </div>
       </div>
     </div>
-    <!-- ▲▲ Dashboard 끝 ▲▲ -->
+
+    <!-- ▲▲ CSV 분석 화면 끝 ▲▲ -->
+
 
 
     <!-- ▼▼ 리더보드 화면 ▼▼ -->
@@ -1023,176 +1886,203 @@ tbody tr:hover td{background:#f9fafb}
         </div>
       </section>
     </div>
-    <!-- ▲▲ 프로젝트 화면 끝 ▲▲ -->
+    
+    <!-- ▼▼ 야핑 플래너 화면 ▼▼ -->
+    <div id="view-yapping" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">야핑 & 보상 플래너</div>
+          <div class="top-sub">
+            스프레드시트에서 관리하던 <b>필수/보조 야핑 · 주기 · 기간 · 보상</b>을 이 화면에서 직접 관리할 수 있습니다.
+            (브라우저 <code>localStorage</code>에 저장)
+          </div>
+        </div>
+      </div>
+
+      <div class="yap-layout">
+        <section class="card card-soft">
+          <div class="section-header">
+            <div class="section-title">새 야핑 계획 추가</div>
+            <div class="section-sub">엑셀 한 줄 = 아래 폼 한 줄이라고 생각하면 편해.</div>
+          </div>
+
+          <form id="yap-form">
+            <div class="yap-form-grid">
+              <div>
+                <div class="yap-label">한국명</div>
+                <input id="yap-kor" class="yap-input" placeholder="카이토, 리버, 뱅커 ..." />
+              </div>
+              <div>
+                <div class="yap-label">프로젝트</div>
+                <input id="yap-project" class="yap-input" placeholder="Kaito, River, Bankr ..." />
+              </div>
+              <div>
+                <div class="yap-label">계열</div>
+                <input id="yap-segment" class="yap-input" placeholder="장기 / 단기 등" />
+              </div>
+              <div>
+                <div class="yap-label">야핑 타입</div>
+                <select id="yap-type" class="yap-select">
+                  <option value="필수">필수</option>
+                  <option value="보조">보조</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="yap-form-grid">
+              <div>
+                <div class="yap-label">야핑 주기</div>
+                <input id="yap-frequency" class="yap-input" placeholder="일2회 / 일1회 / 주1회 ..." />
+              </div>
+              <div>
+                <div class="yap-label">보상</div>
+                <input id="yap-reward" class="yap-input" placeholder="$200, 포인트, WL 등" />
+              </div>
+              <div>
+                <div class="yap-label">시작일</div>
+                <input id="yap-start" type="date" class="yap-input" />
+              </div>
+              <div>
+                <div class="yap-label">종료일</div>
+                <input id="yap-end" type="date" class="yap-input" />
+              </div>
+            </div>
+
+            <div class="yap-form-grid-1">
+              <div>
+                <div class="yap-label">메모</div>
+                <input id="yap-memo" class="yap-input" placeholder="예: 일2회 스레드 + 디스코드 후기, 최소 2개월 유지" />
+              </div>
+            </div>
+
+            <button class="yap-add-btn" type="submit">+ 야핑 계획 추가</button>
+          </form>
+        </section>
+
+        <section class="card card-soft">
+          <div class="section-header">
+            <div class="section-title">나의 야핑 리스트</div>
+            <div class="section-sub">왼쪽 체크박스는 전체 완료 여부 체크 용도, 메모까지 한 눈에 정리.</div>
+          </div>
+          <div id="yap-list">
+            <div class="yap-list-empty">등록된 야핑 계획이 없습니다. 왼쪽에서 새 계획을 추가해줘.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <!-- ▲▲ 야핑 플래너 화면 끝 ▲▲ -->
+
+    <!-- ▼▼ InfoFi 리더보드 화면 ▼▼ -->
+    
+    
+    <!-- ▼▼ 커뮤니티 화면 ▼▼ -->
+    <div id="view-community" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">커뮤니티 (로컬 전용 베타)</div>
+          <div class="top-sub">
+            브라우저에만 저장되는 작은 커뮤니티야. 닉네임 + 글 + 트위터 링크를 남기고, 서로 댓글과 좋아요를 남겨볼 수 있어.
+          </div>
+        </div>
+      </div>
+
+      <div class="community-layout">
+        <section class="card card-soft">
+          <div class="section-header">
+            <div class="section-title">💬 최근 글 & 글 쓰기</div>
+            <div class="section-sub">
+              가운데에서 바로 글을 읽고, 필요할 때만 글 쓰기 영역을 펼칠 수 있어.
+            </div>
+          </div>
+
+          <div class="community-toggle">
+            <button type="button" id="community-toggle-btn" class="community-toggle-btn">
+              ✏️ 새 글 쓰기 열기
+            </button>
+            <div class="community-hint">
+              · 사이드바 닉네임 버튼으로 이름을 먼저 정해도 좋아.<br>
+              · 이 커뮤니티의 모든 데이터는 이 브라우저의 localStorage에만 저장돼.
+            </div>
+          </div>
+
+          <form id="community-form" class="community-form" style="display:none;">
+            <div>
+              <div class="community-form-label">내용</div>
+              <textarea id="community-content" class="community-textarea" placeholder="오늘의 마쉐 / 인사이트 / 잡담 등을 자유롭게 남겨줘."></textarea>
+            </div>
+            <div>
+              <div class="community-form-label">트위터 링크 (선택)</div>
+              <input id="community-twitter" class="community-input" placeholder="https://x.com/.... 형태의 링크를 붙여넣어줘." />
+            </div>
+            <button type="submit" class="community-submit">글 올리기</button>
+          </form>
+
+          <div id="community-list" class="community-list">
+            <div class="community-empty">아직 등록된 글이 없어. 첫 글을 남겨볼래?</div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <!-- ▲▲ 커뮤니티 화면 끝 ▲▲ -->
+
+<div id="view-infofi" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">InfoFi 리더보드(현재 나만 가능함...)</div>
+          <div class="top-sub">
+            Kaito / Cookie / 등 InfoFi 프로젝트의 <b>프로젝트별 리더보드 순위</b>
+            <b></b>
+          </div>
+        </div>
+      </div>
+
+      <section class="card card-soft infofi-hero">
+        <div class="infofi-hero-title">🔍 핸들로 내 InfoFi 순위 찾기</div>
+        <div class="infofi-hero-sub">
+          예: <code>@bud_dha__</code> 처럼 입력하면됨
+        </div>
+
+        <div class="infofi-search-row">
+          <input id="infofi-handle-input" class="infofi-search-input" placeholder="@핸들 입력 (예: @bud_dha__)" />
+          <button type="button" class="infofi-search-btn" onclick="handleInfofiSearch()">검색</button>
+        </div>
+
+        <div class="infofi-handle-label" id="infofi-handle-label"></div>
+        <div class="infofi-hint">
+          ※  <code></code> 딜레이 있음
+        </div>
+        <div class="infofi-source-note">
+          데이터 출처: <a href="https://gomtu.xyz/kaito-leaderboard" target="_blank" rel="noopener">Gomtu Kaito Leaderboard</a>
+        </div>
+      </section>
+
+      <section class="infofi-results card">
+        <div id="infofi-result-wrap" class="infofi-projects-grid">
+          <div class="empty">먼저 위에서 @핸들을 입력하고 검색을 눌러줘.</div>
+      </div>
+
+      <!-- ✅ Kaito Leaderboard 결과 영역 (InfoFi 검색과 통합) -->
+      
+      <!-- ✅ Kaito Leaderboard 결과 (텍스트만 표시) -->
+      <div
+        id="kaito-result"
+        style="margin-top:8px;font-size:13px;line-height:1.6;color:#e5e7eb;"
+      ></div>
+
+
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ▲▲ InfoFi 리더보드 화면 끝 ▲▲ -->
+
+<!-- ▲▲ 프로젝트 화면 끝 ▲▲ -->
 
   </main>
 </div>
 
-<!-- Supabase JS (Google 로그인용) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-// ===== Supabase Google 로그인 설정 =====
-const SUPABASE_URL = "https://ejqrnapdwblbqvnperid.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_ltaNA7nnVozoSCOcZljg";
-
-let supabaseClient = null;
-
-// 사이드바에 사용자 정보 반영
-function applyUserToSidebar(user){
-  const nameSpan   = document.getElementById("side-username");
-  const handleLink = document.getElementById("side-handle-link");
-  const avatarImg  = document.getElementById("side-avatar-img");
-  const btn        = document.getElementById("x-login-btn");
-  if (!nameSpan || !handleLink || !btn) return;
-
-  if (!user) {
-    nameSpan.textContent = "게스트";
-    handleLink.textContent = "@로그인 필요";
-    handleLink.href = "https://twitter.com";
-    if (avatarImg) {
-      avatarImg.src = "https://unavatar.io/twitter/bud_dha__";
-    }
-    btn.textContent = "Google로 로그인";
-  } else {
-    const fullName = user.user_metadata?.name
-                  || user.user_metadata?.full_name
-                  || "X 사용자";
-    const nick = user.user_metadata?.user_name
-              || user.user_metadata?.preferred_username
-              || "";
-    const handle = nick ? "@" + nick : "@x-user";
-
-    nameSpan.textContent = fullName;
-    handleLink.textContent = handle + " ↗";
-    handleLink.href = nick ? ("https://twitter.com/" + nick) : "https://twitter.com";
-
-    if (avatarImg) {
-      const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-      if (avatarUrl) avatarImg.src = avatarUrl;
-    }
-    btn.textContent = "로그아웃";
-  }
-}
-
-// OAuth 리다이렉트 code 처리 + 세션 로드
-async function initSupabaseAuth(){
-  if (typeof supabase === "undefined") {
-    console.warn("Supabase JS 로드 안 됨");
-    return;
-  }
-
-  if (!supabaseClient) {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  // 1) 리다이렉트로 돌아온 경우 code → 세션 교환
-  try {
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
-    const errorDesc = url.searchParams.get("error_description");
-
-    if (errorDesc) {
-      console.warn("OAuth error:", errorDesc);
-    }
-
-    if (code) {
-      const { error } = await supabaseClient.auth.exchangeCodeForSession(url.href);
-      if (error) {
-        console.error("exchangeCodeForSession error", error);
-      } else {
-        // URL 정리 (code 파라미터 제거)
-        window.history.replaceState({}, document.title, url.origin + url.pathname + url.hash);
-      }
-    }
-  } catch (e) {
-    console.warn("OAuth 코드 처리 중 오류", e);
-  }
-
-  // 2) 현재 세션 기준 사이드바 업데이트
-  try {
-    const { data, error } = await supabaseClient.auth.getUser();
-    if (error) {
-      console.warn("auth.getUser 오류", error);
-    }
-    const user = data?.user || null;
-    applyUserToSidebar(user);
-  } catch (e) {
-    console.warn("getUser 호출 중 오류", e);
-  }
-
-  // 3) 로그인 상태 변경 시마다 사이드바 자동 갱신
-  try {
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-      applyUserToSidebar(session?.user ?? null);
-    });
-  } catch(e) {
-    console.warn("onAuthStateChange 등록 오류", e);
-  }
-}
-
-// 로그인/로그아웃 버튼 이벤트 등록
-function setupAuthButton(){
-  const btn = document.getElementById("x-login-btn");
-  if (!btn) return;
-  // 이벤트 리스너로 한 번, 인라인 onclick으로 한 번 – 둘 중 하나만 먹어도 동작하게
-  btn.addEventListener("click", handleAuthClick);
-}
-
-async function handleAuthClick(){
-  if (typeof supabase === "undefined") {
-    alert("Supabase 스크립트 로드 오류입니다. (CDN 차단 여부 확인)");
-    return;
-  }
-  if (!supabaseClient) {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  try {
-    const { data } = await supabaseClient.auth.getUser();
-    const user = data?.user || null;
-
-    if (user) {
-      // 이미 로그인 상태면 로그아웃
-      await supabaseClient.auth.signOut();
-      applyUserToSidebar(null);
-      alert("로그아웃 되었습니다.");
-    } else {
-      // ✅ 꼭 네 실제 서비스 주소로 바꿔 넣어야 하는 부분
-      const FRONTEND_URL = "https://www.buddha-mindshare.com";
-
-      const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: FRONTEND_URL,
-          skipBrowserRedirect: false   // 우리가 직접 location 이동
-        }
-      });
-      if (signInErr) {
-        console.error("Google 로그인 오류", signInErr);
-        alert("Google 로그인 중 오류가 발생했습니다: " + (signInErr.message || signInErr));
-      } else if (signInData?.url) {
-        // Supabase가 준 로그인 URL로 강제 이동
-        window.location.href = signInData.url;
-      } else {
-        alert("로그인 URL을 받지 못했습니다. Supabase 설정을 다시 확인해 주세요.");
-      }
-    }
-  } catch(e) {
-    console.warn("로그인/로그아웃 처리 중 오류", e);
-    alert("로그인/로그아웃 처리 중 오류가 발생했습니다: " + (e.message || e));
-  }
-}
-// 페이지 로드 후 초기화
-document.addEventListener("DOMContentLoaded", () => {
-  try {
-    initSupabaseAuth();
-  } catch(e) {
-    console.warn("Supabase 초기화 실패", e);
-  }
-  setupAuthButton();
-});
-</script>
 
 
 <script>
@@ -1202,6 +2092,323 @@ const MIN_POSTS_FOR_LEADERBOARD = 20;
 const TRIM_RATIO = 0.1;
 let CURRENT_LANG = "ko";
 
+
+const THEME_KEY = "mindshare_theme_v1";
+function applyThemeFromStorage(){
+  try{
+    const saved = localStorage.getItem(THEME_KEY) || "light";
+    const root = document.documentElement;
+    const toggle = document.getElementById("theme-toggle");
+    if(saved === "dark"){
+      root.classList.add("dark-theme");
+      if(toggle) toggle.checked = true;
+    }else{
+      root.classList.remove("dark-theme");
+      if(toggle) toggle.checked = false;
+    }
+  }catch(e){}
+}
+function initThemeToggle(){
+  const toggle = document.getElementById("theme-toggle");
+  if(!toggle) return;
+  toggle.addEventListener("change", ()=>{
+    const root = document.documentElement;
+    try{
+      if(toggle.checked){
+        root.classList.add("dark-theme");
+        localStorage.setItem(THEME_KEY,"dark");
+      }else{
+        root.classList.remove("dark-theme");
+        localStorage.setItem(THEME_KEY,"light");
+      }
+    }catch(e){}
+  });
+}
+
+const NICKNAME_KEY = "mindshare_nickname_v1";
+
+function applyNicknameSidebar(){
+  const nameSpan   = document.getElementById("side-username");
+  const handleLink = document.getElementById("side-handle-link");
+  const avatarImg  = document.getElementById("side-avatar-img");
+  if (!nameSpan || !handleLink) return;
+
+  const stored = (typeof localStorage !== "undefined")
+    ? localStorage.getItem(NICKNAME_KEY)
+    : null;
+
+  if (!stored) {
+    // 기본값: 게스트 모드
+    nameSpan.textContent = "게스트";
+    handleLink.textContent = "@익명";
+    handleLink.href = "javascript:void(0)";
+    if (avatarImg) {
+      avatarImg.src = "https://unavatar.io/twitter/guest";
+    }
+    return;
+  }
+
+  const nick = stored.trim().slice(0, 30) || "게스트";
+  nameSpan.textContent = nick;
+  handleLink.textContent = "@" + nick;
+  handleLink.href = "javascript:void(0)";
+  if (avatarImg) {
+    // 완전 익명 느낌으로, 닉네임 기반 아바타
+    avatarImg.src = "https://unavatar.io/twitter/" + encodeURIComponent(nick);
+  }
+}
+
+function openNicknamePrompt(){
+  let current = "";
+  if (typeof localStorage !== "undefined") {
+    current = localStorage.getItem(NICKNAME_KEY) || "";
+  }
+  const input = prompt("이 브라우저에서 사용할 익명 닉네임을 정해줘 (예: 붓다-야핑장인)", current);
+  if (!input) return;
+  const nick = input.trim().slice(0, 30);
+  if (!nick) return;
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(NICKNAME_KEY, nick);
+  }
+  applyNicknameSidebar();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyNicknameSidebar();
+  applyThemeFromStorage();
+  initThemeToggle();
+  const btn = document.getElementById("nickname-btn");
+  if (btn) {
+    btn.addEventListener("click", openNicknamePrompt);
+  }
+
+  // YAP 가중치 토글이 바뀔 때마다 카드/히트맵/성장 그래프 다시 그리기
+  const inner = document.getElementById("yap-inner-toggle");
+  const top100 = document.getElementById("yap-100-toggle");
+  const handleToggleChange = () => {
+    if (!ANALYSIS || !CURRENT_LIST || !CURRENT_LIST.length) return;
+    updateYapCard(ANALYSIS);
+    renderYapHeatmap(CURRENT_LIST);
+    renderGrowthChart(CURRENT_LIST);
+  };
+  [inner, top100].forEach(el => {
+    if (el) el.addEventListener("change", handleToggleChange);
+  });
+});
+
+
+/* ===== 커뮤니티 로컬 게시판 ===== */
+const COMMUNITY_KEY = "mindshare_community_v1";
+
+function getCurrentNicknameForCommunity(){
+  try{
+    const stored = (typeof localStorage !== "undefined")
+      ? localStorage.getItem(NICKNAME_KEY)
+      : null;
+    const nick = stored && stored.trim() ? stored.trim().slice(0,30) : "게스트";
+    return nick;
+  }catch(e){
+    return "게스트";
+  }
+}
+
+function loadCommunityPosts(){
+  try{
+    const raw = localStorage.getItem(COMMUNITY_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr;
+  }catch(e){
+    return [];
+  }
+}
+
+function saveCommunityPosts(list){
+  try{
+    localStorage.setItem(COMMUNITY_KEY, JSON.stringify(list || []));
+  }catch(e){}
+}
+
+function createCommunityPost({content, twitterUrl, parentId=null}){
+  const now = Date.now();
+  return {
+    id: "c_" + now + "_" + Math.random().toString(36).slice(2,8),
+    author: getCurrentNicknameForCommunity(),
+    content: (content || "").trim(),
+    twitterUrl: (twitterUrl || "").trim(),
+    parentId: parentId,
+    likes: 0,
+    createdAt: now
+  };
+}
+
+function renderCommunity(){
+  const container = document.getElementById("community-list");
+  if (!container) return;
+
+  const posts = loadCommunityPosts();
+  container.innerHTML = "";
+
+  if (!posts.length){
+    const empty = document.createElement("div");
+    empty.className = "community-empty";
+    empty.textContent = "아직 등록된 글이 없어. 첫 글을 남겨볼래?";
+    container.appendChild(empty);
+    return;
+  }
+
+  // 최신 순 정렬
+  posts.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+
+  const topLevel = posts.filter(p => !p.parentId);
+  const replies = posts.filter(p => p.parentId);
+
+  topLevel.forEach(post => {
+    const postEl = document.createElement("div");
+    postEl.className = "community-post";
+
+    const meta = document.createElement("div");
+    meta.className = "community-meta";
+    const authorSpan = document.createElement("span");
+    authorSpan.textContent = post.author || "게스트";
+    const dateSpan = document.createElement("span");
+    const d = new Date(post.createdAt || Date.now());
+    const pad = n => (n<10?"0"+n:n);
+    dateSpan.textContent = `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    meta.appendChild(authorSpan);
+    meta.appendChild(dateSpan);
+
+    const body = document.createElement("div");
+    body.className = "community-body";
+    body.textContent = post.content || "";
+
+    postEl.appendChild(meta);
+    postEl.appendChild(body);
+
+    if (post.twitterUrl){
+      const link = document.createElement("a");
+      link.className = "community-link";
+      link.href = post.twitterUrl;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.innerHTML = "트위터 열기 ↗";
+      postEl.appendChild(link);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "community-actions";
+
+    const likeBtn = document.createElement("button");
+    likeBtn.type = "button";
+    likeBtn.className = "community-action-btn";
+    const likesLabel = () => (post.likes || 0) ? `좋아요 ${post.likes}` : "좋아요";
+    likeBtn.textContent = likesLabel();
+    likeBtn.addEventListener("click", () => {
+      const all = loadCommunityPosts();
+      const found = all.find(p => p.id === post.id);
+      if (found){
+        found.likes = (found.likes || 0) + 1;
+        saveCommunityPosts(all);
+        renderCommunity();
+      }
+    });
+
+    const replyBtn = document.createElement("button");
+    replyBtn.type = "button";
+    replyBtn.className = "community-action-btn";
+    replyBtn.textContent = "답글 달기";
+    replyBtn.addEventListener("click", () => {
+      const text = prompt("답글 내용을 입력해줘:");
+      if (!text || !text.trim()) return;
+      const all = loadCommunityPosts();
+      const reply = createCommunityPost({content:text, twitterUrl:"", parentId:post.id});
+      all.push(reply);
+      saveCommunityPosts(all);
+      renderCommunity();
+    });
+
+    actions.appendChild(likeBtn);
+    actions.appendChild(replyBtn);
+    postEl.appendChild(actions);
+
+    // 하위 답글 렌더링
+    const children = replies.filter(r => r.parentId === post.id);
+    if (children.length){
+      const repliesWrap = document.createElement("div");
+      repliesWrap.className = "community-replies";
+      children
+        .sort((a,b)=> (a.createdAt||0) - (b.createdAt||0))
+        .forEach(rep => {
+          const repEl = document.createElement("div");
+          repEl.className = "community-reply";
+          const repMeta = document.createElement("div");
+          repMeta.className = "community-reply-meta";
+          const d2 = new Date(rep.createdAt || Date.now());
+          const pad2 = n => (n<10?"0"+n:n);
+          repMeta.textContent = `${rep.author || "게스트"} · ${d2.getFullYear()}.${pad2(d2.getMonth()+1)}.${pad2(d2.getDate())} ${pad2(d2.getHours())}:${pad2(d2.getMinutes())}`;
+          const repBody = document.createElement("div");
+          repBody.textContent = rep.content || "";
+          repEl.appendChild(repMeta);
+          repEl.appendChild(repBody);
+          repliesWrap.appendChild(repEl);
+        });
+      postEl.appendChild(repliesWrap);
+    }
+
+    container.appendChild(postEl);
+  });
+}
+
+
+function initCommunity(){
+  const form = document.getElementById("community-form");
+  const contentEl = document.getElementById("community-content");
+  const twitterEl = document.getElementById("community-twitter");
+  const toggleBtn = document.getElementById("community-toggle-btn");
+  if (!form || !contentEl) return;
+
+  // 토글 버튼: 글쓰기 영역 열고/닫기
+  if (toggleBtn){
+    toggleBtn.addEventListener("click", () => {
+      const isHidden = form.style.display === "none" || !form.style.display;
+      if (isHidden){
+        form.style.display = "flex";
+        toggleBtn.textContent = "⬇ 글쓰기 접기";
+      }else{
+        form.style.display = "none";
+        toggleBtn.textContent = "✏️ 새 글 쓰기 열기";
+      }
+    });
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const content = contentEl.value || "";
+    const twitterUrl = twitterEl ? twitterEl.value || "" : "";
+    if (!content.trim()){
+      alert("내용을 입력해줘!");
+      return;
+    }
+    const posts = loadCommunityPosts();
+    const newPost = createCommunityPost({content, twitterUrl});
+    posts.push(newPost);
+    saveCommunityPosts(posts);
+    contentEl.value = "";
+    if (twitterEl) twitterEl.value = "";
+
+    // 글 작성 후 자동 접기
+    if (toggleBtn){
+      form.style.display = "none";
+      toggleBtn.textContent = "✏️ 새 글 쓰기 열기";
+    }
+
+    renderCommunity();
+  });
+
+  // 최초 로딩 시 한 번 렌더
+  renderCommunity();
+}
 /* 프로젝트 키워드 (원하면 여기 수정) */
 /* 프로젝트 키워드 (이미지에 나온 프로젝트 + 주요 야핑 프로젝트) */
 const PROJECTS = [
@@ -2081,6 +3288,25 @@ ${bestPost.link ? "- 링크: " + bestPost.link : ""}
 
   el.textContent = text;
 }
+
+function setupRangeTabs(){
+  const rangeTabs = document.getElementById("range-tabs");
+  if(!rangeTabs) return;
+  if(rangeTabs.dataset.bound === "1") return;
+  rangeTabs.dataset.bound = "1";
+
+  const buttons = rangeTabs.querySelectorAll(".range-tab");
+  buttons.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      buttons.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const range = btn.dataset.range || "ALL";
+      CURRENT_RANGE = range;
+      updateView();
+    });
+  });
+}
+
 /* ========== 전체 뷰 업데이트 (기간 필터 적용) ========== */
 function updateView(){
   if(!ALL_BASE.length) return;
@@ -2131,7 +3357,10 @@ function updateView(){
     totalPosts: total
   };
 
-    summaryEl.innerHTML = `
+    
+  updateYapCard(ANALYSIS);
+
+summaryEl.innerHTML = `
     <div class="summary-card summary-card--posts">
       <div class="summary-ring"><span>📝</span></div>
       <div class="summary-text">
@@ -2172,6 +3401,7 @@ function updateView(){
   summaryEl.style.display="grid";
 
   renderGrowthChart(filtered);
+  renderYapHeatmap(filtered);
   renderTop10(filtered);
   if(CURRENT_GRADE === "ALL"){
     renderGrade(filtered.slice(0,30));
@@ -2221,6 +3451,104 @@ function saveHistoryEntry(){
   }
 }
 
+
+
+/* ========== 마지막 CSV 분석 스냅샷 (닉네임별) ========== */
+const LAST_SNAPSHOT_PREFIX = "ms_last_analysis_v1_";
+
+function getCurrentProfileKey(){
+
+function updateLastSnapshotUI(){
+  try{
+    const infoEl = document.getElementById("last-snapshot-info");
+    if (!infoEl) return;
+    if (typeof localStorage === "undefined") {
+      infoEl.textContent = "이 브라우저에서는 마지막 CSV 저장 기능을 사용할 수 없습니다.";
+      return;
+    }
+    const raw = localStorage.getItem(getCurrentProfileKey());
+    if (!raw) {
+      infoEl.textContent = "저장된 마지막 CSV 분석이 없습니다.";
+      return;
+    }
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.timestamp) {
+      infoEl.textContent = "저장된 마지막 CSV 분석이 없습니다.";
+      return;
+    }
+    const d = new Date(parsed.timestamp);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    infoEl.textContent = `마지막 분석: ${y}-${m}-${day} ${hh}:${mm} 기준`;
+  }catch(e){
+    console.warn("마지막 분석 UI 업데이트 실패", e);
+  }
+}
+
+  let nick = "";
+  try{
+    if (typeof localStorage !== "undefined") {
+      nick = localStorage.getItem(NICKNAME_KEY) || "";
+    }
+  }catch(e){}
+  if(!nick) nick = "guest";
+  return LAST_SNAPSHOT_PREFIX + encodeURIComponent(nick);
+}
+
+function saveLastSnapshot(){
+  try{
+    if (typeof localStorage === "undefined") return;
+    if (!ANALYSIS || !ALL_BASE.length) return;
+    const payload = {
+      timestamp: new Date().toISOString(),
+      range: CURRENT_RANGE || "ALL",
+      posts: ALL_BASE
+    };
+    localStorage.setItem(getCurrentProfileKey(), JSON.stringify(payload));
+    updateLastSnapshotUI();
+  }catch(e){
+    console.warn("마지막 분석 저장 실패", e);
+  }
+}
+
+function loadLastSnapshot(){
+  try{
+    if (typeof localStorage === "undefined") return null;
+    const raw = localStorage.getItem(getCurrentProfileKey());
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.posts)) return null;
+    return parsed;
+  }catch(e){
+    console.warn("마지막 분석 불러오기 실패", e);
+    return null;
+  }
+}
+
+function restoreLastAnalysis(){
+  const snap = loadLastSnapshot();
+  updateLastSnapshotUI();
+  if (!snap || !Array.isArray(snap.posts) || !snap.posts.length){
+    alert("이 브라우저에 저장된 마지막 CSV 분석이 없습니다.\n먼저 CSV를 업로드해서 한 번 분석해줘.");
+    return;
+  }
+
+  ALL_BASE = snap.posts;
+  CURRENT_RANGE = snap.range || "ALL";
+  CURRENT_GRADE = "ALL";
+
+  const errorEl = document.getElementById("error");
+  if (errorEl) errorEl.textContent = "";
+
+  const rangeTabs = document.getElementById("range-tabs");
+  if (rangeTabs) rangeTabs.style.display = "flex";
+
+  setupRangeTabs();
+  updateView();
+}
 function renderHistoryList(){
   const wrap = document.getElementById("history-wrap");
   if(!wrap) return;
@@ -2284,8 +3612,495 @@ function renderHistoryList(){
   `;
 }
 
+
+/* ========= Dashboard 실시간 위젯 (BTC/ETH/FX/뉴스/프로젝트/리더보드) ========== */
+
+let DASHBOARD_STARTED = false;
+const DASH_CHARTS = {};
+const DASH_WORKER_BASE = "https://btceth.wnehdrla8382.workers.dev"; // ← 너의 Cloudflare Worker 주소
+
+const DASH_CACHE_KEY_BTC = "mudDHA_dash_cache_btc_v1";
+const DASH_CACHE_KEY_ETH = "mudDHA_dash_cache_eth_v1";
+
+
+// candlestick 플러그인이 있으면 candlestick, 없으면 line 차트로 폴백
+function getDashChartType(){
+  try{
+    if (Chart && Chart.registry && Chart.registry.getController("candlestick")) {
+      return "candlestick";
+    }
+  }catch(e){}
+  return "line";
+}
+
+// close 값만 있는 시계열을 OHLC 비슷한 형태로 변환
+function closeSeriesToOhlc(series){
+  const out = [];
+  if (!Array.isArray(series) || !series.length) return out;
+  let prevClose = series[0].c;
+  for (let i = 0; i < series.length; i++){
+    const item = series[i];
+    const c = Number(item.c);
+    const ts = item.t;
+    const open = prevClose != null ? prevClose : c;
+    const close = c;
+    const highBase = Math.max(open, close);
+    const lowBase  = Math.min(open, close);
+    const high = highBase * 1.001;
+    const low  = lowBase  * 0.999;
+    out.push({ x: i, o: open, h: high, l: low, c: close, t: ts });
+    prevClose = close;
+  }
+  return out;
+}
+
+function createDashCandleChart(ctx){
+  const t = getDashChartType();
+
+  const commonOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        intersect: false,
+        mode: "index",
+        displayColors: false,
+        callbacks: {
+          label: (context) => {
+            const v = context.parsed.y;
+            if (v == null) return "";
+            const prefix = ctx.canvas.id === "btc-chart" || ctx.canvas.id === "eth-chart" ? "$ " : "";
+            return prefix + v.toLocaleString();
+          }
+        }
+      }
+    },
+    scales: {
+      x: { display: false },
+      y: { display: false }
+    }
+  };
+
+  if (t === "candlestick"){
+    return new Chart(ctx, {
+      type: "candlestick",
+      data: {
+        datasets: [{
+          data: [],
+          borderWidth: 1
+        }]
+      },
+      options: commonOpts
+    });
+  } else {
+    return new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          tension: 0.25,
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: true,
+          borderColor: "#22c55e",
+          backgroundColor: (context) => {
+            const chart = context.chart;
+            const {ctx} = chart;
+            const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
+            gradient.addColorStop(0, "rgba(34, 197, 94, 0.35)");
+            gradient.addColorStop(1, "rgba(34, 197, 94, 0)");
+            return gradient;
+          }
+        }]
+      },
+      options: commonOpts
+    });
+  }
+}
+
+function updateDashChartFromSeries(chart, series){
+  if (!chart || !Array.isArray(series) || !series.length) return;
+  const t = chart.config.type;
+  if (t === "candlestick"){
+    const ohlc = closeSeriesToOhlc(series);
+    chart.data.datasets[0].data = ohlc;
+  } else {
+    const labels = series.map(c => {
+      if (!c || !c.t) return "";
+      const d = new Date(c.t);
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      return `${m}/${day}`;
+    });
+    const values = series.map(c => Number(c.c));
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = values;
+  }
+  chart.update("none");
+}
+
+function updateDashChartFromSeries(chart, series){
+  if (!chart || !Array.isArray(series) || !series.length) return;
+  const t = chart.config.type;
+  if (t === "candlestick"){
+    const ohlc = closeSeriesToOhlc(series);
+    chart.data.datasets[0].data = ohlc;
+  } else {
+    const labels = series.map((_, idx) => idx.toString());
+    const values = series.map(c => Number(c.c));
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = values;
+  }
+  chart.update("none");
+}
+
+// Worker에서 코인 시계열 가져오기 (CoinGecko 프록시)
+async function fetchDashCoinSeries(asset, days){
+  const url = `${DASH_WORKER_BASE}/api/candle?asset=${encodeURIComponent(asset)}&days=${encodeURIComponent(days)}`;
+  const res = await fetch(url);
+  const json = await res.json();
+  return Array.isArray(json.candles) ? json.candles : [];
+}
+
+// 대시보드 2개 자산 업데이트 (BTC / ETH 전용)
+async function refreshDashboardRealtime(){
+  try {
+    const [btc, eth] = await Promise.all([
+      fetchDashCoinSeries("bitcoin", 1),
+      fetchDashCoinSeries("ethereum", 1),
+    ]);
+
+    // BTC 갱신 + 캐시 저장
+    if (btc && btc.length && DASH_CHARTS.btc){
+      updateDashChartFromSeries(DASH_CHARTS.btc, btc);
+      const last = btc[btc.length - 1].c;
+      const el = document.getElementById("btc-price-text");
+      if (el) el.textContent = `$ ${Number(last).toLocaleString()}`;
+      try {
+        localStorage.setItem(DASH_CACHE_KEY_BTC, JSON.stringify(btc));
+      } catch(e){}
+    }
+
+    // ETH 갱신 + 캐시 저장
+    if (eth && eth.length && DASH_CHARTS.eth){
+      updateDashChartFromSeries(DASH_CHARTS.eth, eth);
+      const last = eth[eth.length - 1].c;
+      const el = document.getElementById("eth-price-text");
+      if (el) el.textContent = `$ ${Number(last).toLocaleString()}`;
+      try {
+        localStorage.setItem(DASH_CACHE_KEY_ETH, JSON.stringify(eth));
+      } catch(e){}
+    }
+  } catch (e) {
+    console.error("refreshDashboardRealtime error:", e);
+  }
+}
+
+function startDashboardRealtime(){
+  if (DASHBOARD_STARTED) return;
+  DASHBOARD_STARTED = true;
+
+  const btcCanvas = document.getElementById("btc-chart");
+  const ethCanvas = document.getElementById("eth-chart");
+
+  if (btcCanvas) DASH_CHARTS.btc = createDashCandleChart(btcCanvas.getContext("2d"));
+  if (ethCanvas) DASH_CHARTS.eth = createDashCandleChart(ethCanvas.getContext("2d"));
+
+  // 🔁 캐시된 데이터가 있으면 먼저 그려주기 (빠른 첫 화면용)
+  try {
+    if (DASH_CHARTS.btc) {
+      const rawBtc = localStorage.getItem(DASH_CACHE_KEY_BTC);
+      if (rawBtc) {
+        const cachedBtc = JSON.parse(rawBtc);
+        if (Array.isArray(cachedBtc) && cachedBtc.length){
+          updateDashChartFromSeries(DASH_CHARTS.btc, cachedBtc);
+          const last = cachedBtc[cachedBtc.length - 1].c;
+          const el = document.getElementById("btc-price-text");
+          if (el) el.textContent = `$ ${Number(last).toLocaleString()}`;
+        }
+      }
+    }
+    if (DASH_CHARTS.eth) {
+      const rawEth = localStorage.getItem(DASH_CACHE_KEY_ETH);
+      if (rawEth) {
+        const cachedEth = JSON.parse(rawEth);
+        if (Array.isArray(cachedEth) && cachedEth.length){
+          updateDashChartFromSeries(DASH_CHARTS.eth, cachedEth);
+          const el = document.getElementById("eth-price-text");
+          const last = cachedEth[cachedEth.length - 1].c;
+          if (el) el.textContent = `$ ${Number(last).toLocaleString()}`;
+        }
+      }
+    }
+  } catch(e){}
+
+  // 첫 로드: 최신 데이터로 갱신
+  refreshDashboardRealtime();
+  // 60초마다 갱신 (실시간 느낌)
+  setInterval(refreshDashboardRealtime, 60000);
+}
+
+/* 오늘의 이슈: Worker 프록시를 통한 뉴스 3개 */
+async function loadDashboardNews(){
+  const listEl = document.getElementById("dash-news-list");
+  if (!listEl) return;
+  try {
+    listEl.innerHTML = "<li class='dash-news-placeholder'>뉴스를 불러오는 중...</li>";
+    const res = await fetch(`${DASH_WORKER_BASE}/api/news`);
+    const json = await res.json();
+    const items = Array.isArray(json.articles) ? json.articles : (json.Data || json.data || []);
+    if (!items || !items.length){
+      listEl.innerHTML = "<li class='dash-news-placeholder'>표시할 뉴스가 없습니다.</li>";
+      return;
+    }
+    const top = items.slice(0,3);
+    listEl.innerHTML = top.map(n => {
+      const title = n.title || "";
+      const url = n.url || "#";
+      return `<li><a href="${url}" target="_blank" rel="noopener noreferrer">${title}</a></li>`;
+    }).join("");
+  } catch(e) {
+    console.error(e);
+    listEl.innerHTML = "<li class='dash-news-placeholder'>뉴스를 불러오는 중 오류가 발생했습니다.</li>";
+  }
+}
+
+/* 프로젝트 카드: INFOFI_SNAPSHOTS 기준 상위 프로젝트 */
+function renderDashboardProjects(){
+  const wrap = document.getElementById("dash-projects-wrap");
+  if(!wrap || !Array.isArray(INFOFI_SNAPSHOTS)) return;
+
+  const byProject = {};
+  INFOFI_SNAPSHOTS.forEach(row=>{
+    const p = row.project || "기타";
+    if(!byProject[p] || (row.mindshare || 0) > (byProject[p].mindshare || 0)){
+      byProject[p] = row;
+    }
+  });
+
+  const arr = Object.values(byProject).sort((a,b)=>(b.mindshare||0)-(a.mindshare||0)).slice(0,6);
+  if(!arr.length){
+    wrap.innerHTML = "<div class='empty'>아직 InfoFi 프로젝트 데이터가 없습니다.</div>";
+    return;
+  }
+  wrap.innerHTML = arr.map((r)=>`
+    <div class="dash-project-item">
+      <div>
+        <div class="dash-project-name">${r.project}</div>
+        <div class="dash-project-rank">${r.window} · rank #${r.rank}</div>
+      </div>
+      <div style="font-size:11px;">MS ${Number(r.mindshare || 0).toFixed(2)}</div>
+    </div>
+  `).join("");
+}
+
+/* 대시보드용 리더보드 TOP10 */
+
+async function loadDashboardLeaderboardTop10(){
+  const wrap = document.getElementById("dashboard-leaderboard-wrap");
+  if(!wrap) return;
+  try{
+    wrap.innerHTML = "<div class='empty'>리더보드를 불러오는 중...</div>";
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : (data.top || []);
+    if(!list || !list.length){
+      wrap.innerHTML = "<div class='empty'>아직 리더보드 데이터가 없습니다.</div>";
+      return;
+    }
+
+    // 🔹 원글 수를 반영한 가중치 점수 계산 (대시보드용 TOP10)
+    const scoredList = list.slice().map(item => {
+      const totalPosts = item.totalPosts || 0;
+      const trimmed    = Number(item.trimmedAvg || 0);
+      const reliability = Math.min(totalPosts, 60) / 60;       // 0 ~ 1
+      const factor      = 0.4 + 0.6 * reliability;            // 0.4 ~ 1.0
+      const score       = trimmed * factor;                   // 가중치 점수
+      return { ...item, _score: score, _factor: factor };
+    }).sort((a,b) => (b._score || 0) - (a._score || 0));
+
+    const top = scoredList.slice(0,10);
+
+    const rows = top.map((item,idx)=>{
+      const handle = item.handle || "";
+      const handleClean = handle.replace("@","").trim();
+      const trimmedAvg = Number(item.trimmedAvg || 0).toFixed(1);
+      const avgScore  = Number(item.avgScore   || 0).toFixed(1);
+      const totalPosts = item.totalPosts || 0;
+      const bestLink  = item.bestLink || (handleClean ? `https://twitter.com/${handleClean}` : "#");
+      return `
+        <tr>
+          <td>#${idx+1}</td>
+          <td>
+            <a href="${bestLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:inherit;">
+              <img src="https://unavatar.io/twitter/${handleClean}" style="width:20px;height:20px;border-radius:999px;border:1px solid rgba(209,213,219,1);" />
+              <span>${handle}</span>
+            </a>
+          </td>
+          <td>${trimmedAvg}</td>
+          <td>${avgScore}</td>
+          <td>${totalPosts}</td>
+        </tr>`;
+    }).join("");
+    wrap.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>순위</th>
+            <th>핸들</th>
+            <th>트림드 평균</th>
+            <th>평균 스코어</th>
+            <th>원글 수</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }catch(e){
+    console.error(e);
+    wrap.innerHTML = "<div class='empty'>리더보드를 불러오는 중 오류가 발생했습니다.</div>";
+  }
+}
+
+
+
+function ensureDashboardInitialized(){
+  startDashboardRealtime();
+  loadDashboardNews();
+  renderDashboardProjects();
+  loadDashboardLeaderboardTop10();
+}
+
+/* ========= YAP 확률 계산 공용 함수 ========= */
+function calcYapProbability(trimmed, avg, posts){
+  const t = Math.max(0, Number(trimmed||0));
+  const a = Math.max(0, Number(avg||0));
+  const p = Math.max(0, Number(posts||0));
+  const qualNorm = Math.min(t / 100, 1);
+  const avgNorm  = Math.min(a / 100, 1);
+  const volNorm  = Math.min(p / 200, 1);
+  const yapBase = 0.6 * qualNorm + 0.3 * avgNorm + 0.1 * volNorm;
+  const prob = Math.max(5,
+    Math.min(95, Math.round(5 + 60 * Math.pow(yapBase, 2)))
+  );
+  return prob;
+}
+
+/* YAP 이너서클 / 고득점 가중치 토글 */
+function getYapBoostFactor(){
+  let factor = 1;
+  const inner = document.getElementById("yap-inner-toggle");
+  const top100 = document.getElementById("yap-100-toggle");
+  if(inner && inner.checked) factor *= 1.30;   // 이너서클 +30%
+  if(top100 && top100.checked) factor *= 1.15; // YAP 100점 경험 +15%
+  return factor;
+}
+
 /* ========= 계정 성장 그래프 ========== */
+
 let growthChart = null;
+
+
+
+function updateYapCard(analysis){
+  const levelEl = document.getElementById("yap-level-text");
+  const subEl   = document.getElementById("yap-level-sub");
+  const tEl     = document.getElementById("yap-trimmed");
+  const aEl     = document.getElementById("yap-avg");
+  const pEl     = document.getElementById("yap-posts");
+  const probEl  = document.getElementById("yap-prob");
+  if(!levelEl || !subEl || !tEl || !aEl || !pEl || !probEl) return;
+
+  // CSV가 아직 없거나 분석 데이터가 없을 때
+  if(!analysis){
+    levelEl.textContent = "-";
+    subEl.textContent   = "CSV를 업로드하면 최근 패턴을 기반으로 YAP 상승 신호를 간단히 보여줄게.";
+    tEl.textContent = "-";
+    aEl.textContent = "-";
+    pEl.textContent = "-";
+    probEl.textContent = "-";
+    return;
+  }
+
+  const trimmed = Number(analysis.trimmedAvg || 0);
+  const avg     = Number(analysis.avgScore   || 0);
+  const posts   = Number(analysis.totalPosts || 0);
+
+  let prob = calcYapProbability(trimmed, avg, posts);
+  // 이너서클 / YAP 100점 경험 가중치 적용
+  prob = Math.round(prob * getYapBoostFactor());
+  if (prob > 100) prob = 100;
+  if (prob < 0)   prob = 0;
+
+  let level = "";
+  let desc  = "";
+  if(prob < 30){
+    level = "🧊 Low";
+    desc = "최근 패턴 기준으로 YAP이 오를 가능성이 낮은 구간이야.";
+  }else if(prob < 60){
+    level = "🌊 Mid";
+    desc = "질/양 중 일부는 올라와 있어서, 조금만 더 밀면 YAP이 반응할 수 있는 중간 구간이야.";
+  }else{
+    level = "🔥 High";
+    desc = "트림드/평균/활동량이 모두 높은 편이라 YAP이 오를 확률이 꽤 높은 상태야.";
+  }
+
+  levelEl.textContent = level;
+  subEl.textContent   = desc;
+  tEl.textContent     = trimmed ? trimmed.toFixed(1) : "-";
+  aEl.textContent     = avg ? avg.toFixed(1) : "-";
+  pEl.textContent     = posts ? posts.toString() : "-";
+  probEl.textContent  = prob + "%";
+}
+
+function renderYapHeatmap(list){
+  const wrap = document.getElementById("yap-heatmap");
+  if(!wrap) return;
+  if(!list || !list.length){
+    wrap.innerHTML = "<div class='empty'>CSV를 업로드하고 기간을 선택하면 날짜별 YAP 신호를 색으로 보여줄게.</div>";
+    return;
+  }
+  wrap.innerHTML = "";
+  const byDate = {};
+  list.forEach(p=>{
+    if(!p.dateObj) return;
+    const d = p.dateObj.toISOString().slice(0,10);
+    if(!byDate[d]) byDate[d] = [];
+    byDate[d].push(p);
+  });
+  const dates = Object.keys(byDate).sort();
+  dates.forEach(d=>{
+    const arr = byDate[d];
+    const scores = arr.map(p=>p.score||0).filter(v=>!isNaN(v));
+    if(!scores.length) return;
+    const posts = scores.length;
+    const sum = scores.reduce((s,v)=>s+v,0);
+    const avg = sum / posts;
+    const trimmed = computeTrimmedAverage(arr, TRIM_RATIO);
+    let prob = calcYapProbability(trimmed, avg, posts);
+    // YAP 가중치 토글 반영
+    prob = Math.round(prob * getYapBoostFactor());
+    if (prob > 100) prob = 100;
+    if (prob < 0)   prob = 0;
+    let lvl = 1;
+    if(prob >= 80) lvl = 5;
+    else if(prob >= 60) lvl = 4;
+    else if(prob >= 40) lvl = 3;
+    else if(prob >= 20) lvl = 2;
+    const box = document.createElement("div");
+    box.className = "yap-heatbox level-" + lvl;
+    box.title = d + "\n트림드 " + trimmed.toFixed(1) +
+      " · 평균 " + avg.toFixed(1) +
+      " · 원글 " + posts +
+      " · YAP " + prob + "%";
+    wrap.appendChild(box);
+  });
+}
+
 
 function renderGrowthChart(list) {
   const canvas = document.getElementById("growth-chart");
@@ -2321,10 +4136,109 @@ function renderGrowthChart(list) {
   // y축: 점수(스코어)
   const scores = arr.map(p => p.score);
 
+  // 날짜별 최고 점수 기준으로 "중요한 날" 선정
+  // 각 날짜마다 최고 점수를 가진 인덱스를 저장
+  const byDateMax = {};
+  arr.forEach((p, idx) => {
+    if (!p.dateObj) return;
+    const d = p.dateObj.toISOString().slice(0,10);
+    const s = Number(p.score || 0);
+    if (!byDateMax[d] || s > byDateMax[d].score) {
+      byDateMax[d] = { score: s, index: idx };
+    }
+  });
+
+  // 최고 점수 기준으로 내림차순 정렬 후 상위 N개 날짜만 선택
+  const maxEntries = Object.values(byDateMax)
+    .sort((a, b) => b.score - a.score);
+
+  const MAX_DOTS = 7; // 한 눈에 보기 위한 최대 점 개수
+  const topEntries = maxEntries.slice(0, MAX_DOTS);
+
+  // 선택된 인덱스만 빨간 점으로 표시
+  const highlightIndexSet = new Set(topEntries.map(e => e.index));
+  const yapPoints = arr.map((p, idx) => {
+    return highlightIndexSet.has(idx) ? p.score : null;
+  });
+
+  // 날짜별 점수 배열 모으기
+  const byDateScores = {};
+  arr.forEach(p => {
+    if (!p.dateObj) return;
+    const d = p.dateObj.toISOString().slice(0,10);
+    if (!byDateScores[d]) byDateScores[d] = [];
+    byDateScores[d].push(Number(p.score || 0));
+  });
+
+  // 날짜 정렬 후, 카드와 유사한 스케일의 YAP 확률 + 전고점/하락 가중치 계산
+  const sortedDates = Object.keys(byDateScores).sort();
+  const yapProbByDate = {};
+  let prevTrim = -Infinity;
+  let prevAvg  = -Infinity;
+
+  sortedDates.forEach(d => {
+    const scoresArr = byDateScores[d];
+    if (!scoresArr.length) {
+      yapProbByDate[d] = 0;
+      return;
+    }
+    const posts = scoresArr.length;
+    const sum = scoresArr.reduce((s, v) => s + v, 0);
+    const avg = sum / posts;
+    const trimmed = computeTrimmedAverage(scoresArr, TRIM_RATIO);
+
+    // 1) 기본 YAP 확률 (카드 스케일에 맞추기 위해 살짝 상향)
+    let baseProb = calcYapProbability(trimmed, avg, posts);
+    baseProb = baseProb * 1.2 + 10; // 전반적으로 유함 제거 + 카드와 비슷한 밸류
+    if (baseProb > 100) baseProb = 100;
+    if (baseProb < 0) baseProb = 0;
+
+    // 2) 전고점/하락 가중치
+    let boost = 1.0;
+    const isAbovePrevTrim = trimmed > prevTrim;
+    const isAbovePrevAvg  = avg > prevAvg;
+    const isBelowPrevTrim = trimmed < prevTrim;
+    const isBelowPrevAvg  = avg < prevAvg;
+
+    // 강한 전고점 돌파 (트림드 & 평균 둘 다 이전 최고 갱신) → 확확 올라가게
+    if (isAbovePrevTrim && isAbovePrevAvg) {
+      boost *= 2.2;
+    }
+    // 약한 돌파 (둘 중 하나만 갱신)
+    else if (isAbovePrevTrim || isAbovePrevAvg) {
+      boost *= 1.45;
+    }
+
+    // 하락일 패널티는 약하게만 적용 (너무 눌리지 않게)
+    if (isBelowPrevTrim && isBelowPrevAvg) {
+      boost *= 0.9;
+    }
+    else if (isBelowPrevTrim || isBelowPrevAvg) {
+      boost *= 0.95;
+    }
+
+    let adjProb = baseProb * boost * getYapBoostFactor();
+    if (adjProb > 100) adjProb = 100;
+    if (adjProb < 0) adjProb = 0;
+
+    yapProbByDate[d] = adjProb;
+
+    // 다음 날 비교를 위한 기준 업데이트
+    if (trimmed > prevTrim) prevTrim = trimmed;
+    if (avg > prevAvg) prevAvg = avg;
+  });
+
+  // x축 인덱스 기준으로 매핑한 확률 (툴팁에서 사용)
+  const yapProbByIndex = arr.map(p => {
+    if (!p.dateObj) return 0;
+    const d = p.dateObj.toISOString().slice(0,10);
+    return yapProbByDate[d] || 0;
+  });
+
   // 그래디언트 생성
   const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-  gradient.addColorStop(0, "rgba(59,130,246,0.4)");   // 파랑 40%
-  gradient.addColorStop(1, "rgba(59,130,246,0.05)");  // 아주 연함
+  gradient.addColorStop(0, "rgba(59,130,246,0.4)");
+  gradient.addColorStop(1, "rgba(59,130,246,0.05)");
 
   const pointShadow = {
     id: "pointShadow",
@@ -2356,12 +4270,38 @@ function renderGrowthChart(list) {
           pointBorderColor: "rgba(59,130,246,1)",
           pointHoverRadius: 6,
           pointHitRadius: 18
+        },
+        {
+          label: "YAP 신호",
+          data: yapPoints,
+          fill: false,
+          borderColor: "rgba(239,68,68,1)",
+          borderWidth: 0,
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: "rgba(239,68,68,1)",
+          pointBorderColor: "rgba(248,250,252,1)",
+          pointHoverRadius: 7,
+          pointHitRadius: 18,
+          showLine: false
         }
       ]
     },
     options: {
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.parsed.y;
+              if (context.datasetIndex === 0) {
+                return "계정 성장 스코어: " + value.toFixed(3);
+              } else {
+                return "삐뽀삐뽀 yaps 신호 발생";
+              }
+            }
+          }
+        }
       },
       scales: {
         x: {
@@ -2377,7 +4317,6 @@ function renderGrowthChart(list) {
     plugins: [pointShadow]
   });
 }
-
 /* ========== CSV 업로드 ========== */
 document.getElementById("csvInput").addEventListener("change", e=>{
   const file=e.target.files[0]; if(!file) return;
@@ -2429,12 +4368,40 @@ document.getElementById("csvInput").addEventListener("change", e=>{
         CURRENT_RANGE = "ALL";
         CURRENT_GRADE = "ALL";
         const rangeTabs = document.getElementById("range-tabs");
-        if(rangeTabs) rangeTabs.style.display = "flex";
+        if(rangeTabs){
+          rangeTabs.style.display = "flex";
+        }
+        setupRangeTabs();
         updateView();
         saveHistoryEntry();
+        saveLastSnapshot();
       }
     }
   });
+      if(ALL_BASE.length){
+        // CSV 업로드 후 자동으로 리더보드와 연결
+        try{
+          const handleInput = document.getElementById("leader-handle");
+          if(handleInput && !handleInput.value.trim()){
+            const sideHandle = document.getElementById("side-handle-link");
+            if(sideHandle){
+              const txt = (sideHandle.textContent || "").trim();
+              if(txt && txt !== "@익명"){
+                handleInput.value = txt;
+              }
+            }
+          }
+          const finalHandleInput = document.getElementById("leader-handle");
+          if(finalHandleInput){
+            const hv = (finalHandleInput.value || "").trim();
+            if(hv && hv !== "@익명" && typeof saveToLeaderboard === "function"){
+              saveToLeaderboard();
+            }
+          }
+        }catch(err){
+          console.error("자동 리더보드 연동 중 오류:", err);
+        }
+      }
 });
 
 /* ========== 리더보드 저장/불러오기 ========== */
@@ -2481,6 +4448,7 @@ async function saveToLeaderboard(){
     alert("리더보드 저장 중 오류가 발생했다.");
   }
 }
+
 async function loadLeaderboard(handle){
   const tableWrap = document.getElementById("leaderboard-wrap");
   const myRankWrap = document.getElementById("my-rank-wrap");
@@ -2499,15 +4467,40 @@ async function loadLeaderboard(handle){
       tableWrap.innerHTML = "<div class='empty'>아직 리더보드 데이터가 없습니다.</div>";
       return;
     }
+
+    // 🔹 원글 수를 반영한 가중치 점수 계산 (리더보드 전용)
+    const scoredList = list.slice().map(item => {
+      const totalPosts = item.totalPosts || 0;
+      const trimmed    = Number(item.trimmedAvg || 0);
+      // 원글 60개 이상이면 신뢰도 1, 그 이하는 선형 감소
+      const reliability = Math.min(totalPosts, 60) / 60;       // 0 ~ 1
+      const factor      = 0.4 + 0.6 * reliability;            // 0.4 ~ 1.0
+      const score       = trimmed * factor;                   // 가중치 점수
+      return { ...item, _score: score, _factor: factor };
+    }).sort((a,b) => (b._score || 0) - (a._score || 0));
+
+    // 🔹 내 순위도 가중치 기준으로 재계산
     if(myRank && myRankWrap){
       const trimmedAvg = Number(myRank.trimmedAvg || 0).toFixed(1);
       const avgScore   = Number(myRank.avgScore   || 0).toFixed(1);
       const totalPosts = myRank.totalPosts || 0;
+
+      let displayRank = myRank.rank;
+      try{
+        const targetHandle = (myRank.handle || "").trim();
+        if(targetHandle){
+          const foundIndex = scoredList.findIndex(it => (it.handle || "").trim() === targetHandle);
+          if(foundIndex >= 0){
+            displayRank = foundIndex + 1;
+          }
+        }
+      }catch(e){}
+
       myRankWrap.innerHTML = `
-        <div style="padding:10px 12px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(209,213,219,1);background:#f9fafb;font-size:12px;">
+        <div style="padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid rgba(209,213,219,1);background:#f9fafb;font-size:12px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:4px;">내 현재 순위</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-            <span style="font-weight:700;color:#f97316;">#${myRank.rank}위</span>
+            <span style="font-weight:700;color:#f97316;">#${displayRank}위</span>
             <span>· 트림드 평균 <strong>${trimmedAvg}</strong></span>
             <span>· 평균 스코어 <strong>${avgScore}</strong></span>
             <span>· 원글 수 <strong>${totalPosts}</strong></span>
@@ -2516,7 +4509,7 @@ async function loadLeaderboard(handle){
       `;
     }
 
-    const rows = list.map((item, idx) => {
+    const rows = scoredList.map((item, idx) => {
       const handle      = item.handle || "";
       const handleClean = handle.replace("@","").trim();
       const trimmedAvg  = Number(item.trimmedAvg || 0).toFixed(1);
@@ -2590,7 +4583,8 @@ const MS_I18N = {
     "#top10-title": "💥 마인드쉐어 폭발 Top 10 <span id='top10-count'></span>",
     "#grade-section-title": "🎚 등급별 상위 게시글 <span>(S~D)</span>",
     "#coach-title": "🤖 마인드쉐어 코치 봇 <span style='font-size:11px;color:var(--text-muted);'>(Beta)</span>",
-    "#coach-chip-text": "현재 선택한 기간 기준 한 줄 요약 + 피드백",
+    "#coach-chip-text": "현재 선택한 기간 기준 · YAP 신호는 최근 7일 정확도↑ 한 줄 요약 + 피드백",
+    ".yap-label": "현재 선택한 기간 기준 · YAP 신호는 최근 7일 정확도↑",
     "#leader-note": "※ 최소 원글 수 20개 이상일 때 리더보드 점수가 더 정확합니다.",
     "#project-summary-title": "📚 프로젝트 요약 + 원형 그래프",
     "#project-summary-sub": "코드 상단 <code>PROJECTS</code> 배열의 키워드를 네가 트는 프로젝트에 맞게 바꿔줘.",
@@ -2628,6 +4622,7 @@ const MS_I18N = {
     "#grade-section-title": "🎚 Top Posts by Grade <span>(S~D)</span>",
     "#coach-title": "🤖 Mindshare Coach Bot <span style='font-size:11px;color:var(--text-muted);'>(Beta)</span>",
     "#coach-chip-text": "One-line summary & feedback for the selected period",
+    ".yap-label": "Based on the currently selected period · YAP signal is most accurate over the last 7 days",
     "#leader-note": "※ For best accuracy, use at least 20 original posts before saving to the leaderboard.",
     "#project-summary-title": "📚 Project Summary + Donut Chart",
     "#project-summary-sub": "Edit the <code>PROJECTS</code> array at the top of the code to match the projects you tweet about."
@@ -2707,47 +4702,249 @@ document.getElementById("leader-save-btn").addEventListener("click", saveToLeade
 loadLeaderboard();
 
 /* ========== 사이드바 뷰 토글 ========== */
+
+
+// ===== 사이드바 탭 전환 로직 (최적화 버전) =====
+document.addEventListener("DOMContentLoaded", () => {
+  
 const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
-const viewDashboard = document.getElementById("view-dashboard");
-const viewLeaderboard = document.getElementById("view-leaderboard");
-const viewProjects = document.getElementById("view-projects");
-const viewHistory = document.getElementById("view-history");
+  const viewDashboard = document.getElementById("view-dashboard");
+  const viewCsv = document.getElementById("view-csv");
+  const viewLeaderboard = document.getElementById("view-leaderboard");
+  const viewProjects = document.getElementById("view-projects");
+  const viewHistory = document.getElementById("view-history");
+  const viewYapping = document.getElementById("view-yapping");
+  const viewInfofi = document.getElementById("view-infofi");
 
-viewNavItems.forEach(item => {
-  item.addEventListener("click", () => {
-    const view = item.dataset.view;
 
-    viewNavItems.forEach(i => i.classList.remove("active"));
-    item.classList.add("active");
+  function showView(target){
+    if (!viewDashboard || !viewLeaderboard || !viewProjects) return;
 
-    if (view === "leaderboard") {
-      viewDashboard.style.display = "none";
-      viewLeaderboard.style.display = "block";
-      viewProjects.style.display = "none";
-      if (viewHistory) viewHistory.style.display = "none";
-      loadLeaderboard();
-    } else if (view === "projects") {
-      viewDashboard.style.display = "none";
-      viewLeaderboard.style.display = "none";
-      viewProjects.style.display = "block";
-      if (viewHistory) viewHistory.style.display = "none";
-    } else if (view === "history") {
-      viewDashboard.style.display = "none";
-      viewLeaderboard.style.display = "none";
-      viewProjects.style.display = "none";
-      if (viewHistory) {
-        viewHistory.style.display = "block";
-        renderHistoryList();
-      }
-    } else {
-      viewDashboard.style.display = "block";
-      viewLeaderboard.style.display = "none";
-      viewProjects.style.display = "none";
-      if (viewHistory) viewHistory.style.display = "none";
+    // 기본값: 전부 숨기기
+    viewDashboard.style.display = "none";
+    if (viewCsv) viewCsv.style.display = "none";
+    viewLeaderboard.style.display = "none";
+    viewProjects.style.display = "none";
+    if (viewHistory) viewHistory.style.display = "none";
+    if (viewYapping) viewYapping.style.display = "none";
+    if (viewInfofi) viewInfofi.style.display = "none";
+    const viewCommunity = document.getElementById("view-community");
+    if (viewCommunity) viewCommunity.style.display = "none";
+
+    switch(target){
+      case "leaderboard":
+        viewLeaderboard.style.display = "block";
+        if (typeof loadLeaderboard === "function") {
+          loadLeaderboard();
+        }
+        break;
+      case "projects":
+        viewProjects.style.display = "block";
+        break;
+      case "history":
+        if (viewHistory) {
+          viewHistory.style.display = "block";
+          if (typeof renderHistoryList === "function") {
+            renderHistoryList();
+          }
+        }
+        break;
+      case "yapping":
+        if (viewYapping) {
+          viewYapping.style.display = "block";
+        }
+        break;
+      case "infofi":
+        if (viewInfofi) {
+          viewInfofi.style.display = "block";
+        }
+        break;
+      case "community":
+        if (viewCommunity) {
+          viewCommunity.style.display = "block";
+          if (typeof initCommunity === "function") {
+            initCommunity();
+          }
+        }
+        break;
+      case "csv":
+        if (viewCsv) {
+          viewCsv.style.display = "block";
+        }
+        break;
+      case "dashboard":
+      default:
+        viewDashboard.style.display = "block";
+        if (typeof ensureDashboardInitialized === "function") {
+          ensureDashboardInitialized();
+        }
+        break;
     }
+  }
+
+  // 처음 로드시 대시보드 보이도록
+  showView("dashboard");
+  viewNavItems.forEach(item => {
+    item.addEventListener("click", () => {
+      const view = item.dataset.view || "dashboard";
+
+      // active 클래스 토글
+      viewNavItems.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+
+      // 뷰 전환
+      showView(view);
+
+      // 🔍 InfoFi 탭을 클릭하면 내 핸들로 InfoFi + Kaito 리더보드를 자동 조회
+      if (view === "infofi") {
+        try {
+          let handle = "";
+          const infofiInput = document.getElementById("infofi-handle-input");
+          const leaderInput = document.getElementById("leader-handle");
+          // kaito 전용 입력은 제거됨
+
+          if (infofiInput && infofiInput.value.trim()) {
+            handle = infofiInput.value.trim();
+          } else if (leaderInput && leaderInput.value.trim()) {
+            handle = leaderInput.value.trim();
+          }
+
+          if (handle) {
+            if (infofiInput) infofiInput.value = handle;
+            if (kaitoInput) kaitoInput.value = handle;
+
+            if (typeof handleInfofiSearch === "function") {
+              handleInfofiSearch();
+            }
+            if (typeof fetchKaitoLeaderboard === "function") {
+              fetchKaitoLeaderboard();
+            }
+          }
+        } catch (err) {
+          console.error("InfoFi auto search error:", err);
+        }
+      }
+    });
   });
 });
 
+
+/* ===== 야핑 플래너 로컬 저장 / 렌더링 ===== */
+const YAP_STORAGE_KEY = "mindshare_yapping_planner_v1";
+let YAPS = [];
+
+function loadYaps(){
+  try{
+    const raw = localStorage.getItem(YAP_STORAGE_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    if(Array.isArray(parsed)) YAPS = parsed;
+  }catch(e){
+    console.warn("야핑 플래너 로드 오류", e);
+  }
+}
+
+function saveYaps(){
+  try{
+    localStorage.setItem(YAP_STORAGE_KEY, JSON.stringify(YAPS));
+  }catch(e){
+    console.warn("야핑 플래너 저장 오류", e);
+  }
+}
+
+function renderYaps(){
+  const wrap = document.getElementById("yap-list");
+  if(!wrap) return;
+  if(!YAPS.length){
+    wrap.innerHTML = '<div class="yap-list-empty">등록된 야핑 계획이 없습니다. 왼쪽에서 새 계획을 추가해줘.</div>';
+    return;
+  }
+  wrap.innerHTML = "";
+  YAPS.forEach((yap, idx)=>{
+    const div = document.createElement("div");
+    div.className = "yap-item" + (yap.done ? " done" : "");
+    div.innerHTML = `
+      <input type="checkbox" data-idx="${idx}" ${yap.done ? "checked" : ""}>
+      <div>
+        <div style="font-weight:600;font-size:12px;">
+          [${yap.type}] ${yap.kor || ""}${yap.kor && yap.project ? " / " : ""}${yap.project || ""}
+        </div>
+        <div class="yap-tags">
+          ${yap.segment ? `<span class="yap-tag">계열: ${yap.segment}</span>` : ""}
+          ${yap.frequency ? `<span class="yap-tag">주기: ${yap.frequency}</span>` : ""}
+          ${yap.reward ? `<span class="yap-tag">보상: ${yap.reward}</span>` : ""}
+          ${yap.start ? `<span class="yap-tag">시작: ${yap.start}</span>` : ""}
+          ${yap.end ? `<span class="yap-tag">종료: ${yap.end}</span>` : ""}
+        </div>
+        ${yap.memo ? `<div style="margin-top:4px;font-size:11px;">메모: ${yap.memo}</div>` : ""}
+      </div>
+      <button class="yap-delete" data-del="${idx}">✕</button>
+    `;
+    wrap.appendChild(div);
+  });
+
+  wrap.querySelectorAll("input[type=checkbox]").forEach(chk=>{
+    chk.addEventListener("change", e=>{
+      const i = Number(e.target.dataset.idx);
+      if(isNaN(i)) return;
+      YAPS[i].done = !!e.target.checked;
+      saveYaps();
+      renderYaps();
+    });
+  });
+  wrap.querySelectorAll(".yap-delete").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      const i = Number(e.target.dataset.del);
+      if(isNaN(i)) return;
+      YAPS.splice(i,1);
+      saveYaps();
+      renderYaps();
+    });
+  });
+}
+
+function setupYapForm(){
+  const form = document.getElementById("yap-form");
+  if(!form) return;
+  form.addEventListener("submit", e=>{
+    e.preventDefault();
+    const kor   = document.getElementById("yap-kor").value.trim();
+    const proj  = document.getElementById("yap-project").value.trim();
+    const segment  = document.getElementById("yap-segment").value.trim();
+    const type     = document.getElementById("yap-type").value;
+    const freq     = document.getElementById("yap-frequency").value.trim();
+    const reward   = document.getElementById("yap-reward").value.trim();
+    const start    = document.getElementById("yap-start").value;
+    const end      = document.getElementById("yap-end").value;
+    const memo     = document.getElementById("yap-memo").value.trim();
+
+    if(!kor && !proj){
+      alert("최소한 한국명 또는 프로젝트명은 입력해줘.");
+      return;
+    }
+
+    YAPS.push({
+      kor: kor,
+      project: proj,
+      segment,
+      type,
+      frequency: freq,
+      reward,
+      start,
+      end,
+      memo,
+      done:false
+    });
+    saveYaps();
+    renderYaps();
+    form.reset();
+  });
+}
+
+// 초기화
+loadYaps();
+setupYapForm();
+renderYaps();
 
 /* 사이드바 접기 / 펼치기 */
 const layout = document.querySelector(".layout");
@@ -2756,6 +4953,775 @@ sidebarToggle.addEventListener("click", () => {
   layout.classList.toggle("collapsed");
 });
 </script>
+
+<script>
+
+// 프로젝트별 로고 URL 매핑 (원하면 여기 URL 채워 넣기)
+
+// 프로젝트별 X 핸들 매핑 (X 아바타를 로고로 자동 사용)
+const INFOFI_PROJECT_X_HANDLES = {
+  "MemeMax": "MemeMax_Fi",
+  "Symphony": "symphonyio",
+  "Kaito / Yapper": "KaitoAI_Labs",
+  "Orderly": "OrderlyNetwork",
+  "STBL": "stbldefi",
+  "Theo": "TheoNetwork",
+  "Sonic (L1)": "Sonic_onSui",
+  "Tria": "useTria",
+  "Superform": "superformxyz",
+  "Glint Analytics": "GlintAnalytics",
+  "Solv Protocol": "SolvProtocol",
+  "Pacifica": "pacifica_fi",
+  "LayerBank": "LayerBankFi",
+  "Rayls": "RaylsLabs",
+  "Velora": "VeloraDEX",
+  "Antix": "antix_in",
+  "Almanak": "AlmanakFi",
+  "BOB (Build on Bit…)": "build_on_bob",
+  "TEN": "tenprotocol",
+  "vooi": "vooi_io"
+};
+
+const INFOFI_PROJECT_LOGOS = {
+  // 예시) "MemeMax": "https://.../mememax-logo.png",
+  //       "Symphony": "https://.../symphony-logo.png"
+};
+
+// ===== InfoFi 리더보드 스냅샷 DB =====
+const INFOFI_SNAPSHOTS = [
+  {
+    handle: "bud_dha__",
+    project: "MemeMax",
+    segment: "Creator",
+    eco: "MemeMax",
+    window: "7D",
+    rank: 93,
+    mindshare: 0.2800,
+    last: 0.2700,
+    firstPercent: 2.03
+  },
+  {
+    handle: "bud_dha__",
+    project: "Symphony",
+    segment: "Community",
+    eco: "Symphony",
+    window: "30D",
+    rank: 7,
+    mindshare: 8.20,
+    last: 0.01,
+    firstPercent: 8.20
+  },
+  {
+    handle: "bud_dha__",
+    project: "Symphony",
+    segment: "Community",
+    eco: "Symphony",
+    window: "3M",
+    rank: 7,
+    mindshare: 2.90,
+    last: 0.06,
+    firstPercent: 2.90
+  },
+  {
+    handle: "bud_dha__",
+    project: "Symphony",
+    segment: "Community",
+    eco: "Symphony",
+    window: "6M",
+    rank: 10,
+    mindshare: 1.40,
+    last: 0.01,
+    firstPercent: 1.40
+  }
+  // TODO: 여기 아래로 다른 핸들/프로젝트들 계속 추가하면 됨
+];
+
+// ===== InfoFi 리더보드 검색 =====
+function normalizeHandle(raw){
+  if(!raw) return "";
+  return raw.trim().replace(/^@/, "").toLowerCase();
+}
+
+function handleInfofiSearch(){
+  const input = document.getElementById("infofi-handle-input");
+  const label = document.getElementById("infofi-handle-label");
+  const wrap  = document.getElementById("infofi-result-wrap");
+  if(!input || !wrap) return;
+
+  const h = normalizeHandle(input.value);
+  if(!h){
+    label.textContent = "";
+    wrap.innerHTML = '<div class="infofi-empty">먼저 @핸들을 입력해 줘.</div>';
+    return;
+  }
+
+  // 같은 핸들로 Kaito 리더보드도 함께 조회
+  if (typeof fetchKaitoLeaderboard === "function") {
+    fetchKaitoLeaderboard();
+  }
+
+  const rows = INFOFI_SNAPSHOTS.filter(r => normalizeHandle(r.handle) === h);
+  label.innerHTML = `검색 핸들: <b>@${h}</b>`;
+
+  // Kaito 리더보드도 함께 조회
+  try {
+    // kaito 전용 입력은 제거됨
+    if (kaitoInput) {
+      kaitoInput.value = "@" + h;
+    }
+    if (typeof fetchKaitoLeaderboard === "function") {
+      fetchKaitoLeaderboard();
+    }
+  } catch (e) {
+    console.error("Kaito auto fetch error:", e);
+  }
+
+
+  if(!rows.length){
+    wrap.innerHTML = '';
+    return;
+  }
+
+  // 프로젝트/에코 기준으로 그룹핑
+  const groups = {};
+  rows.forEach(r => {
+    const key = (r.eco || r.project) + "|" + r.segment;
+    if(!groups[key]){
+      groups[key] = {
+        project: r.project,
+        eco: r.eco || "",
+        segment: r.segment || "",
+        rows: []
+      };
+    }
+    groups[key].rows.push(r);
+  });
+
+  
+  
+  let html = "";
+  Object.values(groups).forEach(g => {
+    // 기간 정렬
+    g.rows.sort((a,b)=>{
+      const order = ["24H","7D","30D","90D","3M","6M","1Y"];
+      const ia = order.indexOf(a.window);
+      const ib = order.indexOf(b.window);
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+
+    // 각 기간별 행 HTML
+    let rowsHtml = "";
+    g.rows.forEach(r => {
+      const win = r.window || "";
+      const rank = r.rank != null ? r.rank : "";
+      const ms = (r.mindshare ?? 0).toFixed(4);
+      const last = (r.last ?? 0).toFixed(4);
+      const firstP = (r.firstPercent ?? 0).toFixed(4);
+
+      rowsHtml += '<tr>'
+        + '<td>' + win + '</td>'
+        + '<td>#' + rank + '</td>'
+        + '<td>' + ms + '%</td>'
+        + '<td>' + last + '%</td>'
+        + '<td>' + firstP + '%</td>'
+        + '</tr>';
+    });
+
+    const eco = g.eco || "";
+    const seg = g.segment || "";
+    const metaText = eco + (eco && seg ? " · " : "") + seg;
+
+    // 로고: 우선 순위
+    // 1) INFOFI_PROJECT_LOGOS에 직접 지정된 URL
+    // 2) INFOFI_PROJECT_X_HANDLES에 등록된 X 핸들의 아바타 (unavatar.io)
+    // 3) 둘 다 없으면 프로젝트 이름 이니셜 원형 뱃지
+    const xHandles = (typeof INFOFI_PROJECT_X_HANDLES === "object") ? INFOFI_PROJECT_X_HANDLES : {};
+    const logos = (typeof INFOFI_PROJECT_LOGOS === "object") ? INFOFI_PROJECT_LOGOS : {};
+    const xHandle = xHandles[g.project] || "";
+    let logoUrl = logos[g.project] || "";
+    if (!logoUrl && xHandle) {
+      logoUrl = "https://unavatar.io/twitter/" + encodeURIComponent(xHandle);
+    }
+    const initial = (g.project || "?").charAt(0).toUpperCase();
+    let logoHtml = "";
+    if (logoUrl) {
+      logoHtml = '<div class="infofi-logo"><img src="' + logoUrl + '" alt="' + g.project + ' logo"></div>';
+    } else {
+      logoHtml = '<div class="infofi-logo">' + initial + '</div>';
+    }
+
+    html += ''
+      + '<div class="infofi-project-card">'
+        + '<div class="infofi-project-header">'
+          + '<div class="infofi-header-left">'
+            + logoHtml
+            + '<div class="infofi-project-main">'
+              + '<div class="infofi-project-name">' + g.project + '</div>'
+              + '<div class="infofi-project-meta">' + metaText + '</div>'
+            + '</div>'
+          + '</div>'
+          + '<div class="infofi-badge">프로젝트 리더보드 스냅샷</div>'
+        + '</div>'
+        + '<div class="infofi-table-wrap">'
+          + '<table class="infofi-table">'
+            + '<thead>'
+              + '<tr>'
+                + '<th>기간</th>'
+                + '<th>Rank</th>'
+                + '<th>Mindshare</th>'
+                + '<th>마지막 스냅샷</th>'
+                + '<th>1위 대비</th>'
+              + '</tr>'
+            + '</thead>'
+            + '<tbody>'
+              + rowsHtml +
+            '</tbody>'
+          + '</table>'
+        + '</div>'
+      + '</div>';
+  });
+
+  wrap.innerHTML = html;
+
+
+}
+
+// Enter 키로 검색
+document.addEventListener("DOMContentLoaded", ()=>{
+  const input = document.getElementById("infofi-handle-input");
+  if(input){
+    input.addEventListener("keydown", e=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+        handleInfofiSearch();
+      }
+    });
+  }
+});
 </script>
+
+  
+
+  <script>
+    const KAITOPROXY_URL = "https://ejqrnapdwblbqvnperid.supabase.co/functions/v1/kaito-proxy";
+
+    const KAITO_TOPIC_TWITTER_HANDLES = {
+  "Aptos": "Aptos",
+  "Beldex": "BeldexCoin",
+  "Berachain": "berachain",
+  "Camp Network": "campnetworkxyz",
+  "Ethereum": "ethereum",
+  "Fogo": "fogo",
+  "Injective": "injective",
+  "Irys": "irys_xyz",
+  "Kaia": "KaiaChain",
+  "MANTRA": "MANTRA_Chain",
+  "Mavryk": "MavrykNetwork",
+  "Mitosis": "MitosisOrg",
+  "Monad": "monad",
+  "Movement": "movementlabsxyz",
+  "Near": "NEARProtocol",
+  "PEAQ": "peaq",
+  "Polkadot": "Polkadot",
+  "Sei": "SeiNetwork",
+  "Somnia": "Somnia_Network",
+  "Sonic": "SonicLabs",
+  "S": "SonicLabs",
+  "Story": "StoryProtocol",
+  "XION": "burnt_xion",
+  "CreatorBid": "CreatorBid",
+  "INFINIT": "Infinit_Labs",
+  "Newton": "MagicNewton",
+  "Surf": "SurfAI",
+  "Symphony": "symphonyio",
+  "Talus": "Talus_Labs",
+  "Theoriq": "TheoriqAI",
+  "Virtuals Protocol": "virtuals_io",
+  "Warden Protocol": "wardenprotocol",
+  "Wayfinder": "AIWayfinder",
+  "ANIME": "animecoin",
+  "Boop": "boopdotfun",
+  "Doodles": "doodles",
+  "MemeX": "MemeX_MRC20",
+  "Moonbirds": "moonbirds",
+  "PENGU": "pudgypenguins",
+  "Corn": "use_corn",
+  "GOAT Network": "GOATRollup",
+  "Lombard": "Lombard_Finance",
+  "Portal to BTC": "PortaltoBitcoin",
+  "SatLayer": "satlayer",
+  "Openmind": "openmind_agi",
+  "Arbitrum": "arbitrum",
+  "Katana": "katana",
+  "Mantle": "0xMantle",
+  "MegaETH": "megaeth",
+  "Polygon": "0xPolygon",
+  "SOON": "soon_svm",
+  "Falcon Finance": "FalconStable",
+  "Frax": "fraxfinance",
+  "Huma": "humafinance",
+  "MoreMarkets": "moremarketsxyz",
+  "Multipli": "multiplifi",
+  "Noble": "noble_xyz",
+  "Orderly": "OrderlyNetwork",
+  "Pyth": "PythNetwork",
+  "Soul Protocol": "0xSoulProtocol",
+  "STBL": "stbl_official",
+  "Turtle Club": "turtleclubhouse",
+  "Walrus": "WalrusProtocol",
+  "Boundless": "boundless_xyz",
+  "Brevis": "brevis_zk",
+  "Cysic": "cysic_xyz",
+  "Miden": "0xMiden",
+  "Starknet": "Starknet",
+  "Succinct": "SuccinctLabs",
+  "Zcash": "Zcash",
+  "zkPass": "zkPass",
+  "Anoma": "anoma",
+  "Bless": "theblessnetwork",
+  "Bybit TradFi": "Bybit_Official",
+  "Humanity Protocol": "Humanityprot",
+  "Integra": "integra_layer",
+  "Multibank": "multibank_io",
+  "Thrive Protocol": "thriveprotocol",
+  "ApeX": "OfficialApeXdex",
+  "Bluefin": "bluefinapp",
+  "dYdX": "dYdX",
+  "Flipster": "flipster_io",
+  "MemeMax": "MemeMax_Fi",
+  "Momentum": "MMTFinance",
+  "PARADEX": "paradex",
+  "Kaito": "KaitoAI",
+  "OG": "0G_labs",
+  "Allora": "AlloraNetwork",
+  "Billions Network": "billions_ntwk",
+  "Edgen": "EdgenTech",
+  "EverlynAI": "everlyn_ai",
+  "IQ": "IQAIcom",
+  "Kindred": "Kindred_AI",
+  "Mira Network": "miranetwork",
+  "Novastro": "Novastro_xyz",
+  "NYT": "Novastro_xyz",
+  "Noya.ai": "NetworkNoya",
+  "OpenLedger": "OpenledgerHQ",
+  "PiP World": "pip_world",
+  "PlayAI": "playAInetwork",
+  "Sapien": "JoinSapien",
+  "Sentient": "SentientAGI",
+  "UXLINK": "UXLINKofficial",
+  "Tria": "useTria",
+  "Anichess": "AnichessGame",
+  "Bitdealer": "bitdealernet",
+  "Defi App": "defiapp",
+  "Hana": "HanaNetwork",
+  "InfineX": "infinex",
+  "Lumiterra": "LumiterraGame",
+  "MapleStory Universe": "MaplestoryU",
+  "Metawin": "MetaWin",
+  "Parti": "jointheparti",
+  "Puffpaw": "puffpaw",
+  "Rainbow": "rainbowdotme",
+  "Sidekick": "Sidekick_Labs",
+  "SIXR Cricket": "SIXR_cricket",
+  "Sophon": "Sophon",
+  "Vultisig": "vultisig",
+  "YEET": "yeet",
+  "Caldera": "Calderaxyz",
+  "Initia": "initia",
+  "Skate": "skate_chain",
+  "Union": "union_build",
+  "KAIO": "KAIO_xyz",
+  "Theo": "Theo_Network",
+  "THEOTHEO": "Theo_Network"
+};
+
+
+async function fetchKaitoLeaderboard() {
+  const input = document.getElementById("infofi-handle-input");
+  const resultDiv = document.getElementById("kaito-result");
+
+  if (!input || !resultDiv) {
+    alert("입력 칸을 찾을 수 없습니다.");
+    return;
+  }
+
+  let handle = (input.value || "").trim();
+  if (!handle) {
+    if (resultDiv) resultDiv.textContent = "";
+    return;
+  }
+  if (handle.startsWith("@")) {
+    handle = handle.slice(1);
+  }
+
+  resultDiv.textContent = "곰투(Kaito)에서 데이터를 불러오는 중...";
+
+  try {
+    const resp = await fetch(
+      KAITOPROXY_URL + "?username=" + encodeURIComponent(handle),
+      { method: "GET" }
+    );
+
+    if (!resp.ok) {
+      resultDiv.textContent = "프록시 응답 오류: " + resp.status;
+      return;
+    }
+
+    const json = await resp.json();
+    console.log("Kaito proxy raw:", json);
+
+    if (!json || !Array.isArray(json.data) || json.data.length === 0) {
+      resultDiv.textContent = "리더보드 데이터를 찾지 못했습니다.";
+      return;
+    }
+
+    // 7D / 30D / 3M 만 사용, topic_id 별로 그룹핑
+    const allowed = ["7D", "30D", "3M"];
+    const byTopic = {};
+    json.data.forEach(item => {
+      const dur = item.duration;
+      if (!allowed.includes(dur)) return;
+      const topic = item.topic_id || "UNKNOWN";
+      if (!byTopic[topic]) byTopic[topic] = [];
+      byTopic[topic].push(item);
+    });
+
+    const topicNames = Object.keys(byTopic);
+    if (!topicNames.length) {
+      resultDiv.textContent = "7D / 30D / 3M 데이터가 없습니다.";
+      return;
+    }
+
+    // topic 이름 대소문자 무시하고 매핑 찾기
+    function findHandleForTopic(topic) {
+      const t = (topic || "").toLowerCase();
+      for (const key in KAITO_TOPIC_TWITTER_HANDLES) {
+        if (key.toLowerCase() === t) return KAITO_TOPIC_TWITTER_HANDLES[key];
+      }
+      return "";
+    }
+
+    const durationOrder = ["7D", "30D", "3M"];
+    function durationIndex(d) {
+      const i = durationOrder.indexOf(d);
+      return i === -1 ? 999 : i;
+    }
+    function rankValue(r) {
+      if (typeof r === "number") return r;
+      const n = parseInt(r, 10);
+      return isNaN(n) ? 999999 : n;
+    }
+
+    
+  const PROJECT_DISPLAY_NAME_OVERRIDES = {
+  "S": "Sonic",
+  "THEOTHEO": "Theo",
+  "NYT": "Novastro"
+};
+
+const cardsHtml = topicNames.map(topic => {
+      const displayTopic = PROJECT_DISPLAY_NAME_OVERRIDES[topic] || topic;
+      const rows = byTopic[topic].slice().sort((a, b) => {
+        const d = durationIndex(a.duration) - durationIndex(b.duration);
+        if (d !== 0) return d;
+        return rankValue(a.rank) - rankValue(b.rank);
+      });
+
+      const topicHandle = findHandleForTopic(topic);
+      let logoUrl = "";
+      if (topicHandle) {
+        logoUrl = "https://unavatar.io/twitter/" + encodeURIComponent(topicHandle);
+      }
+
+      const initial = (topic || "?").charAt(0).toUpperCase();
+      const logoHtml = logoUrl
+        ? '<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#111827;margin-right:10px;"><img src="'
+          + logoUrl
+          + '" alt="' + topic + ' logo" style="width:100%;height:100%;object-fit:cover;"></div>'
+        : '<div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0f172a;color:#e5e7eb;font-size:14px;font-weight:700;margin-right:10px;">'
+          + initial
+          + '</div>';
+
+      const rowsHtml = rows.map(item => {
+        const dur = item.duration || "-";
+        const rank = item.rank ?? "-";
+        const rawTier = item.tier || "-";
+        const tier = (rawTier.toLowerCase() === "tier2") ? "Wider Community"
+                    : (rawTier.toLowerCase() === "tier1") ? "Creator"
+                    : rawTier;
+        const mindshare = item.mindshare ?? "-";
+        return `
+          <tr>
+            <td style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,0.7);text-align:center;">${dur}</td>
+            <td style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,0.7);text-align:center;">#${rank}</td>
+            <td style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,0.7);text-align:center;">${tier}</td>
+            <td style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,0.7);text-align:right;">${mindshare}</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div style="
+          margin-top:10px;
+          padding:14px 16px;
+          border-radius:16px;
+          background:rgba(15,23,42,0.9);
+          border:1px solid rgba(148,163,184,0.45);
+          font-size:13px;
+          line-height:1.6;
+          color:#e5e7eb;
+        ">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;">
+              ${logoHtml}
+              <div>
+                <div style="font-weight:700;font-size:13px;">${displayTopic}</div>
+                <div style="font-size:12px;opacity:0.8;">@${handle}</div>
+              </div>
+            </div>
+          </div>
+          <div style="border-radius:12px;overflow:hidden;border:1px solid rgba(55,65,81,0.9);">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead>
+                <tr style="background:rgba(31,41,55,0.95);">
+                  <th style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,1);text-align:center;">기간</th>
+                  <th style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,1);text-align:center;">Rank</th>
+                  <th style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,1);text-align:center;">Tier</th>
+                  <th style="padding:6px 8px;border-bottom:1px solid rgba(55,65,81,1);text-align:right;">Mindshare</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    resultDiv.innerHTML = cardsHtml;
+  } catch (err) {
+    console.error(err);
+    resultDiv.textContent = "요청 중 오류가 발생했습니다.";
+  }
+}
+
+
+// 엔터로도 조회
+    window.addEventListener("DOMContentLoaded", function () {
+      const input = document.getElementById("kaito-handle-input");
+      if (input) {
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            fetchKaitoLeaderboard();
+          }
+        });
+      }
+    });
+  
+
+/* ========== "마지막 CSV로 조회하기" 버튼 ========== */
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("btn-last-csv");
+  updateLastSnapshotUI();
+  if (!btn) return;
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    restoreLastAnalysis();
+  });
+});
+</script>
+
+<script>
+(function(){
+  const PROFILE_KEY = "mindshare_profile_v1";
+
+  function loadProfile(){
+    try{
+      const raw = localStorage.getItem(PROFILE_KEY);
+      if(!raw) return { nickname: "게스트", handle: "" };
+      const obj = JSON.parse(raw);
+      if(!obj || typeof obj !== "object") return { nickname: "게스트", handle: "" };
+      return {
+        nickname: obj.nickname || "게스트",
+        handle: (obj.handle || "").replace(/^@/,"")
+      };
+    }catch(e){
+      return { nickname: "게스트", handle: "" };
+    }
+  }
+
+  function saveProfile(p){
+    try{
+      localStorage.setItem(PROFILE_KEY, JSON.stringify({
+        nickname: p.nickname || "게스트",
+        handle: (p.handle || "").replace(/^@/,"")
+      }));
+    }catch(e){
+      console.warn("Failed to save profile", e);
+    }
+  }
+
+  function applyProfile(){
+    const p = loadProfile();
+    const nameEl   = document.getElementById("side-username");
+    const linkEl   = document.getElementById("side-handle-link");
+    const avatarEl = document.getElementById("side-avatar-img");
+
+    if(nameEl){
+      nameEl.textContent = p.nickname || "게스트";
+    }
+
+    if(linkEl){
+      const handle = (p.handle || "").replace(/^@/,"");
+      if(handle){
+        linkEl.textContent = "@" + handle;
+        linkEl.href = "https://twitter.com/" + handle;
+      }else{
+        linkEl.textContent = "@익명";
+        linkEl.href = "https://twitter.com";
+      }
+    }
+
+    if(avatarEl){
+      const handle = (p.handle || "").replace(/^@/,"");
+      if(handle){
+        avatarEl.src = "https://unavatar.io/twitter/" + encodeURIComponent(handle);
+      }else{
+        avatarEl.src = "https://unavatar.io/twitter/bud_dha__";
+      }
+    }
+  }
+
+  function openProfilePrompt(){
+    const current = loadProfile();
+    const nick = window.prompt("대시보드에 표시할 닉네임을 적어줘 (예: MUDDHA, buddha 등)", current.nickname || "");
+    if(nick === null) return; // 취소
+    const trimmedNick = nick.trim();
+
+    const handle = window.prompt("분석할 X 핸들을 적어줘 (@ 없이, 예: bud_dha__ )\n건너뛰고 싶으면 그냥 빈칸으로 두고 확인 눌러.", current.handle || "");
+    if(handle === null) return; // 취소 유지
+    const cleanHandle = (handle || "").trim().replace(/^@/,"");
+
+    const profile = {
+      nickname: trimmedNick || "게스트",
+      handle: cleanHandle
+    };
+    saveProfile(profile);
+    applyProfile();
+  }
+
+  function ensureNickname(){
+    const p = loadProfile();
+    if(p.nickname && p.nickname !== "게스트"){
+      return p;
+    }
+    const ok = window.confirm("익명 닉네임을 먼저 설정할래? (히스토리/리더보드 저장에 사용돼)");
+    if(!ok) return p;
+    openProfilePrompt();
+    return loadProfile();
+  }
+
+  // 전역에서 쓸 수 있게 노출 (필요하면 다른 함수에서 사용)
+  window.mindshareProfile = {
+    load: loadProfile,
+    save: saveProfile,
+    apply: applyProfile,
+    ensure: ensureNickname,
+    openPrompt: openProfilePrompt
+  };
+
+  document.addEventListener("DOMContentLoaded", function(){
+    applyProfile();
+
+    const btn = document.getElementById("nickname-btn");
+    if(btn){
+      btn.addEventListener("click", function(e){
+        e.preventDefault();
+        openProfilePrompt();
+      });
+    }
+
+    // 리더보드 저장 버튼 클릭 시, 닉네임 먼저 유도
+    const leaderSaveBtn = document.getElementById("leader-save-btn");
+    if(leaderSaveBtn){
+      leaderSaveBtn.addEventListener("click", function(){
+        ensureNickname();
+      }, { capture: true });
+    }
+  });
+})();
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const csvInput = document.getElementById("csvInput");
+  if(!csvInput) return;
+  csvInput.addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const fr = new FileReader();
+    fr.onload = function(ev){
+      const csvText = ev.target.result || "";
+      const subEl = document.getElementById("csv-server-top5-sub");
+      const bodyEl = document.getElementById("csv-server-top5-body");
+      if(subEl) subEl.textContent = "서버로 분석 요청 중...";
+      if(bodyEl) bodyEl.innerHTML = "<div class='empty'>요청 중...</div>";
+      // load profile
+      let nickname="게스트", handle="";
+      try{
+        if(window.mindshareProfile){
+          const p=window.mindshareProfile.load();
+          nickname=p.nickname||nickname;
+          handle=(p.handle||"").replace(/^@/,"");
+        }
+      }catch(e){}
+      fetch("http://localhost:4000/analyze-csv", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ csvText, nickname, handle })
+      })
+      .then(r=>r.json().catch(()=>({})))
+      .then(data=>{
+        let root=data;
+        if(root && root.result) root=root.result;
+        let top5=[];
+        if(root){
+          if(Array.isArray(root.top5)) top5=root.top5;
+          if(!top5.length && root.projects){
+            top5=Object.entries(root.projects)
+              .sort((a,b)=>b[1]-a[1])
+              .slice(0,5)
+              .map(([name,count])=>({name,count}));
+          }
+          if(!top5.length && root.projectCounts){
+            top5=Object.entries(root.projectCounts)
+              .sort((a,b)=>b[1]-a[1])
+              .slice(0,5)
+              .map(([name,count])=>({name,count}));
+          }
+        }
+        if(!top5.length){
+          if(subEl) subEl.textContent="서버에서 Top5를 찾지 못했습니다.";
+          if(bodyEl) bodyEl.textContent="응답: "+JSON.stringify(data);
+          return;
+        }
+        if(subEl) subEl.textContent="서버 기준 Top5 결과";
+        if(bodyEl){
+          bodyEl.innerHTML = top5.map(item=>
+            "<div>"+item.name+" — "+item.count+"</div>"
+          ).join("");
+        }
+      })
+      .catch(err=>{
+        if(subEl) subEl.textContent="서버 통신 오류";
+        if(bodyEl) bodyEl.textContent=err;
+      });
+    };
+    fr.readAsText(file);
+  });
+});
+</script>
+
 </body>
 </html>
