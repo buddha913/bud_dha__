@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <title> MUDDHA 1.0.0</title>
+  <title>X 크리에이터 마인드쉐어 분석기 5.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- CSV 파서 -->
@@ -10,6 +10,9 @@
   <!-- 프로젝트별 원형 그래프용 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@3.3.0/dist/chartjs-chart-financial.umd.min.js"></script>
+
+  <!-- Supabase client -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <!-- ✅ STEP 2 -->
   <style>
@@ -1454,6 +1457,173 @@ html.dark-theme .section-sub{
   color:var(--text-muted);
   margin-bottom:2px;
 }
+
+/* ===== YAP 버퍼 게이지 ===== */
+.yap-gauge-card{
+  background:
+    radial-gradient(circle at 0% 0%, #e0f2fe, transparent 55%),
+    radial-gradient(circle at 100% 0%, #ddd6fe, transparent 55%),
+    #ffffff;
+}
+.yap-gauge-main{
+  margin-top:6px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  font-size:12px;
+}
+.yap-gauge-percent-row{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.yap-gauge-percent{
+  font-size:26px;
+  font-weight:800;
+}
+.yap-gauge-level{
+  font-size:13px;
+  color:var(--text-muted);
+}
+.yap-gauge-bar{
+  position:relative;
+  width:100%;
+  height:10px;
+  border-radius:999px;
+  background:rgba(226,232,240,1);
+  overflow:hidden;
+  box-shadow:inset 0 1px 3px rgba(15,23,42,.15);
+}
+.yap-gauge-fill{
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#22c55e,#facc15,#fb7185);
+  transition:width .25s ease;
+}
+.yap-gauge-sub{
+  font-size:11px;
+  color:var(--text-muted);
+}
+.yap-gauge-legend{
+  margin:6px 0 0;
+  padding-left:18px;
+  font-size:11px;
+  color:var(--text-muted);
+}
+.yap-gauge-legend li{
+  margin-bottom:2px;
+}
+.yap-gauge-metrics{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.metric-chip{
+  flex:1 1 120px;
+  min-width:120px;
+  padding:6px 8px;
+  border-radius:10px;
+  background:rgba(15,23,42,0.02);
+  border:1px solid rgba(148,163,184,0.2);
+}
+.metric-label{
+  font-size:10px;
+  color:var(--text-muted);
+  margin-bottom:2px;
+}
+.metric-value{
+  font-size:13px;
+  font-weight:600;
+}
+.yap-gauge-forecast{
+  margin-top:10px;
+  padding:8px 9px;
+  border-radius:12px;
+  background:rgba(56,189,248,0.04);
+  border:1px dashed rgba(56,189,248,0.7);
+}
+.forecast-title{
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.forecast-value{
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:2px;
+}
+.forecast-sub{
+  font-size:10px;
+  color:var(--text-muted);
+}
+.yap-gauge-highlight{
+  margin-top:10px;
+  padding:8px 9px;
+  border-radius:12px;
+  background:rgba(139,92,246,0.04);
+  border:1px solid rgba(139,92,246,0.4);
+}
+.highlight-title{
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:4px;
+}
+.highlight-body{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  font-size:10px;
+}
+.highlight-row{
+  display:flex;
+  justify-content:space-between;
+  gap:6px;
+}
+.highlight-label{
+  color:var(--text-muted);
+}
+.highlight-value{
+  font-weight:500;
+  text-align:right;
+  max-width:230px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.highlight-value a{
+  color:var(--accent);
+  text-decoration:none;
+  font-weight:500;
+}
+.highlight-value a:hover{
+  text-decoration:underline;
+}
+.yap-gauge-note{
+  margin-top:10px;
+  padding:8px 9px;
+  border-radius:12px;
+  background:rgba(15,23,42,0.02);
+  border:1px dashed rgba(148,163,184,0.5);
+}
+.yap-gauge-note .note-title{
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:4px;
+}
+.yap-gauge-note .note-list{
+  margin:0;
+  padding-left:16px;
+  font-size:10px;
+  color:var(--text-muted);
+}
+.yap-gauge-note .note-list li{
+  margin-bottom:2px;
+}
 </style>
 </head>
 
@@ -1485,6 +1655,9 @@ html.dark-theme .section-sub{
         </div>
         <div class="side-nav-item" data-view="csv">
           <span class="icon">🧮</span><span class="side-label" id="nav-csv-label">CSV로 분석</span>
+        </div>
+        <div class="side-nav-item" data-view="yap-gauge">
+          <span class="icon">🔋</span><span class="side-label" id="nav-yapgauge-label">YAP 게이지</span>
         </div>
         <div class="side-nav-item" data-view="leaderboard">
           <span class="icon">🏆</span><span class="side-label" id="nav-leaderboard-label">리더보드</span>
@@ -1876,6 +2049,104 @@ html.dark-theme .section-sub{
     </div>
 
     <!-- ▲▲ CSV 분석 화면 끝 ▲▲ -->
+    <!-- ▼▼ YAP 게이지 화면 ▼▼ -->
+    <div id="view-yap-gauge" style="display:none;">
+      <div class="top-nav">
+        <div>
+          <div class="top-title">YAP 버퍼 게이지</div>
+          <div class="top-sub">
+            최근 선택한 기간의 YAP 버퍼용 내부 지표와 원글 수를 기반으로<br>
+            카이토에 쌓인 YAP 에너지를 % 단위로 가늠해주는 화면이야.
+          </div>
+        </div>
+      </div>
+
+      <section class="card yap-gauge-card" style="margin-top:8px;max-width:880px;">
+        <div class="section-header">
+          <div class="section-title">🔋 YAP 버퍼 게이지 <span style="font-size:11px;color:var(--text-muted);">(Beta)</span></div>
+          <div class="section-sub">
+            CSV를 업로드하고 기간을 선택하면, 같은 분석 결과를 기반으로<br>
+            지금 계정에 얼마나 YAP 버퍼가 쌓여있는지 %로 보여줄게.
+          </div>
+        </div>
+
+        <div class="yap-gauge-main">
+          <div class="yap-gauge-percent-row">
+            <div class="yap-gauge-percent" id="yap-gauge-percent">-</div>
+            <div class="yap-gauge-level" id="yap-gauge-level">데이터 없음</div>
+          </div>
+
+          <div class="yap-gauge-bar">
+            <div class="yap-gauge-fill" id="yap-gauge-fill"></div>
+          </div>
+
+          <div class="yap-gauge-sub" id="yap-gauge-desc">
+            CSV를 업로드하고 기간을 선택하면 YAP 버퍼(잔여 점수)를 %로 보여줄게.
+          </div>
+
+          <ul class="yap-gauge-legend">
+            <li><b>0 ~ 30%</b> : 🧊 Low — 최근 패턴 기준으로, 아직 크게 쌓인 YAP 버퍼는 많지 않은 구간.</li>
+            <li><b>30 ~ 60%</b> : 🌊 Mid — 작은 YAP(+1 ~ 2점) 정도가 나올 수 있는 중간 수준 버퍼.</li>
+            <li><b>60 ~ 100%</b> : 🔥 High — 한 번 크게 터질 수 있는 YAP 버퍼가 제법 쌓여 있는 상태.</li>
+          </ul>
+
+          <div class="yap-gauge-metrics">
+            <div class="metric-chip">
+              <div class="metric-label">선택 구간 원글 수</div>
+              <div class="metric-value" id="yap-gauge-posts">-</div>
+            </div>
+            <div class="metric-chip">
+              <div class="metric-label">버퍼 기준 점수</div>
+              <div class="metric-value" id="yap-gauge-trimmed">-</div>
+            </div>
+            <div class="metric-chip">
+              <div class="metric-label">버퍼 기준 계정지수</div>
+              <div class="metric-value" id="yap-gauge-avg">-</div>
+            </div>
+          </div>
+
+          <div class="yap-gauge-forecast">
+            <div class="forecast-title">예상 YAP 범위</div>
+            <div class="forecast-value" id="yap-gauge-forecast">-</div>
+            <div class="forecast-sub" id="yap-gauge-forecast-desc">
+              선택한 구간의 패턴을 기반으로, 앞으로 받을 가능성이 있는 YAP 구간을 대략적으로 보여줄게.
+            </div>
+          </div>
+
+          <div class="yap-gauge-highlight">
+            <div class="highlight-title">최근 최고 임팩트 게시글</div>
+            <div class="highlight-body">
+              <div class="highlight-row">
+                <span class="highlight-label">날짜</span>
+                <span class="highlight-value" id="yap-gauge-best-date">-</span>
+              </div>
+              <div class="highlight-row">
+                <span class="highlight-label">스코어</span>
+                <span class="highlight-value" id="yap-gauge-best-score">-</span>
+              </div>
+              <div class="highlight-row">
+                <span class="highlight-label">링크</span>
+                <span class="highlight-value">
+                  <a id="yap-gauge-best-link" href="javascript:void(0)" target="_blank">-</a>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="yap-gauge-note">
+            <div class="note-title">이 화면에서 쓰는 지표들</div>
+            <ul class="note-list">
+              <li><b>버퍼 기준 점수</b> : 최근 선택한 기간의 상위 트윗 위주로 다시 계산한 점수야. CSV 분석 탭의 트림드 점수와는 살짝 다르게 튜닝했어.</li>
+              <li><b>버퍼 기준 계정지수</b> : 계정 전체 평균 대신, YAP 예측에 맞게 조정한 내부 지수야.</li>
+              <li><b>YAP 버퍼 %</b> : 위 두 지표 + 원글 수를 0~100 스케일로 환산한 값이야. 높을수록 “언젠가 한 번 터질 가능성”이 커진다고 보면 돼.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- ▲▲ YAP 게이지 화면 끝 ▲▲ -->
+
+
 
 
 
@@ -2114,7 +2385,7 @@ html.dark-theme .section-sub{
 <div id="view-infofi" style="display:none;">
       <div class="top-nav">
         <div>
-          <div class="top-title">InfoFi 리더보드</div>
+          <div class="top-title">InfoFi 리더보드(현재 나만 가능함...)</div>
           <div class="top-sub">
             Kaito / Cookie / 등 InfoFi 프로젝트의 <b>프로젝트별 리더보드 순위</b>
             <b></b>
@@ -2274,6 +2545,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleToggleChange = () => {
     if (!ANALYSIS || !CURRENT_LIST || !CURRENT_LIST.length) return;
     updateYapCard(ANALYSIS);
+    updateYapGauge(ANALYSIS);
     renderYapHeatmap(CURRENT_LIST);
     renderGrowthChart(CURRENT_LIST);
   };
@@ -3415,6 +3687,7 @@ function updateView(){
 
   if(!filtered.length){
     ANALYSIS = null;
+    updateYapGauge(null);
     summaryEl.innerHTML = "";
     summaryEl.style.display = "none";
     errorEl.textContent = "선택한 기간에 해당하는 데이터가 없습니다.";
@@ -3457,6 +3730,7 @@ function updateView(){
 
     
   updateYapCard(ANALYSIS);
+  updateYapGauge(ANALYSIS);
 
 summaryEl.innerHTML = `
     <div class="summary-card summary-card--posts">
@@ -4155,6 +4429,107 @@ function updateYapCard(analysis){
   probEl.textContent  = prob + "%";
 }
 
+
+function updateYapGauge(analysis){
+  const pctEl  = document.getElementById("yap-gauge-percent");
+  const lvlEl  = document.getElementById("yap-gauge-level");
+  const descEl = document.getElementById("yap-gauge-desc");
+  const fillEl = document.getElementById("yap-gauge-fill");
+  const postsEl = document.getElementById("yap-gauge-posts");
+  const trimmedEl = document.getElementById("yap-gauge-trimmed");
+  const avgEl = document.getElementById("yap-gauge-avg");
+  const forecastEl = document.getElementById("yap-gauge-forecast");
+  const forecastDescEl = document.getElementById("yap-gauge-forecast-desc");
+  const bestDateEl = document.getElementById("yap-gauge-best-date");
+  const bestScoreEl = document.getElementById("yap-gauge-best-score");
+  const bestLinkEl = document.getElementById("yap-gauge-best-link");
+
+  if(!pctEl || !lvlEl || !descEl || !fillEl) return;
+
+  if(!analysis){
+    pctEl.textContent  = "-";
+    lvlEl.textContent  = "데이터 없음";
+    descEl.textContent = "CSV를 업로드하고 기간을 선택하면 YAP 버퍼(잔여 점수)를 %로 보여줄게.";
+    fillEl.style.width = "0%";
+
+    if(postsEl) postsEl.textContent = "-";
+    if(trimmedEl) trimmedEl.textContent = "-";
+    if(avgEl) avgEl.textContent = "-";
+    if(forecastEl) forecastEl.textContent = "-";
+    if(forecastDescEl) forecastDescEl.textContent = "선택한 구간의 패턴을 기반으로, 앞으로 받을 가능성이 있는 YAP 구간을 대략적으로 보여줄게.";
+    if(bestDateEl) bestDateEl.textContent = "-";
+    if(bestScoreEl) bestScoreEl.textContent = "-";
+    if(bestLinkEl){ bestLinkEl.textContent = "-"; bestLinkEl.removeAttribute("href"); }
+
+    return;
+  }
+
+  const trimmed = Number(analysis.trimmedAvg || 0);
+  const avg     = Number(analysis.avgScore   || 0);
+  const posts   = Number(analysis.totalPosts || 0);
+
+  let prob = calcYapProbability(trimmed, avg, posts);
+  prob = Math.round(prob * getYapBoostFactor());
+  if (prob > 100) prob = 100;
+  if (prob < 0)   prob = 0;
+
+  let levelText = "";
+  let desc = "";
+  if(prob < 30){
+    levelText = "🧊 Low Buffer";
+    desc = "최근 패턴 기준으로 아직 크게 쌓인 YAP 버퍼는 많지 않은 구간이야.";
+  }else if(prob < 60){
+    levelText = "🌊 Mid Buffer";
+    desc = "작은 YAP(+1~2점) 정도가 나올 수 있는 중간 수준의 버퍼 상태야.";
+  }else{
+    levelText = "🔥 High Buffer";
+    desc = "한 번 크게 터질 수 있는 YAP 버퍼가 제법 쌓여 있는 상태야.";
+  }
+
+  pctEl.textContent  = prob + "%";
+  lvlEl.textContent  = levelText;
+  descEl.textContent = desc;
+  fillEl.style.width = prob + "%";
+
+  if(postsEl) postsEl.textContent = posts ? posts.toLocaleString() + "개" : "0개";
+  if(trimmedEl) trimmedEl.textContent = trimmed ? trimmed.toFixed(2) : "0.00";
+  if(avgEl) avgEl.textContent = avg ? avg.toFixed(2) : "0.00";
+
+  if(forecastEl && forecastDescEl){
+    let rangeText = "";
+    let subText = "";
+    if(prob < 20){
+      rangeText = "0 ~ 0.5점 정도";
+      subText = "현재 CSV 기준으로는 추가 YAP이 바로 나오기보단, 패턴을 조금 더 쌓아야 하는 구간이야.";
+    }else if(prob < 40){
+      rangeText = "0 ~ 1점 정도";
+      subText = "작은 잔여 YAP이 나올 수 있는 초입 구간이야. 반응이 조금 더 쌓이면 의미 있는 상승이 나올 수 있어.";
+    }else if(prob < 60){
+      rangeText = "0.5 ~ 2점 정도";
+      subText = "최근 패턴 기준으로, 1점 안팎의 소규모 YAP가 나올 수 있는 상태야.";
+    }else if(prob < 80){
+      rangeText = "2 ~ 4점 정도";
+      subText = "YAP가 한 번 튀어오를만한 에너지가 제법 쌓인 상태야. 1~3일 내에 변화를 기대해볼 수 있어.";
+    }else{
+      rangeText = "4점 이상도 가능";
+      subText = "강한 스파이크 + 누적 패턴이 함께 나오는 구간이야. 가까운 시일 내에 꽤 의미 있는 YAP 상승이 나올 수 있어.";
+    }
+    forecastEl.textContent = rangeText;
+    forecastDescEl.textContent = subText;
+  }
+
+  if(bestDateEl) bestDateEl.textContent = analysis.bestDate || "-";
+  if(bestScoreEl) bestScoreEl.textContent = analysis.bestScore ? analysis.bestScore.toFixed(2) : "-";
+  if(bestLinkEl){
+    if(analysis.bestLink){
+      bestLinkEl.textContent = "트윗 보러가기";
+      bestLinkEl.href = analysis.bestLink;
+    }else{
+      bestLinkEl.textContent = "-";
+      bestLinkEl.removeAttribute("href");
+    }
+  }
+}
 function renderYapHeatmap(list){
   const wrap = document.getElementById("yap-heatmap");
   if(!wrap) return;
@@ -4830,6 +5205,8 @@ const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
     if (viewInfofi) viewInfofi.style.display = "none";
     const viewCommunity = document.getElementById("view-community");
     if (viewCommunity) viewCommunity.style.display = "none";
+    const viewYapGauge = document.getElementById("view-yap-gauge");
+    if (viewYapGauge) viewYapGauge.style.display = "none";
 
     switch(target){
       case "leaderboard":
@@ -4852,6 +5229,11 @@ const viewNavItems = document.querySelectorAll(".side-nav-item[data-view]");
       case "yapping":
         if (viewYapping) {
           viewYapping.style.display = "block";
+        }
+        break;
+      case "yap-gauge":
+        if (viewYapGauge) {
+          viewYapGauge.style.display = "block";
         }
         break;
       case "infofi":
@@ -5756,6 +6138,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 })();
+</script>
+
+
+<script>
+const SUPABASE_URL = "https://ftdpkgfwqmorldeptavl.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0ZHBrZ2Z3cW1vcmxkZXB0YXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTA2MzAsImV4cCI6MjA3OTU4NjYzMH0.DBYUU7YvZMwg7fn10dPQBZBUhPce7VxUm9YOon7xZlk";
+let supabaseClient = null;
+function initSupabase(){
+  try {
+    if (window.supabase && !supabaseClient) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log("Supabase 초기화 완료:", SUPABASE_URL);
+    }
+  } catch(e) {
+    console.error("Supabase 초기화 실패:", e);
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  initSupabase();
+});
 </script>
 
 <script>
