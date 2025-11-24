@@ -11,9 +11,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@3.3.0/dist/chartjs-chart-financial.umd.min.js"></script>
 
-  <!-- Supabase client -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
   <!-- ✅ STEP 2 -->
   <style>
   html {
@@ -1625,6 +1622,7 @@ html.dark-theme .section-sub{
   margin-bottom:2px;
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -4848,6 +4846,9 @@ document.getElementById("csvInput").addEventListener("change", e=>{
         updateView();
         saveHistoryEntry();
         saveLastSnapshot();
+        if (typeof saveCsvToSupabase === "function") {
+          try { saveCsvToSupabase(file); } catch(err) { console.error("Supabase 저장 오류", err); }
+        }
       }
     }
   });
@@ -6140,26 +6141,6 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 </script>
 
-
-<script>
-const SUPABASE_URL = "https://ftdpkgfwqmorldeptavl.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0ZHBrZ2Z3cW1vcmxkZXB0YXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTA2MzAsImV4cCI6MjA3OTU4NjYzMH0.DBYUU7YvZMwg7fn10dPQBZBUhPce7VxUm9YOon7xZlk";
-let supabaseClient = null;
-function initSupabase(){
-  try {
-    if (window.supabase && !supabaseClient) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      console.log("Supabase 초기화 완료:", SUPABASE_URL);
-    }
-  } catch(e) {
-    console.error("Supabase 초기화 실패:", e);
-  }
-}
-document.addEventListener("DOMContentLoaded", () => {
-  initSupabase();
-});
-</script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function(){
   const csvInput = document.getElementById("csvInput");
@@ -6230,5 +6211,54 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 </script>
 
+
+<script>
+const SUPABASE_URL = "https://ftdpkgfwqmorldeptavl.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0ZHBrZ2Z3cW1vcmxkZXB0YXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTA2MzAsImV4cCI6MjA3OTU4NjYzMH0.DBYUU7YvZMwg7fn10dPQBZBUhPce7VxUm9YOon7xZlk";
+
+let supabaseClient = null;
+
+// Supabase 초기화
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!window.supabase || supabaseClient) return;
+  try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log("Supabase 초기화 완료");
+  } catch (err) {
+    console.error("Supabase 초기화 오류:", err);
+  }
+});
+
+// CSV를 Supabase에 저장
+async function saveCsvToSupabase(file){
+  try {
+    if (!supabaseClient) return;
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError) {
+      console.warn("Supabase 사용자 조회 오류:", userError.message);
+      return;
+    }
+    if (!user) {
+      console.log("로그인한 사용자가 없어 Supabase 저장을 건너뜁니다.");
+      return;
+    }
+    const content = await file.text();
+    const { error } = await supabaseClient
+      .from("csv_uploads")
+      .insert({
+        user_id: user.id,
+        filename: file.name || "unknown.csv",
+        file_content: content
+      });
+    if (error) {
+      console.error("Supabase csv_uploads 저장 오류:", error.message);
+    } else {
+      console.log("Supabase csv_uploads 저장 완료");
+    }
+  } catch (err) {
+    console.error("saveCsvToSupabase 수행 중 오류:", err);
+  }
+}
+</script>
 </body>
 </html>
