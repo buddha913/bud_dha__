@@ -1,9 +1,0 @@
-{
-  "name": "bud-dha-cookie-api",
-  "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "@sparticuz/chromium": "^119.0.0",
-    "puppeteer-core": "^22.0.0"
-  }
-}
