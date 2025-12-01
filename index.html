@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-<title>X 크리에이터 마인드쉐어 분석기 5.0</title>
+<title>X 임시 MUDDHA1.0.0</title>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <!-- CSV 파서 -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -1722,43 +1722,27 @@ html.dark-theme .section-sub{
 .auth-overlay{
   position:fixed;
   inset:0;
-  /* 로그인 첫 화면용 풀스크린 그라디언트 (좌측 밝은 청록, 우측 보라) */
-  background:
-    linear-gradient(135deg,#10b4d8,#1f2937 40%,#4c1d95 100%);
-  background-size:100% 100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  background:rgba(15,23,42,0.55);
+  display:none;
+  align-items:stretch;
+  justify-content:flex-end;
   z-index:50;
-}
-
-@keyframes muddhabg{
-  0%{
-    background-position: 0% 0%, 100% 100%, 0% 0%;
-  }
-  50%{
-    background-position: 30% 10%, 80% 90%, 30% 10%;
-  }
-  100%{
-    background-position: 70% 20%, 40% 80%, 50% 20%;
-  }
 }
 .auth-overlay.visible{
   display:flex;
 }
 .auth-panel{
-  width:420px;
-  max-width:calc(100% - 40px);
-  background:linear-gradient(180deg,rgba(248,250,252,0.96),rgba(229,231,235,0.98));
+  width:360px;
+  max-width:100%;
+  background:linear-gradient(180deg,#ffffff,#f9fbff);
   color:#111827;
-  box-shadow:0 26px 60px rgba(15,23,42,0.65);
-  padding:24px 26px 22px;
+  box-shadow:-24px 0 50px rgba(15,23,42,0.9);
+  padding:20px 22px 22px;
   display:flex;
   flex-direction:column;
   gap:12px;
-  border-radius:24px;
+  border-radius:20px 0 0 20px;
 }
-
 html.dark-theme .auth-panel{
   background:linear-gradient(180deg,#020617,#020617);
   color:#e5e7eb;
@@ -1884,9 +1868,9 @@ html.dark-theme .auth-input{
   font-size:13px;
   font-weight:600;
   cursor:pointer;
-  background:linear-gradient(90deg,#18a4ff,#b546ff);
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
   color:#f9fafb;
-  box-shadow:0 10px 22px rgba(37,99,235,0.45);
+  box-shadow:0 10px 22px rgba(79,70,229,0.45);
 }
 .auth-submit-btn:hover{
   filter:brightness(1.03);
@@ -1896,186 +1880,6 @@ html.dark-theme .auth-input{
   color:var(--text-muted,#9ca3af);
   margin-top:2px;
 }
-
-
-/* === MUDDHA DARK NEON + SOFT GLASS THEME (Option A) === */
-:root{
-  --bg:#020617;
-  --bg-soft:#020617;
-  --sidebar-bg:rgba(15,23,42,0.92);
-  --card-bg:rgba(15,23,42,0.78);
-  --card-soft:rgba(15,23,42,0.86);
-  --text-main:#e5e7eb;
-  --text-muted:#9ca3af;
-  --border-soft:rgba(148,163,184,0.35);
-}
-
-/* 전체 배경을 다크 네온 오로라 느낌으로 */
-body{
-  background:
-    radial-gradient(circle at 0% 0%, #22d3ee 0, transparent 55%),
-    radial-gradient(circle at 100% 0, #a855f7 0, transparent 55%),
-    radial-gradient(circle at 50% 100%, #f97316 0, transparent 55%),
-    #020617;
-  background-size:170% 170%;
-  animation:muddhaAurora 22s ease-in-out infinite alternate;
-  color:var(--text-main);
-}
-
-/* 기존 배경 애니메이션 키프레임 */
-@keyframes muddhaAurora{
-  0%{background-position:0% 0%;}
-  50%{background-position:40% 35%;}
-  100%{background-position:80% 75%;}
-}
-
-/* 네온 소프트 글라스 사이드바 */
-.sidebar{
-  background:linear-gradient(160deg,rgba(15,23,42,0.92),rgba(15,23,42,0.84));
-  border-right:1px solid var(--border-soft);
-  backdrop-filter:blur(18px) saturate(140%);
-  box-shadow:
-    0 18px 40px rgba(15,23,42,0.9),
-    0 0 0 1px rgba(15,23,42,0.9);
-  color:var(--text-main);
-}
-
-/* 카드/대시셀/히어로 모두 소프트 글라스화 */
-.card,
-.dash-cell,
-.hero-card,
-.bot-card,
-.yap-gauge-card{
-  background:rgba(15,23,42,0.78);
-  border-radius:18px;
-  border:1px solid rgba(148,163,184,0.4);
-  box-shadow:
-    0 18px 40px rgba(15,23,42,0.9),
-    0 0 0 1px rgba(15,23,42,0.9);
-  backdrop-filter:blur(16px) saturate(150%);
-  color:var(--text-main);
-}
-
-/* 히어로 영역 살짝 강조 */
-.hero-card{
-  background:
-    radial-gradient(circle at 0% 0%, rgba(34,211,238,0.25), transparent 55%),
-    radial-gradient(circle at 100% 0%, rgba(168,85,247,0.28), transparent 55%),
-    rgba(15,23,42,0.88);
-  border-color:rgba(129,140,248,0.6);
-}
-
-/* 요약 카드 텍스트는 밝게 유지 */
-.summary-card{
-  box-shadow:
-    0 18px 40px rgba(15,23,42,0.9),
-    0 0 0 1px rgba(15,23,42,0.9);
-}
-
-/* 네온 느낌용 버튼 */
-.leader-btn,
-.infofi-search-btn,
-.community-submit,
-.yap-add-btn,
-.side-auth-main-btn,
-.auth-bar button{
-  background:linear-gradient(135deg,#22d3ee,#a855f7) !important;
-  border-color:transparent !important;
-  color:#f9fafb !important;
-  box-shadow:0 18px 40px rgba(34,211,238,0.45);
-}
-
-/* 일반 칩/필터 버튼은 어두운 글라스 느낌 */
-.range-tab,
-.grade-tab,
-.lang-btn,
-.community-toggle-btn,
-.file-input-fake{
-  background:rgba(15,23,42,0.9);
-  border-color:rgba(148,163,184,0.7);
-  color:var(--text-main);
-}
-
-/* 테이블 배경도 다크톤에 맞춰 보정 */
-.table-wrap{
-  background:rgba(15,23,42,0.96);
-  border-color:rgba(55,65,81,0.9);
-}
-table{
-  color:var(--text-main);
-}
-th{
-  background:rgba(15,23,42,0.96);
-  color:var(--text-muted);
-}
-tbody tr:hover td{
-  background:rgba(15,23,42,0.85);
-}
-
-/* 서브텍스트 계열 색 보정 */
-.top-sub,
-.section-sub,
-.text-meta,
-.community-hint,
-.infofi-hint,
-.infofi-source-note,
-.yap-sub,
-.yap-gauge-sub{
-  color:var(--text-muted);
-}
-
-/* 사이드바 프로필/푸터 색 보정 */
-.side-handle,
-.side-footer,
-.side-auth-caption,
-.side-auth-status{
-  color:var(--text-muted);
-}
-
-/* 다크테마 토글 케이스도 네온 스타일 유지 */
-html.dark-theme body{
-  background:
-    radial-gradient(circle at 0% 0%, #22d3ee 0, transparent 55%),
-    radial-gradient(circle at 100% 0, #a855f7 0, transparent 55%),
-    radial-gradient(circle at 50% 100%, #f97316 0, transparent 55%),
-    #020617;
-}
-
-/* 로그인 오버레이 배경도 네온 스타일로 통일 */
-.auth-overlay{
-  background:
-    radial-gradient(circle at 0% 0%, rgba(34,211,238,0.65) 0, transparent 55%),
-    radial-gradient(circle at 100% 100%, rgba(168,85,247,0.6) 0, transparent 55%),
-    radial-gradient(circle at 50% 100%, rgba(249,115,22,0.5) 0, transparent 55%),
-    #020617;
-  background-size:160% 160%;
-  animation:muddhaAurora 22s ease-in-out infinite alternate;
-}
-
-/* 로그인 패널은 살짝 더 밝은 글라스 */
-.auth-panel{
-  background:linear-gradient(180deg,rgba(15,23,42,0.95),rgba(15,23,42,0.9));
-  color:#e5e7eb;
-  border:1px solid rgba(148,163,184,0.6);
-}
-
-/* 작은 요소들 살짝 네온 느낌 강조 */
-.range-tab.active,
-.grade-tab.active,
-.lang-btn.active,
-.side-nav-item.active{
-  background:linear-gradient(135deg,#22d3ee,#a855f7);
-  color:#f9fafb;
-  border-color:transparent;
-  box-shadow:0 14px 32px rgba(34,211,238,0.5);
-}
-
-/* 사이드바 뱃지 */
-.side-badge{
-  background:radial-gradient(circle at 0% 0%,#22d3ee,#a855f7);
-  box-shadow:0 14px 28px rgba(15,23,42,.85);
-}
-
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -2286,15 +2090,15 @@ html.dark-theme body{
       color: #0f172a;
       display: flex;
       align-items: stretch;
-      justify-content: flex-start;
+      justify-content: stretch;
       padding: 16px;
       gap: 16px;
     }
     .app-shell {
       display: flex;
       flex: 1;
-      max-width: 1440px;
-      margin: 0;
+      max-width: 1280px;
+      margin: 0 auto;
       gap: 16px;
     }
     .sidebar {
@@ -2880,163 +2684,53 @@ html.dark-theme body{
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
-
 <style>
-/* FINAL OVERRIDE: Force Dark Neon + Soft Glass theme globally */
+  /* 🔓 레이아웃 고정 해제 – 화면 전체 폭 사용 */
+  .app-shell {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
 
-body{
-  background:
-    radial-gradient(circle at 0% 0%, #22d3ee 0, transparent 55%),
-    radial-gradient(circle at 100% 0, #a855f7 0, transparent 55%),
-    radial-gradient(circle at 50% 100%, #f97316 0, transparent 55%),
-    #020617 !important;
-  background-size:170% 170% !important;
-  animation:muddhaAurora 22s ease-in-out infinite alternate !important;
-  color:#e5e7eb !important;
-}
-
-.sidebar{
-  background:linear-gradient(160deg,rgba(15,23,42,0.92),rgba(15,23,42,0.84)) !important;
-  border-right:1px solid rgba(148,163,184,0.35) !important;
-  box-shadow:
-    0 18px 40px rgba(15,23,42,0.9),
-    0 0 0 1px rgba(15,23,42,0.9) !important;
-  backdrop-filter:blur(18px) saturate(140%) !important;
-  color:#e5e7eb !important;
-}
-
-.card,
-.dash-cell,
-.hero-card,
-.bot-card,
-.yap-gauge-card{
-  background:rgba(15,23,42,0.78) !important;
-  border-radius:18px !important;
-  border:1px solid rgba(148,163,184,0.5) !important;
-  box-shadow:
-    0 18px 40px rgba(15,23,42,0.9),
-    0 0 0 1px rgba(15,23,42,0.9) !important;
-  backdrop-filter:blur(16px) saturate(150%) !important;
-  color:#e5e7eb !important;
-}
-
-.table-wrap{
-  background:rgba(15,23,42,0.96) !important;
-  border-color:rgba(55,65,81,0.9) !important;
-}
-th{
-  background:rgba(15,23,42,0.96) !important;
-  color:#9ca3af !important;
-}
-tbody tr:hover td{
-  background:rgba(15,23,42,0.85) !important;
-}
-
-.leader-btn,
-.infofi-search-btn,
-.community-submit,
-.yap-add-btn,
-.side-auth-main-btn,
-.auth-bar button{
-  background:linear-gradient(135deg,#22d3ee,#a855f7) !important;
-  border-color:transparent !important;
-  color:#f9fafb !important;
-  box-shadow:0 18px 40px rgba(34,211,238,0.45) !important;
-}
-
-.range-tab.active,
-.grade-tab.active,
-.lang-btn.active,
-.side-nav-item.active{
-  background:linear-gradient(135deg,#22d3ee,#a855f7) !important;
-  color:#f9fafb !important;
-  border-color:transparent !important;
-  box-shadow:0 14px 32px rgba(34,211,238,0.5) !important;
-}
-</style>
-
-<style>
-/* v6 top-bar + chip styles from B version */
-.top-bar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-.top-title{font-size:18px;font-weight:600;}
-.top-subtitle{font-size:12px;color:var(--text-muted);}
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.chip{
-  font-size:11px;
-  padding:5px 9px;
-  border-radius:999px;
-  border:1px solid rgba(148,163,184,0.6);
-  background:rgba(15,23,42,0.7);
-}
-.chip-button{
-  cursor:pointer;
-}
-  .top-bar{
-    flex-direction:column;
-    align-items:flex-start;
+  .main {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
   }
 </style>
 
-
-<style>
-/* v6 FULLWIDTH OVERRIDE: 전체 화면 가로폭 사용 */
-
-.layout.app-shell{
-  max-width:none !important;
-  width:100% !important;
-  margin:0 !important;
-  overflow-x:hidden !important;
-}
-
-.main{
-  max-width:100% !important;
-  min-width:0 !important;
-  margin:0 auto !important;
-  padding-left:32px !important;
-  padding-right:32px !important;
-}
-@media (max-width:980px){
-  .main{
-    padding-left:16px !important;
-    padding-right:16px !important;
-  }
-}
-</style>
 </head>
 <body>
 <div class="layout app-shell">
 <!-- AUTH BAR -->
 <!-- AUTH PANEL (slide-in) -->
 <div class="auth-overlay" id="auth-overlay">
-  <div class="auth-panel">
-    <div class="auth-panel-header">
-      <div>
-        <div class="auth-panel-title">MUDDHA 업데이트 중이에요</div>
-        <div class="auth-panel-sub">
-          더 나은 Mindshare Analyzer를 준비하고 있습니다.<br/>
-          잠시 후 다시 방문해 주세요.
-        </div>
-      </div>
-    </div>
-    <div style="margin-top:18px;font-size:12px;line-height:1.6;color:#6b7280;">
-      현재 로그인·회원가입·대시보드 이용이 잠시 중단되었습니다.<br/>
-      문의: X&nbsp;
-      <a href="https://twitter.com/bud_dha__" target="_blank" style="color:#4f46e5;text-decoration:underline;">
-        @bud_dha__
-      </a>
-    </div>
-  </div>
+<div class="auth-panel">
+<div class="auth-panel-header">
+<div>
+<div class="auth-panel-title" id="auth-mode-label">로그인 / 회원가입</div>
+<div class="auth-panel-sub">이메일 하나로 간단하게 로그인하거나, 처음이면 바로 계정을 만들 수 있어요.</div>
 </div>
-
+<button class="auth-close-btn" id="auth-close-btn" type="button">×</button>
+</div>
+<div class="auth-tabs">
+<button class="auth-tab active" id="auth-tab-login" type="button">이메일 로그인</button>
+<button class="auth-tab" id="auth-tab-signup" type="button">새 계정 만들기</button>
+</div>
+<form class="auth-form" id="auth-form">
+<label class="auth-label" for="auth-email">이메일</label>
+<input class="auth-input" id="auth-email" placeholder="example@mindshare.app" required="" type="email"/>
+<label class="auth-label" for="auth-password">비밀번호</label>
+<input class="auth-input" id="auth-password" placeholder="8자 이상 입력해 주세요" required="" type="password"/>
+<button class="auth-submit-btn" id="auth-submit-btn" type="submit">이메일로 로그인</button>
+<div class="auth-hint">※ 같은 이메일·비밀번호 조합이면 같은 계정으로 인식돼요.</div>
+<div class="auth-extra">
+<button class="auth-link-btn" id="auth-forgot-password" type="button">비밀번호를 잊으셨나요?</button>
+<p class="auth-extra-hint">현재는 테스트용 로그인이라 이메일을 잊어버리면 새 이메일로 새 계정을 만들어서 사용해야 해요.</p>
+</div>
+</form>
+</div>
+</div>
 <!-- SIDEBAR -->
 <aside class="sidebar">
 <button class="sidebar-toggle" id="sidebar-toggle">⟨</button>
@@ -3072,14 +2766,14 @@ tbody tr:hover td{
 </div>
 <div class="side-section-title">KAITO</div>
 <div class="side-nav-item" data-view="infofi">
-<span class="nav-dot"></span><span class="side-label" id="nav-infofi-label">Kaito 리더보드</span>
+<span class="nav-dot"></span><span class="side-label" id="nav-infofi-label">Kaito 리더보드(잠시 닫습니다)</span>
 </div>
 <div class="side-nav-item" data-view="yap-gauge">
 <span class="nav-dot"></span><span class="side-label" id="nav-yapgauge-label">YAP 게이지</span>
 </div>
 <div class="side-section-title">COOKIE</div>
 <div class="side-nav-item" data-view="cookie">
-<span class="nav-dot"></span><span class="side-label" id="nav-cookie-label">Cookie 리더보드</span>
+<span class="nav-dot"></span><span class="side-label" id="nav-cookie-label">Cookie 리더보드(잠시 닫습니다)</span>
 </div>
 <div class="side-section-title">기타</div>
 <div class="side-nav-item" data-view="guide">
@@ -3117,8 +2811,6 @@ tbody tr:hover td{
 </aside>
 <!-- MAIN -->
 <main class="main">
-
-
 <!-- ▼▼ Dashboard 화면 ▼▼ -->
 <div id="view-dashboard">
 <div class="top-nav">
@@ -3139,7 +2831,7 @@ tbody tr:hover td{
 </div>
 </div>
 </div>
-</div>
+</div><div class="section-note">전체 계정의 마인드쉐어 흐름과 BTC/ETH/환율, MUDDHA 리더보드를 한 화면에서 보는 홈 탭입니다.</div>
 <!-- Dashboard 상단: 성장 그래프 + 요약 카드 -->
 <div class="grid-1 dashboard-summary-grid">
 <div class="column-main">
@@ -3221,7 +2913,7 @@ tbody tr:hover td{
             X 애널리틱스 CSV만 있으면 내 계정의 마인드쉐어를 한 번에 진단하는 가이드야.
           </div>
 </div>
-</div>
+</div><div class="section-note">CSV 다운로드 방법과 MUDDHA 사용법을 단계별로 정리한 가이드입니다.</div>
 <section class="card card-soft" style="margin-top:8px; max-width:920px;">
 <div class="section-header">
 <div class="section-title">1. X 애널리틱스 CSV 가져오기</div>
@@ -8187,16 +7879,6 @@ async function initSupabaseAuth(){
       console.warn("초기 사용자 조회 오류:", error.message);
     }
     updateAuthUI(user || null);
-    if (!user) {
-      const ov = document.getElementById("auth-overlay");
-      if (ov) {
-        ov.classList.add("visible");
-        const emailInput = document.getElementById("auth-email");
-        if (emailInput) {
-          setTimeout(() => emailInput.focus(), 50);
-        }
-      }
-    }
   } catch (err){
     console.error("initSupabaseAuth 오류:", err);
   }
@@ -8235,6 +7917,14 @@ async function initSupabaseAuth(){
     closeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       hideAuthPanel();
+    });
+  }
+
+  if (overlay){
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay){
+        hideAuthPanel();
+      }
     });
   }
 
@@ -8286,17 +7976,15 @@ async function initSupabaseAuth(){
       if (!supabaseClient) return;
       const email = (emailInput && emailInput.value.trim()) || "";
       const password = (pwInput && pwInput.value.trim()) || "";
-      const emailForSupabase = email.includes("@") ? email : `${email}@muddha-id.com`;
-
       if (!email || !password){
-        alert("아이디와 비밀번호를 모두 입력해줘.");
+        alert("이메일과 비밀번호를 모두 입력해줘.");
         return;
       }
 
       try {
         if (currentAuthMode === "login"){
           // 로그인 모드
-          const { data, error } = await supabaseClient.auth.signInWithPassword({ email: emailForSupabase, password });
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
           if (error){
             console.warn("로그인 오류:", error.message);
             const msg = (error.message || "").toLowerCase();
@@ -8315,7 +8003,7 @@ async function initSupabaseAuth(){
           alert("로그인 완료!");
         } else {
           // 회원가입 모드
-          const { data, error } = await supabaseClient.auth.signUp({ email: emailForSupabase, password });
+          const { data, error } = await supabaseClient.auth.signUp({ email, password });
           if (error){
             console.warn("회원가입 오류:", error.message);
             const msg = (error.message || "").toLowerCase();
@@ -8356,8 +8044,8 @@ async function initSupabaseAuth(){
 }
 
 
-const SUPABASE_URL = "https://ajzgeshowxalnnmemowv.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqemdlc2hvd3hhbG5ubWVtb3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNDM1NjEsImV4cCI6MjA3OTkxOTU2MX0.6VrDH1RPT_TTwkN2hwOsEsP8xnv2fZIsFXvWkvy_qm4";
+const SUPABASE_URL = "https://ftdpkgfwqmorldeptavl.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0ZHBrZ2Z3cW1vcmxkZXB0YXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTA2MzAsImV4cCI6MjA3OTU4NjYzMH0.DBYUU7YvZMwg7fn10dPQBZBUhPce7VxUm9YOon7xZlk";
 
 let supabaseClient = null;
 
