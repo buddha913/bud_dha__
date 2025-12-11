@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>프로젝트 포지션 &amp; 섹터 분석 - MUDDHA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           margin: 0; padding: 0; background: #050816; color: #f5f5f5; line-height: 1.7; }
+    header, main, footer { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+    header { padding-top: 32px; padding-bottom: 16px; }
+    h1 { font-size: 2rem; margin-bottom: 10px;
+         background: linear-gradient(120deg, #f1fa8c, #ffb86c, #ff79c6);
+         -webkit-background-clip: text; color: transparent; }
+    h2 { margin-top: 28px; font-size: 1.35rem; color: #f1fa8c; }
+    h3 { margin-top: 18px; font-size: 1.1rem; color: #ffb86c; }
+    p { margin: 8px 0 14px; }
+    ul { padding-left: 20px; margin: 6px 0 14px; }
+    li { margin-bottom: 4px; }
+    nav { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.9rem; }
+    nav a { color: #8be9fd; text-decoration: none; padding: 4px 10px; border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04); }
+    nav a:hover { text-decoration: underline; }
+    footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 16px 0 28px;
+             font-size: 0.9rem; color: #bbbbbb; margin-top: 24px; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.2); font-size: 0.8rem; margin-right: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>프로젝트 포지션 &amp; 섹터 분석</h1>
+    <p>
+      이 페이지는 MUDDHA에서 제공하는
+      <strong>프로젝트 포지션</strong>·<strong>섹터 분석</strong> 기능의 개념을 설명합니다.
+      외부 리더보드 이름을 사용하지 않고, 일반적인 분석 관점만 다룹니다.
+    </p>
+    <nav>
+      <a href="about.html">About</a>
+      <a href="infofi_mindshare.html">InfoFi &amp; Mindshare</a>
+      <a href="influence_levels.html">영향력 레벨</a>
+      <a href="project_positions.html">프로젝트 포지션</a>
+      <a href="guide.html">사용 가이드</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>1. 프로젝트 포지션이란?</h2>
+    <p>
+      MUDDHA에서 말하는 <strong>프로젝트 포지션</strong>은,
+      투자 포지션이 아니라 <strong>“정보·활동 포지션”</strong>에 가깝습니다.
+    </p>
+    <p>
+      즉,
+      “<strong>내 타임라인과 관심이 어떤 프로젝트 근처에 모여 있는가?</strong>”를 보여주는 지도입니다.
+    </p>
+
+    <h2>2. 어떤 데이터를 참고하나?</h2>
+    <p>
+      실제 구현 버전에 따라 다를 수 있지만, 일반적으로는 다음과 같은 요소들을 참고합니다.
+    </p>
+    <ul>
+      <li>X CSV에서 프로젝트 관련 키워드·티커 언급 빈도</li>
+      <li>기간별(7일·30일·전체 등) 언급량 변화</li>
+      <li>한 프로젝트를 다루는 글의 길이·형태(간단 멘션 vs. 분석형 글)</li>
+      <li>여러 프로젝트 사이에서의 상대적인 비중</li>
+    </ul>
+
+    <h2>3. 섹터 분석</h2>
+    <p>
+      단일 프로젝트만 보는 것보다,
+      <strong>섹터 단위로 나눠서 보는 것이</strong> 중장기 전략에 도움이 되는 경우가 많습니다.
+    </p>
+    <p>MUDDHA는 예를 들어 다음과 같은 식으로 섹터를 묶어 볼 수 있습니다.</p>
+    <ul>
+      <li><span class="pill">L1 · L2</span> 메인 체인 / 레이어</li>
+      <li><span class="pill">DeFi</span> 파생상품, 유동성, 대출 등</li>
+      <li><span class="pill">Infra · Tooling</span> 인프라, 인덱싱, 개발 툴</li>
+      <li><span class="pill">Meme / Culture</span> 밈, 커뮤니티 중심 프로젝트</li>
+      <li><span class="pill">RWA · 기타</span> 실물 자산, 새로운 실험들</li>
+    </ul>
+    <p>
+      사용자가 CSV를 업로드하면, 각 프로젝트를 해당 섹터에 매핑해
+      <strong>“어떤 섹터에 가장 많이 말 걸고 있는지”</strong>를 시각화할 수 있습니다.
+    </p>
+
+    <h2>4. 포지션을 보는 이유</h2>
+    <p>
+      프로젝트 포지션·섹터 분석은,
+      <strong>“지금 내가 무엇에 몰려 있는지”</strong>를 깨닫게 해줍니다.
+    </p>
+    <ul>
+      <li>한 섹터에만 과하게 몰려 있지는 않은지</li>
+      <li>생각보다 신경 쓰지 못했던 분야는 어디인지</li>
+      <li>내가 관심을 끊었는데, 시장은 계속 관심을 주는 섹터는 없는지</li>
+    </ul>
+    <p>
+      이런 질문을 던져보는 것만으로도,
+      다음 사이클을 준비하는 데 중요한 힌트를 얻을 수 있습니다.
+    </p>
+
+    <h2>5. MUDDHA의 역할</h2>
+    <p>
+      MUDDHA는 외부 리더보드나 점수를 재생산하는 도구가 아니라,
+      <strong>내 활동 기록에 기반한 “개인용 포지션 뷰어”</strong>에 가깝습니다.
+    </p>
+    <p>
+      사용자의 CSV·활동 데이터를 바탕으로,
+      각 프로젝트·섹터에 대한 나만의 지도를 만들어 주는 조용한 보조 도구입니다.
+    </p>
+  </main>
+
+  <footer>
+    이 페이지는 MUDDHA의 일반적인 분석 방향을 설명하기 위한 문서입니다.
+  </footer>
+</body>
+</html>
